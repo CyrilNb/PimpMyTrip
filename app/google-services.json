@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "587270424566",
+    "firebase_url": "https://pimpmytrip-33d56.firebaseio.com",
+    "project_id": "pimpmytrip-33d56",
+    "storage_bucket": "pimpmytrip-33d56.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:587270424566:android:75e8961c1437c3b5",
+        "android_client_info": {
+          "package_name": "fr.univtln.cniobechoudayer.pimpmytrip"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "587270424566-nu0h0rqa283asrahslfp360d0idkr0gr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDabBMkUpUkGTHbK7XKsuBa4svoq4SE5LM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
