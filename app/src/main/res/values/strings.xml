@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">PimpMyTrip</string>
+
+    <!-- NAVIGATION DRAWER -->
+    <string name="titleMap">Map</string>
+    <string name="titleRefTrips">Reference Trips</string>
+    <string name="titleMyTrips">My Trips</string>
+    <string name="titleAR">Augmented Reality</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- STATISTICS -->
 </resources>
