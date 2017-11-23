@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">PimpMyTrip</string>
-    <string name="action_sign_in_short">Register</string>
+    <string name="action_sign_up_short">Register</string>
+    <string name="action_sign_in_short">Sign in</string>
     <string name="email">Email</string>
     <string name="minimum_password">Password too short, enter minimum 6 characters!</string>
     <string name="auth_failed">Authentication failed, check your email and password or sign up</string>
@@ -16,7 +17,7 @@
     <string name="hint_name">Fullname</string>
     <string name="btn_login">LOGIN</string>
     <string name="btn_link_to_register">Not a member yet ? Get registered now!</string>
-    <string name="btn_link_to_login">Already registered. Sign in!</string>
+    <string name="btn_link_to_login">Already registered ? Sign in!</string>
     <string name="title_activity_reset_password">ResetPasswordActivity</string>
     <string name="btn_forgot_password">Forgot your password?</string>
     <string name="btn_reset_password">Reset Password</string>
@@ -26,6 +27,9 @@
     <string name="btn_send">Send</string>
     <string name="btn_remove">Remove</string>
     <string name="btn_sign_out">Sign Out</string>
-    <string name="lbl_forgot_password">Forgot password?</string>
-    <string name="forgot_password_msg">We just need your registered Email Id to sent you password reset instructions.</string>
+    <string name="label_forgot_password">Forgot password ?</string>
+    <string name="forgot_password_msg">We just need your registered Email to sent you password reset instructions.</string>
+    <string name="hint_confirmPassword">Confirm password</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="prompt_password">Current password</string>
 </resources>
