@@ -1,5 +1,8 @@
 <resources>
+    <!-- GENERAL -->
     <string name="app_name">PimpMyTrip</string>
+
+    <!-- Authentication -->
     <string name="action_sign_up_short">Register</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="email">Email</string>
@@ -30,6 +33,9 @@
     <string name="label_forgot_password">Forgot password ?</string>
     <string name="forgot_password_msg">We just need your registered Email to sent you password reset instructions.</string>
     <string name="hint_confirmPassword">Confirm password</string>
-    <string name="title_activity_maps">Map</string>
     <string name="prompt_password">Current password</string>
+
+    <!-- Google Map -->
+    <string name="title_activity_maps">Map</string>
+
 </resources>
