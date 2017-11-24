@@ -5,5 +5,5 @@ package fr.univtln.cniobechoudayer.pimpmytrip.Utils;
  * Created by Cyril Niobé on 21/11/2017.
  */
 
-public class Helper {
+public class Utils {
 }
