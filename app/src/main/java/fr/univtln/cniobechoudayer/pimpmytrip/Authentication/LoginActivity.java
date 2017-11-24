@@ -16,8 +16,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-
-import fr.univtln.cniobechoudayer.pimpmytrip.Activities.MapsActivity;
+import fr.univtln.cniobechoudayer.pimpmytrip.Activities.MainActivity;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 
 /**
@@ -123,7 +122,8 @@ public class LoginActivity extends AppCompatActivity {
                             if (!task.isSuccessful()) {
                                     Toast.makeText(LoginActivity.this, getString(R.string.auth_failed), Toast.LENGTH_LONG).show();
                             }else {
-                                Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
+
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 startActivity(intent);
                                 finish();
                             }
