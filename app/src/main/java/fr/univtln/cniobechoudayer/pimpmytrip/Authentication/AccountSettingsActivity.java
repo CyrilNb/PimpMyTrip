@@ -4,12 +4,12 @@ package fr.univtln.cniobechoudayer.pimpmytrip.Authentication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -17,14 +17,18 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.Utils.Utils;
 
 public class AccountSettingsActivity extends AppCompatActivity {
+    private static final int REQUEST_REVOKE_ACESS_GOOGLE = 2;
 
     private Button btnChangeEmail, btnChangePassword, btnSendResetEmail, btnRemoveUser,
-            changeEmail, changePassword, sendEmail, remove, signOut;
+            changeEmail, changePassword, sendEmail, remove, signOut, btnRevokeAccessGoogle;
 
     private EditText oldEmail, newEmail, password, newPassword;
     private ProgressBar progressBar;
+    private CoordinatorLayout coordinatorLayout;
+
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
 
@@ -37,6 +41,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
         btnChangePassword = (Button) findViewById(R.id.change_password_button);
         btnSendResetEmail = (Button) findViewById(R.id.sending_pass_reset_button);
         btnRemoveUser = (Button) findViewById(R.id.remove_user_button);
+        btnRevokeAccessGoogle = (Button) findViewById(R.id.revoke_access_google);
         changeEmail = (Button) findViewById(R.id.changeEmail);
         changePassword = (Button) findViewById(R.id.changePass);
         sendEmail = (Button) findViewById(R.id.send);
@@ -58,11 +63,11 @@ public class AccountSettingsActivity extends AppCompatActivity {
         remove.setVisibility(View.GONE);
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayoutSettings);
 
         if (progressBar != null) {
             progressBar.setVisibility(View.GONE);
         }
-
 
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
@@ -107,11 +112,11 @@ public class AccountSettingsActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        Toast.makeText(AccountSettingsActivity.this, "Email address is updated. Please sign in with new email!", Toast.LENGTH_LONG).show();
+                                        Utils.displayErrorMessage(getApplicationContext(),AccountSettingsActivity.this,coordinatorLayout,"Email address is updated. Please sign in with new email!");
                                         signOut();
                                         progressBar.setVisibility(View.GONE);
                                     } else {
-                                        Toast.makeText(AccountSettingsActivity.this, "Failed to update email!", Toast.LENGTH_LONG).show();
+                                        Utils.displayErrorMessage(getApplicationContext(),AccountSettingsActivity.this,coordinatorLayout,"Failed to update email!");
                                         progressBar.setVisibility(View.GONE);
                                     }
                                 }
@@ -151,11 +156,11 @@ public class AccountSettingsActivity extends AppCompatActivity {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
-                                            Toast.makeText(AccountSettingsActivity.this, "Password is updated, sign in with new password!", Toast.LENGTH_SHORT).show();
+                                            Utils.displayErrorMessage(getApplicationContext(),AccountSettingsActivity.this,coordinatorLayout,"Password is updated, sign in with new password!");
                                             signOut();
                                             progressBar.setVisibility(View.GONE);
                                         } else {
-                                            Toast.makeText(AccountSettingsActivity.this, "Failed to update password!", Toast.LENGTH_SHORT).show();
+                                            Utils.displayErrorMessage(getApplicationContext(),AccountSettingsActivity.this,coordinatorLayout,"Failed to update password!");
                                             progressBar.setVisibility(View.GONE);
                                         }
                                     }
@@ -192,10 +197,10 @@ public class AccountSettingsActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        Toast.makeText(AccountSettingsActivity.this, "Reset password email is sent!", Toast.LENGTH_SHORT).show();
+                                        Utils.displayErrorMessage(getApplicationContext(),AccountSettingsActivity.this,coordinatorLayout,"Reset password email is sent!");
                                         progressBar.setVisibility(View.GONE);
                                     } else {
-                                        Toast.makeText(AccountSettingsActivity.this, "Failed to send reset email!", Toast.LENGTH_SHORT).show();
+                                        Utils.displayErrorMessage(getApplicationContext(),AccountSettingsActivity.this,coordinatorLayout,"Failed to send reset email!");
                                         progressBar.setVisibility(View.GONE);
                                     }
                                 }
@@ -217,12 +222,12 @@ public class AccountSettingsActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        Toast.makeText(AccountSettingsActivity.this, "Your profile is deleted :( Create an account now!", Toast.LENGTH_SHORT).show();
+                                        Utils.displayErrorMessage(getApplicationContext(),AccountSettingsActivity.this,coordinatorLayout,"Your profile is deleted :(");
                                         startActivity(new Intent(AccountSettingsActivity.this, SignUpActivity.class));
                                         finish();
                                         progressBar.setVisibility(View.GONE);
                                     } else {
-                                        Toast.makeText(AccountSettingsActivity.this, "Failed to delete your account!", Toast.LENGTH_SHORT).show();
+                                        Utils.displayErrorMessage(getApplicationContext(),AccountSettingsActivity.this,coordinatorLayout,"Failed to remove account");
                                         progressBar.setVisibility(View.GONE);
                                     }
                                 }
@@ -238,11 +243,43 @@ public class AccountSettingsActivity extends AppCompatActivity {
             }
         });
 
+        btnRevokeAccessGoogle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                revokeAccess();
+            }
+        });
+
     }
 
     //sign out method
     public void signOut() {
-        auth.signOut();
+        if (LoginActivity.googleApiClient != null && LoginActivity.googleApiClient.isConnected()) //has to be only one instance of googleApiClient in the app
+            {
+            LoginActivity.googleSignInClient.signOut()
+                    .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Intent intent = new Intent(AccountSettingsActivity.this, LoginActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+            } else {
+            auth.signOut();
+        }
+    }
+
+    private void revokeAccess() {
+        LoginActivity.googleSignInClient.revokeAccess()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Intent intent = new Intent(AccountSettingsActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
     }
 
     @Override
@@ -264,4 +301,5 @@ public class AccountSettingsActivity extends AppCompatActivity {
             auth.removeAuthStateListener(authListener);
         }
     }
+
 }

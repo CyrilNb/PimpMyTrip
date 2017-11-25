@@ -4,6 +4,7 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayoutLogin"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -24,7 +25,7 @@
             android:layout_gravity="center_horizontal"
             android:src="@mipmap/ic_launcher" />
 
-        <!-- Email -->
+        <!-- EMAIL EDITTEXT -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -39,7 +40,7 @@
         </android.support.design.widget.TextInputLayout>
 
 
-        <!-- Password -->
+        <!-- PASSWORD EDITTEXT -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -56,7 +57,7 @@
                 android:textColor="@android:color/white" />
         </android.support.design.widget.TextInputLayout>
 
-
+        <!-- SIGN IN BUTTON -->
         <Button
             android:id="@+id/sign_in_button"
             style="?android:textAppearanceSmall"
@@ -68,7 +69,8 @@
             android:textColor="@android:color/black"
             android:textStyle="bold" />
 
-        <Button
+        <!-- GOOGLE BUTTON -->
+       <Button
             android:id="@+id/sign_in_with_google_button"
             style="?android:textAppearanceSmall"
             android:layout_width="match_parent"
@@ -79,6 +81,7 @@
             android:textColor="@android:color/black"
             android:textStyle="bold" />
 
+        <!-- RESET PASSWORD BUTTON -->
         <Button
             android:id="@+id/btn_reset_password"
             android:layout_width="fill_parent"
@@ -89,7 +92,7 @@
             android:textAllCaps="false"
             android:textColor="@color/colorAccent" />
 
-        <!-- Link to Signup Screen -->
+        <!-- SIGNUP BUTTON -->
         <Button
             android:id="@+id/sign_up_button_from_login"
             android:layout_width="fill_parent"

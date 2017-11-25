@@ -2,6 +2,7 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayoutSettings"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -139,6 +140,15 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@string/remove_user"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/revoke_access_google"
+            style="?android:textAppearanceSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/revoke_google_access"
             android:textStyle="bold" />
 
         <Button

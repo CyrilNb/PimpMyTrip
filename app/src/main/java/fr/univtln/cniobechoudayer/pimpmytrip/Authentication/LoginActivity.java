@@ -3,6 +3,8 @@ package fr.univtln.cniobechoudayer.pimpmytrip.Authentication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -10,57 +12,103 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.Toast;
-
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
-import fr.univtln.cniobechoudayer.pimpmytrip.Activities.MapsActivity;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.Utils.Utils;
+
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 /**
  * Login Activity
  * Created by Cyril Niobé on 23/11/2017.
  */
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
+    private static final int RC_SIGN_IN = 007;
 
-    EditText emailEditText, passwordEditText;
-    Button loginButton, signupButton, btnSignInWithGoogle, btnForgotPassword;
-    String email;
-    String password;
+    private EditText emailEditText, passwordEditText;
+    private Button btnLogin, btnSignup, btnForgotPassword;
+    private Button btnSignInWithGoogle;
+    private String email;
+    private String password;
+    private ProgressBar progressBar;
+    private CoordinatorLayout rootView;
 
+    //FirebaseAuth
     private FirebaseAuth auth;
-    ProgressBar progressBar;
+    public static GoogleSignInClient googleSignInClient;
+    public static GoogleApiClient googleApiClient;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        rootView = (CoordinatorLayout) findViewById(R.id.coordinatorLayoutLogin);
         progressBar = (ProgressBar) findViewById(R.id.progressBarLogin);
         emailEditText = (EditText) findViewById(R.id.editTxtEmailLogin);
         passwordEditText = (EditText) findViewById(R.id.editTxtPasswordLogin);
-        loginButton = (Button) findViewById(R.id.sign_in_button);
-        signupButton = (Button) findViewById(R.id.sign_up_button_from_login);
-        btnSignInWithGoogle = (Button) findViewById(R.id.sign_in_with_google_button);
+        btnLogin = (Button) findViewById(R.id.sign_in_button);
+        btnSignup = (Button) findViewById(R.id.sign_up_button_from_login);
+        btnSignInWithGoogle = (Button)findViewById(R.id.sign_in_with_google_button);
         btnForgotPassword = (Button) findViewById(R.id.btn_reset_password);
 
         auth = FirebaseAuth.getInstance();
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        // Configure Google Sign In
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        googleSignInClient = GoogleSignIn.getClient(LoginActivity.this, gso);
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        Utils.displayErrorMessage(getApplicationContext(),LoginActivity.this,rootView,"Failed to connect");
+                    }
+                })
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        Utils.displayErrorMessage(getApplicationContext(),LoginActivity.this,rootView,"Failed to connect");
+                    }
+                })
+                .build();
+
+        btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                login();
+                loginWithEmail();
+            }
+        });
+        btnSignInWithGoogle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loginWithGoogle();
             }
         });
 
-        signupButton.setOnClickListener(new View.OnClickListener() {
+        btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Start the Signup activity
@@ -89,26 +137,54 @@ public class LoginActivity extends AppCompatActivity {
         moveTaskToBack(true);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = auth.getCurrentUser();
+        //TODO launch mapsfragment
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = auth.getCurrentUser();
+        //TODO launch mapsfragment
+
+    }
+
+    /**
+     * Validates all inputs (email and password here) if they are not empty and in the expected format.
+     *
+     * @return true if it's ok or false if there is an error
+     */
     private boolean validateInputs() {
         boolean valid = true;
 
-        if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches())
-        {
+        if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             emailEditText.setError("Enter a valid email address");
             valid = false;
-        } else
-        {
+        } else {
             emailEditText.setError(null);
         }
+
+        if (TextUtils.isEmpty(password)) {
+            passwordEditText.setError("Enter a password");
+            valid = false;
+        } else {
+            passwordEditText.setError(null);
+        }
+
         return valid;
     }
 
-    private void login(){
+    private void loginWithEmail() {
         Log.d(TAG, "Login");
         email = emailEditText.getText().toString();
         password = passwordEditText.getText().toString();
 
-        if(validateInputs()) {
+        if (validateInputs()) {
             progressBar.setVisibility(View.VISIBLE);
 
             //authenticate user
@@ -121,28 +197,77 @@ public class LoginActivity extends AppCompatActivity {
                             // signed in user can be handled in the listener.
                             progressBar.setVisibility(View.GONE);
                             if (!task.isSuccessful()) {
-                                    Toast.makeText(LoginActivity.this, getString(R.string.auth_failed), Toast.LENGTH_LONG).show();
-                            }else {
-                                Intent intent = new Intent(LoginActivity.this, MapsActivity.class);
+                                Utils.displayErrorMessage(getApplicationContext(),LoginActivity.this,rootView,getResources().getString(R.string.auth_failed));
+                            } else {
+                                Intent intent = new Intent(LoginActivity.this, AccountSettingsActivity.class);
                                 startActivity(intent);
                                 finish();
                             }
                         }
                     });
 
-        }else{
-            Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
+        } else {
+            Utils.displayErrorMessage(getApplicationContext(),LoginActivity.this,rootView,"Login failed");
+    }
+
+}
+
+    private void loginWithGoogle() {
+            Intent signInIntent = googleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                firebaseAuthWithGoogle(account);
+            } catch (ApiException e) {
+                // Google Sign In failed, update UI appropriately
+                Log.w(TAG, "Google sign in failed", e);
+                Utils.displayErrorMessage(getApplicationContext(),LoginActivity.this,rootView,"Google sign in failed");
+            }
         }
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_SIGNUP) {
-            if (resultCode == RESULT_OK) {
-                // TODO: Implement successful signup logic here
-                // By default we just finish the Activity and log them in automatically
-                this.finish();
-            }
-        }
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
+        // be available.
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
     }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+        progressBar.setVisibility(View.VISIBLE);
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        auth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "signInWithCredential:success");
+                            FirebaseUser user = auth.getCurrentUser();
+                            progressBar.setVisibility(View.GONE);
+                            Intent intent = new Intent(LoginActivity.this, AccountSettingsActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            progressBar.setVisibility(View.GONE);
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInWithCredential:failure", task.getException());
+                            Utils.displayErrorMessage(getApplicationContext(),LoginActivity.this,rootView,"Authentication failed");
+                        }
+                    }
+                });
+    }
+
+
 }
