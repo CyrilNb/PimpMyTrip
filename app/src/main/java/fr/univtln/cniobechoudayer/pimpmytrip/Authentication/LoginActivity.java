@@ -25,7 +25,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
+import fr.univtln.cniobechoudayer.pimpmytrip.Activities.MainActivity;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.Utils.Utils;
 
@@ -198,8 +198,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             progressBar.setVisibility(View.GONE);
                             if (!task.isSuccessful()) {
                                 Utils.displayErrorMessage(getApplicationContext(),LoginActivity.this,rootView,getResources().getString(R.string.auth_failed));
-                            } else {
-                                Intent intent = new Intent(LoginActivity.this, AccountSettingsActivity.class);
+                            }
+                            else {
+
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 startActivity(intent);
                                 finish();
                             }

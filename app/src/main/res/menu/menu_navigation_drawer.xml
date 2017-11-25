@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+            <item
+                android:id="@+id/tabMap"
+                android:icon="@drawable/map"
+                android:title="@string/titleMap"
+                android:actionMenuTextColor="#541D5D"/>
+            <item
+                android:id="@+id/tabRefTrips"
+                android:icon="@drawable/ic_timeline_black_48dp"
+                android:title="@string/titleRefTrips"
+                android:actionMenuTextColor="#541D5D"/>
+            <item
+                android:id="@+id/tabMyTrips"
+                android:icon="@drawable/ic_history_black_48dp"
+                android:title="@string/titleMyTrips"
+                android:actionMenuTextColor="#541D5D"/>
+            <item
+                android:id="@+id/tabAR"
+                android:icon="@drawable/ic_remove_red_eye_black_48dp"
+                android:title="@string/titleAR"
+                android:actionMenuTextColor="#541D5D"/>
+
+</menu>
