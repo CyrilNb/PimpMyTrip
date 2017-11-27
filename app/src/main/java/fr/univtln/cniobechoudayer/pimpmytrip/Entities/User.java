@@ -7,19 +7,45 @@ import android.graphics.Bitmap;
  * Created by Cyril Niobé on 22/11/2017.
  */
 
-//abstract ? donc un seul host ? un utilisateur peut pas devenir organisateur a tout moment ?
 public class User {
 
-    /**
-     * MEMBERS
-     */
+    /***********
+     * MEMBERS *
+     ***********/
+
     private int idUser;
     private String pseudo;
+    private String email;
     private Bitmap photo;
 
     /**
-     * GETTER AND SETTER
+     * Constructor of a user
+     * @param email email of the user
+     * @param pseudo pseudo of the user
      */
+    public User(String pseudo,String email) {
+        this.pseudo = pseudo;
+        this.email = email;
+    }
+
+    /**
+     * Constructor of a user
+     * @param email email of the user
+     */
+    public User(String email){
+        this.email = email;
+    }
+
+    /**
+     * Default constructor required for calls to
+     * DataSnapshot.getValue(User.class)
+     */
+    public User() {
+    }
+
+    /*********************
+     * GETTER AND SETTER *
+     *********************/
 
     /**
      * Get the id of the user
@@ -35,6 +61,22 @@ public class User {
      */
     private void setIdUser(int idUser) {
         this.idUser = idUser;
+    }
+
+    /**
+     * Get the email of the user
+     * @return email
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * Set the email of the user
+     * @param email
+     */
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     /**
@@ -69,16 +111,7 @@ public class User {
         this.photo = photo;
     }
 
-    //TODO BUILDER pattern
-    /**
-     * Constructor of a user
-     * @param idUser
-     * @param pseudo
-     */
-    public User(int idUser, String pseudo) {
-        this.idUser = idUser;
-        this.pseudo = pseudo;
-    }
+
 
     @Override
     public boolean equals(Object o) {
