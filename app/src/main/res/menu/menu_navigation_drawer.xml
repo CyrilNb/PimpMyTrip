@@ -1,25 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainMenuNavDrawer">
 
             <item
                 android:id="@+id/tabMap"
                 android:icon="@drawable/map"
-                android:title="@string/titleMap"
-                android:actionMenuTextColor="#541D5D"/>
+                android:title="@string/titleMap"/>
             <item
                 android:id="@+id/tabRefTrips"
                 android:icon="@drawable/ic_timeline_black_48dp"
-                android:title="@string/titleRefTrips"
-                android:actionMenuTextColor="#541D5D"/>
+                android:title="@string/titleRefTrips"/>
             <item
                 android:id="@+id/tabMyTrips"
                 android:icon="@drawable/ic_history_black_48dp"
-                android:title="@string/titleMyTrips"
-                android:actionMenuTextColor="#541D5D"/>
+                android:title="@string/titleMyTrips"/>
             <item
                 android:id="@+id/tabAR"
                 android:icon="@drawable/ic_remove_red_eye_black_48dp"
-                android:title="@string/titleAR"
-                android:actionMenuTextColor="#541D5D"/>
+                android:title="@string/titleAR"/>
+    <item android:title="@string/titleManagementCateg"
+        android:id="@+id/managementTripsCateg">
+        <menu>
+            <item
+                android:id="@+id/titleTripsAdd"
+                android:icon="@drawable/ic_create_black_48dp"
+                android:title="@string/titleTripsAdd"/>
+            <item
+                android:id="@+id/titleTripsManagement"
+                android:icon="@drawable/ic_dashboard_black_48dp"
+                android:title="@string/titleTripsManagement"/>
+        </menu>
+    </item>
 
 </menu>

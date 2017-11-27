@@ -12,17 +12,25 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+
 import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.MapFragment;
+import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.ProfileFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.RefTripsFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.Utils.CircleTransform;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private NavigationView navigationView;
     private Toolbar toolbar;
     private DrawerLayout drawer;
+
+    private ImageView imageViewProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,17 +53,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         /**
          * Checking if user is a trip manager
          */
-        if(checkIfUserIsManager()){
+        if(!checkIfUserIsManager()){
             Menu navMenu = navigationView.getMenu();
-            Menu subManagementMenu = navMenu.addSubMenu(getResources().getString(R.string.titleManagementCateg));
-            subManagementMenu.add(getResources().getString(R.string.titleTripsAdd));
-            subManagementMenu.add(getResources().getString(R.string.titleTripsManagement));
+            navMenu.findItem(R.id.managementTripsCateg).setVisible(false);
         }
 
         /**
          * Displaying default fragment once MainActivity is loaded
          */
         displayFragment(new MapFragment());
+
+        /**
+         * Getting header and loading picture //TODO avoid drawer lagging
+         */
+        View header = navigationView.getHeaderView(0);
+        imageViewProfile = (ImageView) header.findViewById(R.id.imageView);
+        if(imageViewProfile != null)
+          Picasso.with(this).load(R.drawable.test_profile).transform(new CircleTransform()).into(imageViewProfile);
+
+        //Setting listener to display from on nav header click
+        header.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawer.closeDrawer(GravityCompat.START);
+                displayFragment(ProfileFragment.getInstance());
+            }
+        });
 
     }
 
