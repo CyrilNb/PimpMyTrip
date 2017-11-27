@@ -21,6 +21,7 @@ import com.squareup.picasso.Picasso;
 import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.MapFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.ProfileFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.RefTripsFragment;
+import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.TripsFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.Utils.CircleTransform;
 
@@ -101,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 displayFragment(RefTripsFragment.getInstance());
                 break;
             case R.id.tabMyTrips:
-                //TODO
+                displayFragment(TripsFragment.getInstance());
                 break;
             case R.id.tabAR:
                 //TODO
