@@ -17,6 +17,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Trip;
@@ -52,9 +53,9 @@ public class RefTripsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         refTripsList = new ArrayList<>();
-        Trip trip= new Trip("#26ae90","testvkavbka",true,10.8);
-        Trip trip2= new Trip("#428bca","USABITCHES",true,1.5);
-        Trip trip3= new Trip("#ff6861","testvkavbka",true,10.8);
+        Trip trip = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
+        Trip trip2 = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
+        Trip trip3 = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
         System.out.println("color:"+trip.getColor());
         refTripsList.add(trip);
         refTripsList.add(trip2);

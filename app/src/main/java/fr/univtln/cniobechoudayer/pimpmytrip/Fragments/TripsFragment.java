@@ -18,6 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Trip;
@@ -55,12 +56,12 @@ public class TripsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsList = new ArrayList<>();
-        Trip trip= new Trip("#26ae90","Mon Super trip",true,10.8);
-        Trip trip2= new Trip("#428bca","Test trip",true,1.5);
-        Trip trip3= new Trip("#ff6861","Paris marseille easy",true,10.8);
-        Trip trip4= new Trip("#ffdbaf","Lyon Vichy",true,10.8);
-        Trip trip5= new Trip("#0097a7","Lac leman",true,10.8);
-        Trip trip6= new Trip("#ffdbaf","Mont victoire",true,10.8);
+        Trip trip = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
+        Trip trip2 = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
+        Trip trip3 = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
+        Trip trip4 = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
+        Trip trip5 = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
+        Trip trip6 = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
         tripsList.add(trip);
         tripsList.add(trip2);
         tripsList.add(trip3);

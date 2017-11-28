@@ -35,7 +35,7 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
     public void onBindViewHolder(MyHolder holder, int position) {
         Trip trip = listTrips.get(position);
         holder.nameRefTrip.setText(trip.getName());
-        String distanceToDisplay = Double.toString(trip.getDistance()) + " kms";
+        String distanceToDisplay = Double.toString(trip.getDistanceInMeters()) + " kms";
         holder.distanceRefTrip.setText(distanceToDisplay);
         holder.imgView.setBackgroundColor(Color.parseColor(trip.getColor()));
     }

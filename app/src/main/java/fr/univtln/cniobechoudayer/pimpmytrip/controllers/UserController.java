@@ -23,7 +23,7 @@ public class UserController {
     private FirebaseAuth firebaseAuth;
     private DatabaseReference database;
     private FirebaseUser currentUser;
-    private String currentUserId;
+    private static String currentUserId;
 
     //TODO singleton
     public UserController() {
@@ -94,6 +94,10 @@ public class UserController {
                 Log.e(TAG, "Failed to read user", error.toException());
             }
         });
+    }
+
+    public static String getConnectedUserId(){
+        return currentUserId;
     }
 
 }

@@ -149,4 +149,10 @@
     <string name="revoke_google_access">Disconnect your Google account</string>
     <string name="google_maps_key">AIzaSyBPccZZOBlcIpH-Tvm8m5d4cU_CXMkllxc</string>
 
+    <!-- Trips Management -->
+    <string name="nameTabTripCreation">Create</string>
+    <string name="nameTabTripManagement">Manage</string>
+        <!-- Floating Action Menu -->
+    <string name="nameFABsaveTrip">Save</string>
+    <string name="nameFABdeleteTrip">Reset</string>
 </resources>

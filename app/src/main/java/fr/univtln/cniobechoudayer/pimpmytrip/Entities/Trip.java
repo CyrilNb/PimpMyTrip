@@ -1,51 +1,39 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.Entities;
 
-import android.graphics.Color;
-
 import java.util.Date;
+import java.util.List;
 
 public class Trip {
 
-    private int idTrip;
-    private boolean isReference;
+    private boolean reference;
     private String name;
     private Date creationDate;
-    private int duration;
-    private double distance;
+    private int durationInSeconds;
+    private int distanceInMeters;
     private String color;
+    private List<Position> listPositions;
+    private List<Waypoint> listWaypoints;
+    private String creatorId;
 
-    // Default constructor required for calls to DataSnapshot.getValue(User.class)
-    public Trip(){}
+    public Trip() {
+    }
 
-    //TODO builder
-    public Trip(String color, Date creationDate, String name, boolean isReference) {
+    public Trip(String color, Date creationDate, String name, boolean isReference, List<Position> listPositions, List<Waypoint> listMarkers, String creatorId) {
         this.color = color;
         this.creationDate = creationDate;
         this.name = name;
-        this.isReference = isReference;
-    }
-
-    public Trip(String color, String name, boolean isReference, double distance) {
-        this.color = color;
-        this.name = name;
-        this.isReference = isReference;
-        this.distance = distance;
-    }
-
-    public int getIdTrip() {
-        return idTrip;
-    }
-
-    public void setIdTrip(int idTrip) {
-        this.idTrip = idTrip;
+        this.reference = isReference;
+        this.listPositions = listPositions;
+        this.listWaypoints = listMarkers;
+        this.creatorId = creatorId;
     }
 
     public boolean isReference() {
-        return isReference;
+        return reference;
     }
 
     public void setIsReference(boolean isReference) {
-        this.isReference = isReference;
+        this.reference = isReference;
     }
 
     public String getName() {
@@ -64,22 +52,25 @@ public class Trip {
         this.creationDate = creationDate;
     }
 
-    public int getDuration() {
-        return duration;
+    public void setReference(boolean reference) {
+        this.reference = reference;
     }
 
-    public void setDuration(int duration) {
-        this.duration = duration;
+    public int getDurationInSeconds() {
+        return durationInSeconds;
     }
 
-    public double getDistance() {
-        return distance;
+    public void setDurationInSeconds(int durationInSeconds) {
+        this.durationInSeconds = durationInSeconds;
     }
 
-    public void setDistance(double distance) {
-        this.distance = distance;
+    public int getDistanceInMeters() {
+        return distanceInMeters;
     }
 
+    public void setDistanceInMeters(int distanceInMeters) {
+        this.distanceInMeters = distanceInMeters;
+    }
 
     public String getColor() {
         return color;
@@ -89,14 +80,27 @@ public class Trip {
         this.color = color;
     }
 
-    @Override
-    public String toString() {
-        return "Trip{" +
-                "idTrip=" + idTrip +
-                ", isReference=" + isReference +
-                ", name='" + name + '\'' +
-                ", duration=" + duration +
-                ", distance=" + distance +
-                '}';
+    public List<Position> getListPositions() {
+        return listPositions;
+    }
+
+    public void setListPositions(List<Position> listPositions) {
+        this.listPositions = listPositions;
+    }
+
+    public List<Waypoint> getListWaypoints() {
+        return listWaypoints;
+    }
+
+    public void setListWaypoints(List<Waypoint> listWaypoints) {
+        this.listWaypoints = listWaypoints;
+    }
+
+    public String getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
     }
 }

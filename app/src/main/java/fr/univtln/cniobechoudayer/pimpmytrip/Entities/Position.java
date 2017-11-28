@@ -2,15 +2,18 @@ package fr.univtln.cniobechoudayer.pimpmytrip.Entities;
 
 public class Position {
 
-    private float coordX;
-    private float coordY;
+    private double coordX;
+    private double coordY;
 
-    public Position(float coordX, float coordY) {
+    public Position() {
+    }
+
+    public Position(double coordX, double coordY) {
         this.coordX = coordX;
         this.coordY = coordY;
     }
 
-    public float getCoordX() {
+    public double getCoordX() {
         return coordX;
     }
 
@@ -18,7 +21,7 @@ public class Position {
         this.coordX = coordX;
     }
 
-    public float getCoordY() {
+    public double getCoordY() {
         return coordY;
     }
 
