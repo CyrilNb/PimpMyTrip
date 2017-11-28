@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.CreationTripFragment;
+import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.ManagerTripFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.MapFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.ProfileFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.RefTripsFragment;
@@ -105,6 +107,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.tabAR:
                 //TODO
+                break;
+            case R.id.titleTripsManagement:
+                displayFragment(ManagerTripFragment.getInstance());
                 break;
         }
 

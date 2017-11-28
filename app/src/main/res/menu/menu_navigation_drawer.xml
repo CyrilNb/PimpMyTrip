@@ -23,10 +23,6 @@
         android:id="@+id/managementTripsCateg">
         <menu>
             <item
-                android:id="@+id/titleTripsAdd"
-                android:icon="@drawable/ic_create_black_48dp"
-                android:title="@string/titleTripsAdd"/>
-            <item
                 android:id="@+id/titleTripsManagement"
                 android:icon="@drawable/ic_dashboard_black_48dp"
                 android:title="@string/titleTripsManagement"/>

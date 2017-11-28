@@ -16,6 +16,9 @@ public class Waypoint {
         this.type = type;
     }
 
+    public Waypoint() {
+    }
+
     public int getIdWayPoint() {
         return idWayPoint;
     }
