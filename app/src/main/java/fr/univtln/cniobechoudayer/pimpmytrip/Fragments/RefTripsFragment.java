@@ -53,9 +53,9 @@ public class RefTripsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         refTripsList = new ArrayList<>();
-        Trip trip = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
-        Trip trip2 = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
-        Trip trip3 = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
+        Trip trip = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
+        Trip trip2 = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
+        Trip trip3 = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
         System.out.println("color:"+trip.getColor());
         refTripsList.add(trip);
         refTripsList.add(trip2);

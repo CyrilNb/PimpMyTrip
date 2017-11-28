@@ -56,12 +56,12 @@ public class TripsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsList = new ArrayList<>();
-        Trip trip = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
-        Trip trip2 = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
-        Trip trip3 = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
-        Trip trip4 = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
-        Trip trip5 = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
-        Trip trip6 = new Trip("F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
+        Trip trip = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
+        Trip trip2 = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
+        Trip trip3 = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
+        Trip trip4 = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
+        Trip trip5 = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
+        Trip trip6 = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, null);
         tripsList.add(trip);
         tripsList.add(trip2);
         tripsList.add(trip3);
