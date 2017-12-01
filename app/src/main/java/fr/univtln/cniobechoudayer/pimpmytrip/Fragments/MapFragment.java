@@ -77,8 +77,6 @@ public class MapFragment extends Fragment implements View.OnClickListener {
 
     private DatabaseReference dbTrips = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
 
-
-
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
 
     public MapFragment() {

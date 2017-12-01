@@ -32,7 +32,7 @@
                 android:paddingTop="@dimen/album_title_padding"
                 android:text="Name of the trip"
                 android:textColor="@color/trip_title"
-                android:textSize="@dimen/trip_title"
+                android:textSize="@dimen/refTrip_title"
                 android:layout_below="@+id/thumbnail_cardview_reftrip" />
 
             <TextView
