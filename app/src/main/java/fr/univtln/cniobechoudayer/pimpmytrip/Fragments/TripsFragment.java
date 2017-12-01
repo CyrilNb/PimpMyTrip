@@ -6,6 +6,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,7 @@ import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerAdapterRefTrip;
 import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerAdapterTrip;
+import fr.univtln.cniobechoudayer.pimpmytrip.callbacks.SimpleItemTouchHelperCallback;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -68,17 +70,46 @@ public class TripsFragment extends Fragment {
         tripsList.add(trip4);
         tripsList.add(trip5);
         tripsList.add(trip6);
+    }
 
-        /*database = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        //tripsList = new ArrayList<>();
+        View rootView = inflater.inflate(R.layout.fragment_trips, container, false);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerViewTrips);
+        adapterTrip = new RecyclerAdapterTrip(tripsList, getActivity());
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(adapterTrip);
+
+        //For drag and swipe with recyclerView
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapterTrip);
+        ItemTouchHelper touchHelper =  new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(recyclerView);
+        return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        database = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
         database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 //This method is called once with the initial value and again whenever data at this location is updated
-                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                    tripsList.clear();
-                    Trip value = dataSnapshot1.getValue(Trip.class);
-                    //System.out.println(value.getName());
+                for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
+                    Trip currentTrip = tripSnapshot.getValue(Trip.class);
+                    Log.d("listreftrips", String.valueOf(currentTrip.getName()));
+                    if (!currentTrip.isReference()) {
+                        tripsList.add(currentTrip);
+                    }
                 }
+
+                Log.d("listreftrips", String.valueOf(tripsList.size()));
+                adapterTrip.notifyDataSetChanged();
+
             }
 
             @Override
@@ -86,23 +117,8 @@ public class TripsFragment extends Fragment {
                 //Failed to read value
                 Log.d(TAG, "Failed to read value of a trip in RefTripsFargment", databaseError.toException());
             }
-        });*/
-        System.out.println(tripsList.size());
+        });
 
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_trips, container, false);
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerViewTrips);
-        RecyclerAdapterTrip adapterTrip = new RecyclerAdapterTrip(tripsList, getActivity());
-        adapterTrip.notifyDataSetChanged();
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(adapterTrip);
-        System.out.println("reftrips:" + tripsList);
-        return rootView;
     }
 
 }

@@ -18,7 +18,9 @@ public class Trip {
     public Trip() {
     }
 
+    //TODO BUILDER
     public Trip(String color, Date creationDate, String name, boolean isReference, List<Position> listPositions, List<Waypoint> listMarkers, int distance, String creatorId) {
+
         this.color = color;
         this.creationDate = creationDate;
         this.name = name;

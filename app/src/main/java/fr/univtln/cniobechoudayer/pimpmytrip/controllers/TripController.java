@@ -22,7 +22,6 @@ public class TripController {
     private List<Position> listPositions;
 
     public TripController() {
-
         firebaseAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase");
         currentUser = firebaseAuth.getCurrentUser();
