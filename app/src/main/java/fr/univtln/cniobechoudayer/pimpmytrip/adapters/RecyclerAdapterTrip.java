@@ -2,6 +2,8 @@ package fr.univtln.cniobechoudayer.pimpmytrip.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -14,14 +16,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import fr.univtln.cniobechoudayer.pimpmytrip.Activities.MainActivity;
+import fr.univtln.cniobechoudayer.pimpmytrip.Authentication.LoginActivity;
 import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.Utils.Utils;
 import fr.univtln.cniobechoudayer.pimpmytrip.interfaces.ItemTouchHelperAdapter;
+
+import static android.support.design.widget.Snackbar.LENGTH_LONG;
+import static android.support.design.widget.Snackbar.make;
 
 public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTrip.MyHolder> implements ItemTouchHelperAdapter {
 
     List<Trip> listTrips;
     Context context;
+    Trip tripToRemoved;
 
     public RecyclerAdapterTrip(List<Trip> list, Context context) {
         this.listTrips = list;
@@ -72,12 +81,18 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
     }
 
     @Override
-    public void onItemDismiss(int position) {
-        listTrips.remove(position);
+    public void onItemDismiss(final int position) {
+        tripToRemoved = listTrips.get(position);
+        listTrips.remove(tripToRemoved);
         notifyItemRemoved(position);
     }
 
-    public class MyHolder extends RecyclerView.ViewHolder {
+    public void onItemUndoDismiss(final int position){
+        listTrips.add(position,tripToRemoved);
+        notifyItemInserted(position);
+    }
+
+    class MyHolder extends RecyclerView.ViewHolder {
         TextView nameTrip, distanceTrip;
         ImageView imgView;
 
@@ -86,9 +101,7 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
             nameTrip = (TextView) itemView.findViewById(R.id.txtView_name_trip);
             distanceTrip = (TextView) itemView.findViewById(R.id.txtView_distance_trip);
             imgView = (ImageView) itemView.findViewById(R.id.thumbnail_cardview_trip);
-
         }
     }
-
 
 }

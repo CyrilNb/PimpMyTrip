@@ -58,18 +58,24 @@ public class TripsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tripsList = new ArrayList<>();
-        Trip trip = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null,89, null);
-        Trip trip2 = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null,89, null);
-        Trip trip3 = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null,89, null);
-        Trip trip4 = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null,89, null);
-        Trip trip5 = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null,89, null);
-        Trip trip6 = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null,89, null);
+        Trip trip = new Trip("#7F7F00", Calendar.getInstance().getTime(), "Mon super trip 1", true, null, null,89, null);
+        Trip trip2 = new Trip("#7F7F00", Calendar.getInstance().getTime(), "Mon super trip 2", true, null, null,89, null);
+        Trip trip3 = new Trip("#7F7F00", Calendar.getInstance().getTime(), "Mon super trip 3", true, null, null,89, null);
+        Trip trip4 = new Trip("#7F7F00", Calendar.getInstance().getTime(), "Mon super trip 4", true, null, null,89, null);
+        Trip trip5 = new Trip("#7F7F00", Calendar.getInstance().getTime(), "Mon super trip 5", true, null, null,89, null);
+        Trip trip6 = new Trip("#7F7F00", Calendar.getInstance().getTime(), "Mon super trip 6", true, null, null,89, null);
+        Trip trip7 = new Trip("#7F7F00", Calendar.getInstance().getTime(), "Mon super trip 7", true, null, null,89, null);
+        Trip trip8 = new Trip("#7F7F00", Calendar.getInstance().getTime(), "Mon super trip 8", true, null, null,89, null);
+        Trip trip9 = new Trip("#7F7F00", Calendar.getInstance().getTime(), "Mon super trip 9", true, null, null,89, null);
         tripsList.add(trip);
         tripsList.add(trip2);
         tripsList.add(trip3);
         tripsList.add(trip4);
         tripsList.add(trip5);
         tripsList.add(trip6);
+        tripsList.add(trip7);
+        tripsList.add(trip8);
+        tripsList.add(trip9);
     }
 
     @Override
@@ -84,7 +90,7 @@ public class TripsFragment extends Fragment {
         recyclerView.setAdapter(adapterTrip);
 
         //For drag and swipe with recyclerView
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapterTrip);
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapterTrip,recyclerView);
         ItemTouchHelper touchHelper =  new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(recyclerView);
         return rootView;
@@ -94,7 +100,7 @@ public class TripsFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        database = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
+        /*database = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
         database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -117,7 +123,7 @@ public class TripsFragment extends Fragment {
                 //Failed to read value
                 Log.d(TAG, "Failed to read value of a trip in RefTripsFargment", databaseError.toException());
             }
-        });
+        });*/
 
     }
 
