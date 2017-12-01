@@ -23,6 +23,8 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <service android:name=".Services.RecordUserLocationService"></service>
+
         <activity
             android:name=".Activities.MainActivity"
             android:hardwareAccelerated="true"/>

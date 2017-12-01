@@ -13,19 +13,20 @@ public class Trip {
     private String color;
     private List<Position> listPositions;
     private List<Waypoint> listWaypoints;
-    private String creatorId;
+    private String creator;
 
     public Trip() {
     }
 
-    public Trip(String color, Date creationDate, String name, boolean isReference, List<Position> listPositions, List<Waypoint> listMarkers, String creatorId) {
+    public Trip(String color, Date creationDate, String name, boolean isReference, List<Position> listPositions, List<Waypoint> listMarkers, int distance, String creatorId) {
         this.color = color;
         this.creationDate = creationDate;
         this.name = name;
         this.reference = isReference;
         this.listPositions = listPositions;
         this.listWaypoints = listMarkers;
-        this.creatorId = creatorId;
+        this.creator = creatorId;
+        this.distanceInMeters = distance;
     }
 
     public boolean isReference() {
@@ -96,11 +97,13 @@ public class Trip {
         this.listWaypoints = listWaypoints;
     }
 
-    public String getCreatorId() {
-        return creatorId;
+    public String getCreator() {
+        return creator;
     }
 
-    public void setCreatorId(String creatorId) {
-        this.creatorId = creatorId;
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
+
+
 }

@@ -1,0 +1,4 @@
+<resources>
+    <integer name="intervalRecordingUserByWalk">1000</integer>
+    <integer name="intervalRecordUserBySUV">1000</integer>
+</resources>

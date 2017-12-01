@@ -50,4 +50,17 @@ public class Utils {
             Toast.makeText(activity,message, Toast.LENGTH_SHORT).show();
         }
     }
+
+    public static String formatTripDistance(double distance) {
+        String unit = "m";
+        if (distance < 1) {
+            distance *= 1000;
+            unit = "mm";
+        } else if (distance > 1000) {
+            distance /= 1000;
+            unit = "km";
+        }
+
+        return String.format("%4.3f%s", distance, unit);
+    }
 }

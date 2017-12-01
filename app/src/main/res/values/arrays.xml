@@ -5,4 +5,9 @@
         <item>Warning</item>
         <item>Danger</item>
     </string-array>
+
+    <string-array name="spinnerChoicesTransportationMode">
+        <item>By walk</item>
+        <item>By SUV</item>
+    </string-array>
 </resources>

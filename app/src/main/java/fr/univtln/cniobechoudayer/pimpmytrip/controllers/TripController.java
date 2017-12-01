@@ -39,13 +39,14 @@ public class TripController {
         return singleton;
     }
 
-    public void createTrip(boolean isReference, List<Position> listPositions, List<Waypoint> listMarkers, String color, String name, String creatorId){
-        Trip newTrip = new Trip(color, Calendar.getInstance().getTime(), name, isReference, listPositions, listMarkers, creatorId);
-        database.child("trips").child(currentUserId).setValue(newTrip);
+    public void createTrip(boolean isReference, List<Position> listPositions, List<Waypoint> listMarkers, String color, String name, int distance, String creatorId){
+        Trip newTrip = new Trip(color, Calendar.getInstance().getTime(), name, isReference, listPositions, listMarkers, distance, creatorId);
+        database.child("trips").child(currentUserId).push().setValue(newTrip);
 
     }
 
     public void deleteTrip(String id){
+        //TODO
         database.child("trips").child(currentUserId).removeValue();
     }
 }

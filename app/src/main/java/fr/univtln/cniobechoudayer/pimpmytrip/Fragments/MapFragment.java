@@ -5,6 +5,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -22,9 +23,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -35,10 +38,9 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -51,11 +53,14 @@ import com.pes.androidmaterialcolorpickerdialog.ColorPickerCallback;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Handler;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Position;
 import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Waypoint;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.Services.RecordUserLocationService;
+import fr.univtln.cniobechoudayer.pimpmytrip.Services.UserLocationReceiver;
 import fr.univtln.cniobechoudayer.pimpmytrip.Utils.Utils;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
@@ -71,12 +76,17 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private EditText titleEditText;
     private Button colorButton;
     private AlertDialog.Builder builder;
+    private boolean isUserWalkingForRecordingPath = true;
+    private UserLocationReceiver userLocationReceiver;
 
     private List<Trip> listReferenceTrip;
     private List<Trip> listMyTrips;
+    private IconGenerator factory;
+    private ValueEventListener listenerDbTrips;
+    private ValueEventListener listenerDbMyTrips;
 
     private DatabaseReference dbTrips = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
-
+    private DatabaseReference dbMyTrips = (DatabaseReference) dbTrips.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
 
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
@@ -118,6 +128,8 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         //Setting view for save alert dialog
         titleEditText = new EditText(getContext());
         colorButton = new Button(getContext());
+
+        factory = new IconGenerator(getActivity());
 
         //Get the mapView
         mMapView = (MapView) rootView.findViewById(R.id.mapView);
@@ -192,6 +204,54 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             }
         });
 
+        listenerDbTrips = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
+                    Trip currentTrip = (Trip) tripSnapshot.getValue(Trip.class);
+                    Log.d("New trip retrieved", String.valueOf(currentTrip.getName()));
+                    if (currentTrip.isReference()) {
+                        listReferenceTrip.add(currentTrip);
+                    }
+                }
+
+                Log.d("listReferenceTrip size:", String.valueOf(listReferenceTrip.size()));
+
+                MapFragment myFragment = (MapFragment) getActivity().getSupportFragmentManager().findFragmentByTag("MapFragment");
+                if (myFragment != null && myFragment.isVisible()) {
+                    loadReferenceTrip();
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        listenerDbMyTrips = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
+                    Trip currentTrip = (Trip) tripSnapshot.getValue(Trip.class);
+                    listMyTrips.add(currentTrip);
+                }
+                Log.d("listMyTrips", "updated");
+                MapFragment myFragment = (MapFragment) getActivity().getSupportFragmentManager().findFragmentByTag("MapFragment");
+                if (myFragment != null && myFragment.isVisible()) {
+                    loadMyTrips();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
         return rootView;
     }
 
@@ -231,32 +291,15 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
-        dbTrips.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+        dbMyTrips.addValueEventListener(listenerDbMyTrips);
+        dbTrips.addValueEventListener(listenerDbTrips);
+    }
 
-                for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
-                    Trip currentTrip = (Trip) tripSnapshot.getValue(Trip.class);
-                    Log.d("New trip retrieved", String.valueOf(currentTrip.getName()));
-                    if (currentTrip.isReference()) {
-                        listReferenceTrip.add(currentTrip);
-                    } else if (currentTrip.getCreatorId() == UserController.getConnectedUserId()) {
-                        listMyTrips.add(currentTrip);
-                    }
-                }
-                Log.d("listReferenceTrip size:", String.valueOf(listReferenceTrip.size()));
-                Log.d("listMyTrips size :", String.valueOf(listMyTrips.size()));
-
-                loadReferenceTrip();
-                loadMyTrips();
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+    @Override
+    public void onStop() {
+        super.onStop();
+        dbMyTrips.removeEventListener(listenerDbMyTrips);
+        dbTrips.removeEventListener(listenerDbTrips);
     }
 
     @Override
@@ -284,7 +327,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
 
                     displayAlertDialogSaveTrip();
                 }else{
-                    //TODO start recording trip
+                    displayAlertDialogChoiceTransportationMode();
                     isUserRecording = true;
                     buttonRecordTrip.setImageResource(R.drawable.ic_stop_white_48dp);
                 }
@@ -350,6 +393,56 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
+     * Method that create and displays alert dialog to choose the transporation mode
+     */
+    private void displayAlertDialogChoiceTransportationMode(){
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(getContext());
+        }
+        LinearLayout alertLayout = new LinearLayout(getContext());
+        alertLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(Utils.convertPixelsToDp(20, getContext()), Utils.convertPixelsToDp(40, getContext()), Utils.convertPixelsToDp(20, getContext()), Utils.convertPixelsToDp(40, getContext()));
+        alertLayout.setLayoutParams(params);
+
+        final Spinner choiceTransportationMode = new Spinner(getContext());
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String> (getContext(), android.R.layout.simple_list_item_1 , getResources().getStringArray(R.array.spinnerChoicesTransportationMode));
+        choiceTransportationMode.setAdapter(spinnerArrayAdapter);
+
+        alertLayout.addView(choiceTransportationMode);
+
+        builder.setTitle("Choose your transporation mode")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        buttonRecordTrip.setImageResource(R.drawable.ic_stop_white_48dp);
+                        isUserRecording = true;
+                        if(choiceTransportationMode.getSelectedItemPosition() == 0){
+                            isUserWalkingForRecordingPath = true;
+                        }else{
+                            isUserWalkingForRecordingPath = false;
+                        }
+                        Intent intentRecordUserLocationService = new Intent(getContext(), RecordUserLocationService.class);
+                        intentRecordUserLocationService.putExtra("isUserWalking", isUserWalkingForRecordingPath);
+                        getActivity().startService(intentRecordUserLocationService);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        isUserRecording = false;
+                        buttonRecordTrip.setImageResource(R.drawable.ic_play_arrow_white_48dp);
+                    }
+                })
+                .setIcon(android.R.drawable.ic_menu_save)
+                .setView(alertLayout)
+                .show();
+
+    }
+
+    /**
      * Method that loads and display the current referenced trip
      */
     private void loadReferenceTrip(){
@@ -375,17 +468,24 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private void displayTrip(Trip tripToDisplay){
         List<Position> positionList = tripToDisplay.getListPositions();
         PolylineOptions pathTrip = new PolylineOptions();
+        factory = new IconGenerator(getActivity());
 
         ListIterator<Position> iterator = positionList.listIterator();
         while(iterator.hasNext()){
 
             Position pos = null;
+            String titleLabel = "";
+            Bitmap icon = null;
 
             if(!iterator.hasPrevious()){
-                IconGenerator factory = new IconGenerator(getActivity());
-                factory.setColor(Color.parseColor(tripToDisplay.getColor()));
-                Bitmap icon = null;
-                icon = factory.makeIcon("Departure " + tripToDisplay.getName());
+                if(tripToDisplay.isReference()){
+                    titleLabel = "REFERENCE TRIP \n Departure " + tripToDisplay.getName();
+                    factory.setColor(Color.YELLOW);
+                } else{
+                    factory.setColor(Color.parseColor(tripToDisplay.getColor()));
+                    titleLabel = "Departure " + tripToDisplay.getName();
+                }
+                icon = factory.makeIcon(titleLabel);
                 pos = iterator.next();
                 mGoogleMap.addMarker(
                         new MarkerOptions()
@@ -397,10 +497,15 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             }
 
             if(!iterator.hasNext()){
-                IconGenerator factory = new IconGenerator(getActivity());
+                if(tripToDisplay.isReference()){
+                    titleLabel = "REFERENCE TRIP \n Arrival " + tripToDisplay.getName();
+                    factory.setColor(Color.YELLOW);
+                } else{
+                    factory.setColor(Color.parseColor(tripToDisplay.getColor()));
+                    titleLabel = "Arrival " + tripToDisplay.getName();
+                }
                 factory.setColor(Color.parseColor(tripToDisplay.getColor()));
-                Bitmap icon = null;
-                icon = factory.makeIcon("Arrival " + tripToDisplay.getName());
+                icon = factory.makeIcon(titleLabel);
                 mGoogleMap.addMarker(
                         new MarkerOptions()
                                 .position(new LatLng(pos.getCoordX(), pos.getCoordY()))
@@ -421,26 +526,30 @@ public class MapFragment extends Fragment implements View.OnClickListener {
      */
     private void displayWaypoints(Trip tripToLoadWaypoints){
 
-        ListIterator<Waypoint> listIterator = tripToLoadWaypoints.getListWaypoints().listIterator();
-        while (listIterator.hasNext()){
-            Waypoint waypoint = listIterator.next();
-            BitmapDescriptor iconForMarker = null;
-            switch (waypoint.getType()){
-                case DANGER:
-                    iconForMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE);
-                    break;
-                case INFO:
-                    iconForMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
-                    break;
-                case WARNING:
-                    iconForMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW);
-                    break;
+        if(tripToLoadWaypoints.getListWaypoints() != null){
+            ListIterator<Waypoint> listIterator = tripToLoadWaypoints.getListWaypoints().listIterator();
+            while (listIterator.hasNext()){
+                Waypoint waypoint = listIterator.next();
+                BitmapDescriptor iconForMarker = null;
+                switch (waypoint.getType()){
+                    case DANGER:
+                        iconForMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE);
+                        break;
+                    case INFO:
+                        iconForMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
+                        break;
+                    case WARNING:
+                        iconForMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW);
+                        break;
+                }
+                mGoogleMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(waypoint.getPosition().getCoordX(), waypoint.getPosition().getCoordY()))
+                        .title(waypoint.getLabel())
+                        .icon(iconForMarker));
             }
-            mGoogleMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(waypoint.getPosition().getCoordX(), waypoint.getPosition().getCoordY()))
-                    .title(waypoint.getLabel())
-                    .icon(iconForMarker));
         }
 
+
     }
+
 }

@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     private void displayFragment(Fragment fragToDisplay){
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.mainContent, fragToDisplay).commit();
+        fragmentManager.beginTransaction().replace(R.id.mainContent, fragToDisplay, fragToDisplay.getClass().getSimpleName()).commit();
     }
 
     /**

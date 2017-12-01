@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
@@ -38,15 +39,26 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.SphericalUtil;
+import com.google.maps.android.ui.IconGenerator;
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
 import com.pes.androidmaterialcolorpickerdialog.ColorPickerCallback;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Position;
+import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.Entities.TypeWaypoint;
 import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Waypoint;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
@@ -76,6 +88,11 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     private com.github.clans.fab.FloatingActionButton saveButtonFAB;
     private com.github.clans.fab.FloatingActionButton deleteButtonFAB;
     private TripController tripController;
+
+    private DatabaseReference dbTrips = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
+
+    private List<Trip> listReferenceTrip;
+    private IconGenerator factory;
 
 
 
@@ -109,6 +126,12 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
         tripController = TripController.getInstance();
 
+        //Setting lists to manage trips to display
+        listReferenceTrip = new ArrayList<>();
+
+        //Setting up maps factory for labels
+        factory = new IconGenerator(getActivity());
+
         //Setting up positions array
         listPositions = new ArrayList<>();
         listWaypoints = new ArrayList<>();
@@ -138,6 +161,9 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         mMapView = (MapView) rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
         mMapView.onResume(); // needed to get the map to display immediately
+
+        //Default color
+        currentChosenColor = "#F2F2F2";
 
         mColorPicker = new ColorPicker(getActivity(), 127, 127, 127);
         mColorPicker.setCallback(new ColorPickerCallback() {
@@ -222,6 +248,127 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        dbTrips.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
+                    Trip currentTrip = tripSnapshot.getValue(Trip.class);
+                    Log.d("New trip retrieved", String.valueOf(currentTrip.getName()));
+                    if (currentTrip.isReference()) {
+                        listReferenceTrip.add(currentTrip);
+                    }
+                }
+                Log.d("listReferenceTrip size:", String.valueOf(listReferenceTrip.size()));
+
+                MapFragment myFragment = (MapFragment) getActivity().getSupportFragmentManager().findFragmentByTag("MapFragment");
+                if (myFragment != null && myFragment.isVisible()) {
+                    loadReferenceTrip();
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    /**
+     * Method that loads and display the current referenced trip
+     */
+    private void loadReferenceTrip(){
+        for(Trip refTrip : listReferenceTrip){
+            displayTrip(refTrip);
+            displayWaypoints(refTrip);
+        }
+    }
+
+
+    /**
+     * Method that display the passed trip in google maps
+     * @param tripToDisplay
+     */
+    private void displayTrip(Trip tripToDisplay){
+        List<Position> positionList = tripToDisplay.getListPositions();
+        PolylineOptions pathTrip = new PolylineOptions();
+        factory = new IconGenerator(getActivity());
+
+        ListIterator<Position> iterator = positionList.listIterator();
+        while(iterator.hasNext()){
+
+            Position pos = null;
+
+            if(!iterator.hasPrevious()){
+                factory.setColor(Color.parseColor(tripToDisplay.getColor()));
+                Bitmap icon = null;
+                icon = factory.makeIcon("Departure " + tripToDisplay.getName());
+                pos = iterator.next();
+                mGoogleMap.addMarker(
+                        new MarkerOptions()
+                                .position(new LatLng(pos.getCoordX(), pos.getCoordY()))
+                                .icon(BitmapDescriptorFactory.fromBitmap(icon))
+                );
+            }else{
+                pos = iterator.next();
+            }
+
+            if(!iterator.hasNext()){
+                IconGenerator factory = new IconGenerator(getActivity());
+                factory.setColor(Color.parseColor(tripToDisplay.getColor()));
+                Bitmap icon = null;
+                icon = factory.makeIcon("Arrival " + tripToDisplay.getName());
+                mGoogleMap.addMarker(
+                        new MarkerOptions()
+                                .position(new LatLng(pos.getCoordX(), pos.getCoordY()))
+                                .icon(BitmapDescriptorFactory.fromBitmap(icon))
+                );
+            }
+            pathTrip.add(new LatLng(pos.getCoordX(), pos.getCoordY()));
+        }
+
+        pathTrip.color(Color.parseColor(tripToDisplay.getColor()));
+
+        mGoogleMap.addPolyline(pathTrip);
+    }
+
+    /**
+     * Method that display the waypoints related to a specific displayed trip
+     * @param tripToLoadWaypoints
+     */
+    private void displayWaypoints(Trip tripToLoadWaypoints){
+
+        if(tripToLoadWaypoints.getListWaypoints() != null){
+            ListIterator<Waypoint> listIterator = tripToLoadWaypoints.getListWaypoints().listIterator();
+            while (listIterator.hasNext()){
+                Waypoint waypoint = listIterator.next();
+                BitmapDescriptor iconForMarker = null;
+                switch (waypoint.getType()){
+                    case DANGER:
+                        iconForMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE);
+                        break;
+                    case INFO:
+                        iconForMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
+                        break;
+                    case WARNING:
+                        iconForMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW);
+                        break;
+                }
+                mGoogleMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(waypoint.getPosition().getCoordX(), waypoint.getPosition().getCoordY()))
+                        .title(waypoint.getLabel())
+                        .icon(iconForMarker));
+            }
+        }
+
+
     }
 
     /**
@@ -331,7 +478,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         builder.setTitle("Stop recording & save trip ?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        tripController.createTrip(true, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), UserController.getConnectedUserId());
+                        tripController.createTrip(true, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), UserController.getConnectedUserId());
                         buttonRecordTrip.setImageResource(R.drawable.ic_play_arrow_white_48dp);
                         isUserRecording = false;
                         Toast.makeText(getContext(), "Your trip has been saved successfully !", Toast.LENGTH_LONG).show();
@@ -506,6 +653,37 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         buttonRecordTrip.setVisibility(View.VISIBLE);
         pathTrip = null;
         isManagerDrawingPath = false;
+    }
+
+    /**
+     * Method to compute the total distance of a trip
+     * @param listPositions
+     * @return
+     */
+    private int computeTotalTripDistance(List<Position> listPositions){
+
+        Marker prevMarker = null;
+        Marker currentMarker = null;
+        double distance = 0;
+
+        ListIterator<Position> listIterator = listPositions.listIterator();
+        while (listIterator.hasNext()) {
+            if(!listIterator.hasPrevious()){
+                Position pos = listIterator.next();
+                prevMarker = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(pos.getCoordX(), pos.getCoordY())).visible(false));
+            }else{
+                Position pos = listIterator.next();
+                currentMarker = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(pos.getCoordX(), pos.getCoordY())).visible(false));
+                distance += SphericalUtil.computeDistanceBetween(prevMarker.getPosition(), currentMarker.getPosition());
+                prevMarker = currentMarker;
+            }
+
+        }
+
+        Log.d("distance computed : ", String.valueOf(distance));
+
+        return (int)distance;
+
     }
 
 }
