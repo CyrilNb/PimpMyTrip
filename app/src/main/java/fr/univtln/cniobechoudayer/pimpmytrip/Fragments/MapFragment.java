@@ -157,6 +157,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             }
         });
 
+
         //Initializing map
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
