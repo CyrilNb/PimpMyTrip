@@ -8,7 +8,7 @@ import java.util.List;
 public class Trip {
 
     @Exclude
-    private String id;
+    private String id; //exclude this member from being serialized and inserted in firebase database
     private boolean reference;
     private String name;
     private Date creationDate;
@@ -111,10 +111,12 @@ public class Trip {
         this.creator = creator;
     }
 
+    @Exclude
     public String getId() {
         return id;
     }
 
+    @Exclude
     public void setId(String id) {
         this.id = id;
     }
