@@ -291,6 +291,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
+        //TODO refactor
         dbMyTrips.addValueEventListener(listenerDbMyTrips);
         dbTrips.addValueEventListener(listenerDbTrips);
     }
@@ -465,7 +466,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
      * Method that display the passed trip in google maps
      * @param tripToDisplay
      */
-    private void displayTrip(Trip tripToDisplay){
+    public void displayTrip(Trip tripToDisplay){
         List<Position> positionList = tripToDisplay.getListPositions();
         PolylineOptions pathTrip = new PolylineOptions();
         factory = new IconGenerator(getActivity());

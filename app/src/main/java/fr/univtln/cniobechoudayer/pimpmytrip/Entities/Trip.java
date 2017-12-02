@@ -1,15 +1,19 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.Entities;
 
+import com.google.firebase.database.Exclude;
+
 import java.util.Date;
 import java.util.List;
 
 public class Trip {
 
+    @Exclude
+    private String id;
     private boolean reference;
     private String name;
     private Date creationDate;
-    private int durationInSeconds;
-    private int distanceInMeters;
+    private int duration;
+    private int distance;
     private String color;
     private List<Position> listPositions;
     private List<Waypoint> listWaypoints;
@@ -18,18 +22,18 @@ public class Trip {
     public Trip() {
     }
 
-    //TODO BUILDER
-    public Trip(String color, Date creationDate, String name, boolean isReference, List<Position> listPositions, List<Waypoint> listMarkers, int distance, String creatorId) {
-
-        this.color = color;
-        this.creationDate = creationDate;
-        this.name = name;
-        this.reference = isReference;
-        this.listPositions = listPositions;
-        this.listWaypoints = listMarkers;
-        this.creator = creatorId;
-        this.distanceInMeters = distance;
+    private Trip(TripBuilder tripBuilder){
+        this.id = tripBuilder.id;
+        this.color = tripBuilder.color;
+        this.creationDate = tripBuilder.creationDate;
+        this.name = tripBuilder.name;
+        this.reference = tripBuilder.reference;
+        this.listPositions = tripBuilder.listPositions;
+        this.listWaypoints = tripBuilder.listWaypoints;
+        this.creator = tripBuilder.creator;
+        this.distance = tripBuilder.distance;
     }
+
 
     public boolean isReference() {
         return reference;
@@ -59,20 +63,20 @@ public class Trip {
         this.reference = reference;
     }
 
-    public int getDurationInSeconds() {
-        return durationInSeconds;
+    public int getDuration() {
+        return duration;
     }
 
-    public void setDurationInSeconds(int durationInSeconds) {
-        this.durationInSeconds = durationInSeconds;
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
-    public int getDistanceInMeters() {
-        return distanceInMeters;
+    public int getDistance() {
+        return distance;
     }
 
-    public void setDistanceInMeters(int distanceInMeters) {
-        this.distanceInMeters = distanceInMeters;
+    public void setDistance(int distance) {
+        this.distance = distance;
     }
 
     public String getColor() {
@@ -107,5 +111,73 @@ public class Trip {
         this.creator = creator;
     }
 
+    public String getId() {
+        return id;
+    }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public static class TripBuilder{
+        private final String id;
+        private boolean reference;
+        private String name;
+        private Date creationDate;
+        private int duration; //seconds
+        private int distance; //meters
+        private String color;
+        private List<Position> listPositions;
+        private List<Waypoint> listWaypoints;
+        private String creator;
+
+        public TripBuilder(String id, String name){
+            this.id = id; //required
+            this.name = name; //required
+        }
+
+        public TripBuilder reference(boolean reference){
+            this.reference = reference;
+            return this;
+        }
+
+        public TripBuilder creationDate(Date creationDate){
+            this.creationDate = creationDate;
+            return this;
+        }
+
+        public TripBuilder duration(int duration){
+            this.duration = duration;
+            return this;
+        }
+
+        public TripBuilder distance(int distance){
+            this.distance = distance;
+            return this;
+        }
+
+        public TripBuilder color(String color){
+            this.color = color;
+            return this;
+        }
+
+        public TripBuilder listPositions(List<Position> listPositions){
+            this.listPositions = listPositions;
+            return this;
+        }
+
+        public TripBuilder listWaypoints(List<Waypoint> listWaypoints){
+            this.listWaypoints = listWaypoints;
+            return this;
+        }
+
+        public TripBuilder creator(String creator){
+            this.creator = creator;
+            return this;
+        }
+
+        public Trip build(){
+            return new Trip(this);
+        }
+    }
 }

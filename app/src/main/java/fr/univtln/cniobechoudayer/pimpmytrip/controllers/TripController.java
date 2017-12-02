@@ -1,5 +1,6 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.controllers;
 
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -38,14 +39,15 @@ public class TripController {
         return singleton;
     }
 
-    public void createTrip(boolean isReference, List<Position> listPositions, List<Waypoint> listMarkers, String color, String name, int distance, String creatorId){
-        Trip newTrip = new Trip(color, Calendar.getInstance().getTime(), name, isReference, listPositions, listMarkers, distance, creatorId);
-        database.child("trips").child(currentUserId).push().setValue(newTrip);
+    public void createTrip(boolean isReference, List<Position> listPositions, List<Waypoint> listWaypoints, String color, String name, int distance, String creatorId){
+        String keyTrip = database.child("trips").child(currentUserId).push().getKey();
+        Trip newTrip = new Trip.TripBuilder(keyTrip,name).reference(isReference).listPositions(listPositions).listWaypoints(listWaypoints)
+                .color(color).distance(distance).creator(creatorId).build();
+        database.child("trips").child(currentUserId).child(keyTrip).setValue(newTrip);
 
     }
 
-    public void deleteTrip(String id){
-        //TODO
-        database.child("trips").child(currentUserId).removeValue();
+    public void deleteTrip(Trip tripToDelete){
+        database.child("trips").child(currentUserId).child(tripToDelete.getId()).removeValue();
     }
 }
