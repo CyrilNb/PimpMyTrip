@@ -46,7 +46,7 @@
                 android:paddingLeft="@dimen/album_title_padding"
                 android:paddingRight="@dimen/album_title_padding"
                 android:text="Distance"
-                android:textSize="@dimen/songs_count" />
+                android:textSize="@dimen/cardview_distance" />
 
             <ImageView
                 android:id="@+id/menuCardViewRefTrip"

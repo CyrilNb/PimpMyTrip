@@ -115,6 +115,10 @@ public class Trip {
         return id;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public static class TripBuilder{
         private final String id;
         private boolean reference;

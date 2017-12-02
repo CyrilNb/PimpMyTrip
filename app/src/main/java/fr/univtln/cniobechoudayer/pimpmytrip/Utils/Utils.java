@@ -51,16 +51,18 @@ public class Utils {
         }
     }
 
-    public static String formatTripDistance(double distance) {
+    public static String formatedTripDistance(double distance) {
         String unit = "m";
         if (distance < 1) {
             distance *= 1000;
             unit = "mm";
         } else if (distance > 1000) {
             distance /= 1000;
-            unit = "km";
+            unit = "kms";
         }
 
         return String.format("%4.3f%s", distance, unit);
     }
+
+
 }
