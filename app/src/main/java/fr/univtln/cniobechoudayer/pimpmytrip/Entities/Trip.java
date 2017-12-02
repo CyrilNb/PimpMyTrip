@@ -119,6 +119,9 @@ public class Trip {
         this.id = id;
     }
 
+    /**
+     * Builder of Trip
+     */
     public static class TripBuilder{
         private final String id;
         private boolean reference;
