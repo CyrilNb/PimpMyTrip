@@ -78,6 +78,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private AlertDialog.Builder builder;
     private boolean isUserWalkingForRecordingPath = true;
     private UserLocationReceiver userLocationReceiver;
+    private Context context;
 
     private List<Trip> listReferenceTrip;
     private List<Trip> listMyTrips;
@@ -107,9 +108,9 @@ public class MapFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-
+        this.context = getContext();
+        factory = new IconGenerator(getActivity());
     }
 
     @Override
@@ -128,8 +129,6 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         //Setting view for save alert dialog
         titleEditText = new EditText(getContext());
         colorButton = new Button(getContext());
-
-        factory = new IconGenerator(getActivity());
 
         //Get the mapView
         mMapView = (MapView) rootView.findViewById(R.id.mapView);
@@ -469,7 +468,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     public void displayTrip(Trip tripToDisplay){
         List<Position> positionList = tripToDisplay.getListPositions();
         PolylineOptions pathTrip = new PolylineOptions();
-        factory = new IconGenerator(getActivity());
+        factory = new IconGenerator(this.context);
 
         ListIterator<Position> iterator = positionList.listIterator();
         while(iterator.hasNext()){
@@ -521,6 +520,26 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         mGoogleMap.addPolyline(pathTrip);
     }
 
+
+    /**
+     * Method that display the passed trip in google maps
+     * @param tripToDisplay
+     */
+    public void displaySwipedTrip(Trip tripToDisplay){
+        List<Position> positionList = tripToDisplay.getListPositions();
+        PolylineOptions pathTrip = new PolylineOptions();
+
+        ListIterator<Position> iterator = positionList.listIterator();
+        while(iterator.hasNext()){
+            Position pos = null;
+            pos = iterator.next();
+            pathTrip.add(new LatLng(pos.getCoordX(), pos.getCoordY()));
+        }
+
+        pathTrip.color(Color.parseColor(tripToDisplay.getColor()));
+
+        mGoogleMap.addPolyline(pathTrip);
+    }
     /**
      * Method that display the waypoints related to a specific displayed trip
      * @param tripToLoadWaypoints

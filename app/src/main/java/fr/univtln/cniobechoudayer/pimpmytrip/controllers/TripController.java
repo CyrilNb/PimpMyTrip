@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Calendar;
 import java.util.List;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Position;
@@ -74,7 +75,7 @@ public class TripController {
      */
     public void insertTrip(boolean isReference, List<Position> listPositions, List<Waypoint> listWaypoints, String color, String name, int distance, String creatorId){
         String keyTrip = database.child("trips").child(currentUserId).push().getKey();
-        Trip newTrip = new Trip.TripBuilder(keyTrip,name).reference(isReference).listPositions(listPositions).listWaypoints(listWaypoints)
+        Trip newTrip = new Trip.TripBuilder(keyTrip,name).reference(isReference).listPositions(listPositions).listWaypoints(listWaypoints).creationDate(Calendar.getInstance().getTime())
                 .color(color).distance(distance).creator(creatorId).build();
         database.child("trips").child(currentUserId).child(keyTrip).setValue(newTrip);
 

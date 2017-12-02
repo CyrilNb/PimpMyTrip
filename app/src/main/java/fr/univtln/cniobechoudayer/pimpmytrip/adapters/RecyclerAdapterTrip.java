@@ -26,7 +26,7 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
 
     private List<Trip> listTrips;
     private Context context;
-    private Trip tripToRemoved;
+    private Trip swipedTrip;
     private android.support.v4.app.FragmentManager fragmentManager;
     private TripController tripController;
 
@@ -85,16 +85,16 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
 
     @Override
     public void onItemDismiss(final int position) {
-        tripToRemoved = listTrips.get(position);
-        listTrips.remove(tripToRemoved);
+        swipedTrip = listTrips.get(position);
+        listTrips.remove(swipedTrip);
         notifyItemRemoved(position);
-        tripController.deleteTrip(tripToRemoved);
+        tripController.deleteTrip(swipedTrip);
     }
 
     public void restoreItem(final int position){
-        listTrips.add(position,tripToRemoved);
+        listTrips.add(position, swipedTrip);
         notifyItemInserted(position);
-        //database
+        tripController.insertTrip(swipedTrip);
     }
 
     public class MyHolder extends RecyclerView.ViewHolder {
@@ -117,7 +117,9 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
      */
     public void displaySelectedTripOnMap(final int position){
         try{
+            swipedTrip = listTrips.get(position);
             fragmentManager.beginTransaction().replace(R.id.mainContent, MapFragment.getInstance(), MapFragment.getInstance().getClass().getSimpleName()).commit();
+            MapFragment.getInstance().displaySwipedTrip(swipedTrip);
         } catch (ClassCastException e) {
             Log.d("fragment", "Can't get the fragment manager with this");
         }
