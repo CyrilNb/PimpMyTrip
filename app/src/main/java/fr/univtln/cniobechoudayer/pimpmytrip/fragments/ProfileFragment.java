@@ -6,12 +6,20 @@ import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Statistics;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.controllers.StatisticsController;
 
 
 public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener{
@@ -20,6 +28,10 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
     private int mMaxScrollSize;
     private static final int PERCENTAGE_TO_ANIMATE_AVATAR = 20;
     private boolean mIsAvatarShown = true;
+    private ListView listViewStats;
+    private List<String> listStatsToDisplay = new ArrayList<String>();
+    private ArrayAdapter<String> adapter;
+    private Statistics userStats;
 
     private static ProfileFragment singleton;
 
@@ -47,6 +59,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         View rootView = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        StatisticsController statsController = StatisticsController.getInstance();
+        userStats = statsController.getUserStats();
+
         //mProfileImage = (ImageView) rootView.findViewById(R.id.profilePicture);
 
         //Picasso.with(getContext()).load(R.drawable.test_profile).transform(new CircleTransform()).into(mProfileImage);
@@ -54,6 +69,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         AppBarLayout appbarLayout = (AppBarLayout) rootView.findViewById(R.id.materialup_appbar);
         mProfileImage = (ImageView) rootView.findViewById(R.id.materialup_profile_image);
+        listViewStats = (ListView) rootView.findViewById(R.id.listViewStats);
 
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.materialup_toolbar);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -66,6 +82,29 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         appbarLayout.addOnOffsetChangedListener(this);
         mMaxScrollSize = appbarLayout.getTotalScrollRange();
+
+        if(userStats != null){
+
+            listStatsToDisplay.add(String.valueOf(userStats.getNbMyTripsTravelled()));
+            listStatsToDisplay.add(String.valueOf(userStats.getTotalDistance()));
+            listStatsToDisplay.add(String.valueOf(userStats.getTotalDistanceBySUV()));
+            listStatsToDisplay.add(String.valueOf(userStats.getTotalDistanceByWalk()));
+            listStatsToDisplay.add(String.valueOf(userStats.getNbTripsCreated()));
+            listStatsToDisplay.add(String.valueOf(userStats.getNbTripsSUVCreated()));
+            listStatsToDisplay.add(String.valueOf(userStats.getNbTripsWalkingCreated()));
+            listStatsToDisplay.add(String.valueOf(userStats.getTotalTimeTravelled()));
+            listStatsToDisplay.add(String.valueOf(userStats.getTotalTimeDrove()));
+            listStatsToDisplay.add(String.valueOf(userStats.getTotalTimeWalked()));
+
+            adapter = new ArrayAdapter<String>(getContext(),
+                    android.R.layout.simple_list_item_1,
+                    listStatsToDisplay);
+
+            listViewStats.setAdapter(adapter);
+            Log.d("userStats", "not null");
+        }else{
+            Log.d("userStats", "null");
+        }
 
         return rootView;
     }

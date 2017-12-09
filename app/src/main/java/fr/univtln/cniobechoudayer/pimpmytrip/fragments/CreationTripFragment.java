@@ -5,6 +5,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -61,7 +62,9 @@ import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.TypeWaypoint;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Waypoint;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.services.RecordUserLocationService;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
+import fr.univtln.cniobechoudayer.pimpmytrip.controllers.StatisticsController;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.TripController;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
@@ -87,6 +90,8 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     private com.github.clans.fab.FloatingActionButton saveButtonFAB;
     private com.github.clans.fab.FloatingActionButton deleteButtonFAB;
     private TripController tripController;
+    private boolean isUserWalkingForRecordingPath = true;
+    private StatisticsController statisticsController;
     private UserController userController;
 
     private DatabaseReference dbTrips = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
@@ -125,6 +130,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         View rootView = inflater.inflate(R.layout.fragment_creation_trip, container, false);
 
         tripController = TripController.getInstance();
+        statisticsController = StatisticsController.getInstance();
         userController = UserController.getInstance();
 
         //Setting lists to manage trips to display
@@ -424,10 +430,10 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         switch(v.getId()){
             case R.id.buttonRecordTrip:
                 if(isUserRecording){
-
                     displayAlertDialogSaveTrip();
                 }else if(!isUserRecording){
                     //TODO start recording trip
+                    displayAlertDialogChoiceTransportationMode();
                     isUserRecording = true;
                     buttonRecordTrip.setImageResource(R.drawable.ic_stop_white_48dp);
                 }
@@ -479,7 +485,8 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         builder.setTitle("Stop recording & save trip ?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        tripController.insertTrip(true, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), userController.getConnectedUserId());
+                        Trip addedTrip = tripController.insertTrip(true, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), userController.getConnectedUserId());
+                        statisticsController.updateStats(addedTrip, isUserWalkingForRecordingPath);
                         buttonRecordTrip.setImageResource(R.drawable.ic_play_arrow_white_48dp);
                         isUserRecording = false;
                         Toast.makeText(getContext(), "Your trip has been saved successfully !", Toast.LENGTH_LONG).show();
@@ -684,6 +691,56 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         Log.d("distance computed : ", String.valueOf(distance));
 
         return (int)distance;
+
+    }
+
+    /**
+     * Method that create and displays alert dialog to choose the transportation mode
+     */
+    private void displayAlertDialogChoiceTransportationMode(){
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(getContext());
+        }
+        LinearLayout alertLayout = new LinearLayout(getContext());
+        alertLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(Utils.convertPixelsToDp(20, getContext()), Utils.convertPixelsToDp(40, getContext()), Utils.convertPixelsToDp(20, getContext()), Utils.convertPixelsToDp(40, getContext()));
+        alertLayout.setLayoutParams(params);
+
+        final Spinner choiceTransportationMode = new Spinner(getContext());
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String> (getContext(), android.R.layout.simple_list_item_1 , getResources().getStringArray(R.array.spinnerChoicesTransportationMode));
+        choiceTransportationMode.setAdapter(spinnerArrayAdapter);
+
+        alertLayout.addView(choiceTransportationMode);
+
+        builder.setTitle("Choose your transporation mode")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                        buttonRecordTrip.setImageResource(R.drawable.ic_stop_white_48dp);
+                        isUserRecording = true;
+                        if(choiceTransportationMode.getSelectedItemPosition() == 0){
+                            isUserWalkingForRecordingPath = true;
+                        }else{
+                            isUserWalkingForRecordingPath = false;
+                        }
+                        Intent intentRecordUserLocationService = new Intent(getContext(), RecordUserLocationService.class);
+                        intentRecordUserLocationService.putExtra("isUserWalking", isUserWalkingForRecordingPath);
+                        getActivity().startService(intentRecordUserLocationService);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        isUserRecording = false;
+                        buttonRecordTrip.setImageResource(R.drawable.ic_play_arrow_white_48dp);
+                    }
+                })
+                .setIcon(android.R.drawable.ic_menu_save)
+                .setView(alertLayout)
+                .show();
 
     }
 

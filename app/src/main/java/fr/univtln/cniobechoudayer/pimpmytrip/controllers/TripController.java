@@ -77,12 +77,12 @@ public class TripController {
      * @param distance distance of the trip
      * @param creatorId userID of the creator of the trip
      */
-    public void insertTrip(boolean isReference, List<Position> listPositions, List<Waypoint> listWaypoints, String color, String name, int distance, String creatorId){
+    public Trip insertTrip(boolean isReference, List<Position> listPositions, List<Waypoint> listWaypoints, String color, String name, int distance, String creatorId){
         String keyTrip = database.child("trips").child(currentUserId).push().getKey();
         Trip newTrip = new Trip.TripBuilder(keyTrip,name).reference(isReference).listPositions(listPositions).listWaypoints(listWaypoints).creationDate(Calendar.getInstance().getTime())
                 .color(color).distance(distance).creator(creatorId).build();
         database.child("trips").child(currentUserId).child(keyTrip).setValue(newTrip);
-
+        return newTrip;
     }
 
     /**
