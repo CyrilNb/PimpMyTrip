@@ -1,4 +1,4 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Services;
+package fr.univtln.cniobechoudayer.pimpmytrip.services;
 
 import android.os.Bundle;
 import android.os.Handler;

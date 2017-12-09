@@ -1,4 +1,4 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Utils;
+package fr.univtln.cniobechoudayer.pimpmytrip.utils;
 
 import android.widget.Toast;
 
@@ -6,12 +6,10 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.app.Activity;
-import android.content.Context;
 import android.os.Build;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 

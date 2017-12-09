@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Trip;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 
 public class RecyclerAdapterRefTrip extends RecyclerView.Adapter<RecyclerAdapterRefTrip.MyHolder> {

@@ -1,4 +1,4 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Authentication;
+package fr.univtln.cniobechoudayer.pimpmytrip.authentication;
 
 
 import android.content.Intent;
@@ -17,7 +17,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
-import fr.univtln.cniobechoudayer.pimpmytrip.Utils.Utils;
+import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 
 public class AccountSettingsActivity extends AppCompatActivity {
     private static final int REQUEST_REVOKE_ACESS_GOOGLE = 2;

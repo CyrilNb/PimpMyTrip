@@ -1,4 +1,4 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Fragments;
+package fr.univtln.cniobechoudayer.pimpmytrip.fragments;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;

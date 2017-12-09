@@ -1,25 +1,17 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Fragments;
+package fr.univtln.cniobechoudayer.pimpmytrip.fragments;
 
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
-
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
-import fr.univtln.cniobechoudayer.pimpmytrip.Utils.CircleTransform;
 
 
 public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener{

@@ -23,24 +23,24 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <service android:name=".Services.RecordUserLocationService"></service>
+        <service android:name=".services.RecordUserLocationService"></service>
 
         <activity
-            android:name=".Activities.MainActivity"
+            android:name=".activities.MainActivity"
             android:hardwareAccelerated="true"/>
-        <activity android:name=".Authentication.AccountSettingsActivity"></activity>
-        <activity android:name=".Authentication.SignUpActivity" />
-        <activity android:name=".Authentication.LoginActivity">
+        <activity android:name=".authentication.AccountSettingsActivity"></activity>
+        <activity android:name=".authentication.SignUpActivity" />
+        <activity android:name=".authentication.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Authentication.ResetPasswordActivity" />
+        <activity android:name=".authentication.ResetPasswordActivity" />
 
         <activity
-            android:name=".Activities.ScrollingActivity"
+            android:name=".activities.ScrollingActivity"
             android:label="@string/title_activity_scrolling"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>

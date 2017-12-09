@@ -1,4 +1,4 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Activities;
+package fr.univtln.cniobechoudayer.pimpmytrip.activities;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;

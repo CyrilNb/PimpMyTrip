@@ -1,4 +1,4 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Fragments;
+package fr.univtln.cniobechoudayer.pimpmytrip.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,14 +17,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Trip;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerAdapterRefTrip;
-import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerAdapterTrip;
-import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
 /**
  * A simple {@link Fragment} subclass.

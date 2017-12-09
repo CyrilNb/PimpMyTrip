@@ -1,4 +1,4 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Fragments;
+package fr.univtln.cniobechoudayer.pimpmytrip.fragments;
 
 
 import android.Manifest;
@@ -56,12 +56,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Position;
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Trip;
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.TypeWaypoint;
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Waypoint;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Position;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.TypeWaypoint;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Waypoint;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
-import fr.univtln.cniobechoudayer.pimpmytrip.Utils.Utils;
+import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.TripController;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
@@ -87,6 +87,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     private com.github.clans.fab.FloatingActionButton saveButtonFAB;
     private com.github.clans.fab.FloatingActionButton deleteButtonFAB;
     private TripController tripController;
+    private UserController userController;
 
     private DatabaseReference dbTrips = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
 
@@ -124,6 +125,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         View rootView = inflater.inflate(R.layout.fragment_creation_trip, container, false);
 
         tripController = TripController.getInstance();
+        userController = UserController.getInstance();
 
         //Setting lists to manage trips to display
         listReferenceTrip = new ArrayList<>();
@@ -477,7 +479,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         builder.setTitle("Stop recording & save trip ?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        tripController.insertTrip(true, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), UserController.getConnectedUserId());
+                        tripController.insertTrip(true, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), userController.getConnectedUserId());
                         buttonRecordTrip.setImageResource(R.drawable.ic_play_arrow_white_48dp);
                         isUserRecording = false;
                         Toast.makeText(getContext(), "Your trip has been saved successfully !", Toast.LENGTH_LONG).show();

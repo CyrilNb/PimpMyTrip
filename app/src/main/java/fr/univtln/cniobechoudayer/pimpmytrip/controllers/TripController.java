@@ -9,9 +9,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.Calendar;
 import java.util.List;
 
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Position;
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Trip;
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Waypoint;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Position;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Waypoint;
 
 /**
  * Class which represents a Trip controller
@@ -28,13 +28,13 @@ public class TripController {
     private DatabaseReference database;
     private FirebaseUser currentUser;
     private String currentUserId;
-    private static TripController singleton;
+    private static TripController instance;
 
     /***************
      * CONSTRUCTOR *
      ***************/
 
-    public TripController() {
+    protected TripController() {
         firebaseAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase");
         currentUser = firebaseAuth.getCurrentUser();
@@ -44,15 +44,19 @@ public class TripController {
     }
 
     /**
-     * Return the singleton
-     * @return
+     * Returns the singleton
+     * @return the unique instance
      */
     public static TripController getInstance(){
-        if(singleton == null){
-            singleton = new TripController();
+        if(instance == null){
+            instance = new TripController();
         }
-        return singleton;
+        return instance;
     }
+
+    /***************
+     *   METHODS   *
+     ***************/
 
     /**
      * Insert a trip in db from a given trip
