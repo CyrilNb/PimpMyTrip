@@ -1,4 +1,4 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Authentication;
+package fr.univtln.cniobechoudayer.pimpmytrip.authentication;
 
 import android.content.Intent;
 import android.os.Bundle;

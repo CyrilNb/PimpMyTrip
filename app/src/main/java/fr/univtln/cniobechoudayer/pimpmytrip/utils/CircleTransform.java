@@ -1,4 +1,4 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Utils;
+package fr.univtln.cniobechoudayer.pimpmytrip.utils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;

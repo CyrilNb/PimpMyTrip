@@ -11,11 +11,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.User;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.User;
 
 /**
- * Controller of User class
- * Created by Cyril Niobé on 24/11/2017.
+ * Class which represents a User controller
+ * to manage CRUD operations and operations on User class
+ * NB: THIS IS A SINGLETON
  */
 
 public class UserController {
@@ -52,16 +53,14 @@ public class UserController {
     public static UserController getInstance() {
         if (instance == null) {
             instance = new UserController();
-        } else {
-            return instance;
         }
+        return instance;
     }
 
 
     /***************
      *   METHODS   *
      ***************/
-
 
     /**
      * Creating new user node under 'users'
@@ -79,21 +78,31 @@ public class UserController {
 
     }
 
+    /**
+     * Method that updates the pseudo of the connected user
+     * @param pseudo new pseudo
+     */
     public void updatePseudoUser(String pseudo) {
         database.child("users").child(currentUserId).child("pseudo").setValue(pseudo);
     }
 
+    /**
+     * Method that updates the email of the connected user
+     * @param email new email
+     */
     public void updateEmailUser(String email) {
         database.child("users").child(currentUserId).child("email").setValue(email);
     }
 
+    /**
+     * Method that delete the connected user
+     */
     public void deleteUser() {
         database.child("users").child(currentUserId).removeValue();
     }
 
 
     //TODO this method will be used in the view of the user profile
-
     /**
      * User data change listener
      */
@@ -137,15 +146,15 @@ public class UserController {
     /**
      * Method that updates in database the fact that a user is connected
      */
-    private void connectUser() {
-
+    public void setUserAsConnected() {
+        database.child("connectedUsers").child(currentUserId).setValue(currentUser);
     }
 
     /**
      * Method that updates in database the fact that a user is disconnected
      */
-    private void disconnectUser() {
-
+    public void setUserAsDisconnected() {
+        database.child("connectedUsers").child(currentUserId).removeValue();
     }
 
 }

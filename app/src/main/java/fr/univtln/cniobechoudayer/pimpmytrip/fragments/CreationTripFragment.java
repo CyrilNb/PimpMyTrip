@@ -1,4 +1,4 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Fragments;
+package fr.univtln.cniobechoudayer.pimpmytrip.fragments;
 
 
 import android.Manifest;
@@ -56,12 +56,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Position;
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Trip;
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.TypeWaypoint;
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Waypoint;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Position;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.TypeWaypoint;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Waypoint;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
-import fr.univtln.cniobechoudayer.pimpmytrip.Utils.Utils;
+import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.TripController;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
