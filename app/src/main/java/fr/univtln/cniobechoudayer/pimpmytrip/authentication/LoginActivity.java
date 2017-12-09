@@ -1,10 +1,9 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Authentication;
+package fr.univtln.cniobechoudayer.pimpmytrip.authentication;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -14,6 +13,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -27,16 +27,17 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import fr.univtln.cniobechoudayer.pimpmytrip.Activities.MainActivity;
-import fr.univtln.cniobechoudayer.pimpmytrip.R;
-import fr.univtln.cniobechoudayer.pimpmytrip.Utils.Utils;
 
-import com.google.android.gms.common.SignInButton;
+import fr.univtln.cniobechoudayer.pimpmytrip.activities.MainActivity;
+import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
+import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
+
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 /**
- * Login Activity
+ * Login Activity to handle the process of logging in by users
  * Created by Cyril Niobé on 23/11/2017.
  */
 
@@ -54,10 +55,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private ProgressBar progressBar;
     private CoordinatorLayout rootView;
 
-    //FirebaseAuth
     private FirebaseAuth auth;
     public static GoogleSignInClient googleSignInClient;
     public static GoogleApiClient googleApiClient;
+
+    private UserController userController;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,10 +72,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         passwordEditText = (EditText) findViewById(R.id.editTxtPasswordLogin);
         btnLogin = (Button) findViewById(R.id.sign_in_button);
         btnSignup = (Button) findViewById(R.id.sign_up_button_from_login);
-        btnSignInWithGoogle = (Button)findViewById(R.id.sign_in_with_google_button);
+        btnSignInWithGoogle = (Button) findViewById(R.id.sign_in_with_google_button);
         btnForgotPassword = (Button) findViewById(R.id.btn_reset_password);
 
         auth = FirebaseAuth.getInstance();
+
+        userController = UserController.getInstance();
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -85,14 +89,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Utils.displayErrorMessage(getApplicationContext(),LoginActivity.this,rootView,"Failed to connect");
+                        Utils.displayErrorMessage(getApplicationContext(), LoginActivity.this, rootView, "Failed to connect");
                     }
                 })
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
                     @Override
                     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                        Utils.displayErrorMessage(getApplicationContext(),LoginActivity.this,rootView,"Failed to connect");
+                        Utils.displayErrorMessage(getApplicationContext(), LoginActivity.this, rootView, "Failed to connect");
                     }
                 })
                 .build();
@@ -190,7 +194,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     private void loginWithEmail() {
-        Log.d(TAG, "Login");
         email = emailEditText.getText().toString();
         password = passwordEditText.getText().toString();
 
@@ -207,26 +210,22 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             // signed in user can be handled in the listener.
                             progressBar.setVisibility(View.GONE);
                             if (!task.isSuccessful()) {
-                                Utils.displayErrorMessage(getApplicationContext(),LoginActivity.this,rootView,getResources().getString(R.string.auth_failed));
-                            }
-                            else {
-
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                startActivity(intent);
-                                finish();
+                                Utils.displayErrorMessage(getApplicationContext(), LoginActivity.this, rootView, getResources().getString(R.string.auth_failed));
+                            } else {
+                                onConnectionSuccess();
                             }
                         }
                     });
 
         } else {
-            Utils.displayErrorMessage(getApplicationContext(),LoginActivity.this,rootView,"Login failed");
+            Utils.displayErrorMessage(getApplicationContext(), LoginActivity.this, rootView, "Login failed");
+        }
+
     }
 
-}
-
     private void loginWithGoogle() {
-            Intent signInIntent = googleSignInClient.getSignInIntent();
-            startActivityForResult(signInIntent, RC_SIGN_IN);
+        Intent signInIntent = googleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     @Override
@@ -243,7 +242,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
-                Utils.displayErrorMessage(getApplicationContext(),LoginActivity.this,rootView,"Google sign in failed");
+                Utils.displayErrorMessage(getApplicationContext(), LoginActivity.this, rootView, "Google sign in failed");
             }
         }
     }
@@ -266,20 +265,27 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = auth.getCurrentUser();
                             progressBar.setVisibility(View.GONE);
-                            Intent intent = new Intent(LoginActivity.this, AccountSettingsActivity.class);
-                            startActivity(intent);
-                            finish();
+                            onConnectionSuccess();
                         } else {
                             progressBar.setVisibility(View.GONE);
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
-                            Utils.displayErrorMessage(getApplicationContext(),LoginActivity.this,rootView,"Authentication failed");
+                            Utils.displayErrorMessage(getApplicationContext(), LoginActivity.this, rootView, "Authentication failed");
                         }
                     }
                 });
     }
 
+    /**
+     * Method that sets the user as connected
+     * and calls the main view
+     */
+    private void onConnectionSuccess() {
+        userController.setUserAsConnected();
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
 
 }

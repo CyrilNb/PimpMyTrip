@@ -1,14 +1,12 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Services;
+package fr.univtln.cniobechoudayer.pimpmytrip.services;
 
 import android.Manifest;
 import android.app.IntentService;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Message;
@@ -21,11 +19,8 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Position;
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Trip;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Position;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
-import fr.univtln.cniobechoudayer.pimpmytrip.controllers.TripController;
-import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
 public class RecordUserLocationService extends IntentService {
 

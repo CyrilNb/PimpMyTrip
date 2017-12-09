@@ -1,4 +1,4 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Utils;
+package fr.univtln.cniobechoudayer.pimpmytrip.utils;
 
 import android.widget.Toast;
 
@@ -6,12 +6,10 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.app.Activity;
-import android.content.Context;
 import android.os.Build;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 
@@ -51,16 +49,18 @@ public class Utils {
         }
     }
 
-    public static String formatTripDistance(double distance) {
+    public static String formatedTripDistance(double distance) {
         String unit = "m";
         if (distance < 1) {
             distance *= 1000;
             unit = "mm";
         } else if (distance > 1000) {
             distance /= 1000;
-            unit = "km";
+            unit = "kms";
         }
 
         return String.format("%4.3f%s", distance, unit);
     }
+
+
 }

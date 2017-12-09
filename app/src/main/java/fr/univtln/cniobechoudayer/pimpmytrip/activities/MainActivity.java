@@ -1,4 +1,4 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Activities;
+package fr.univtln.cniobechoudayer.pimpmytrip.activities;
 
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -9,7 +9,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,14 +17,14 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
-import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.CreationTripFragment;
-import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.ManagerTripFragment;
-import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.MapFragment;
-import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.ProfileFragment;
-import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.RefTripsFragment;
-import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.TripsFragment;
+import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
+import fr.univtln.cniobechoudayer.pimpmytrip.fragments.ManagerTripFragment;
+import fr.univtln.cniobechoudayer.pimpmytrip.fragments.MapFragment;
+import fr.univtln.cniobechoudayer.pimpmytrip.fragments.ProfileFragment;
+import fr.univtln.cniobechoudayer.pimpmytrip.fragments.RefTripsFragment;
+import fr.univtln.cniobechoudayer.pimpmytrip.fragments.TripsFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
-import fr.univtln.cniobechoudayer.pimpmytrip.Utils.CircleTransform;
+import fr.univtln.cniobechoudayer.pimpmytrip.utils.CircleTransform;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.StatisticsController;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
@@ -132,6 +131,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        UserController.getInstance().setUserAsDisconnected();
+    }
+
     /**
      * When item of toolbar is selected
      * @param item
@@ -163,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     private boolean checkIfUserIsManager(){
         return true;
+        //TODO verifier si l'utilisateur qui se connecte est un manager
     }
 
 }

@@ -1,4 +1,4 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Authentication;
+package fr.univtln.cniobechoudayer.pimpmytrip.authentication;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,7 +17,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
-import fr.univtln.cniobechoudayer.pimpmytrip.Utils.Utils;
+import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
 /**
@@ -35,10 +35,8 @@ public class SignUpActivity extends AppCompatActivity {
     private String password;
     private String pseudo;
 
-    //Firebase auth
     private FirebaseAuth auth;
 
-    //UserController
     private UserController userController;
 
     @Override
@@ -114,7 +112,6 @@ public class SignUpActivity extends AppCompatActivity {
                         if (!task.isSuccessful()) {
                             Utils.displayErrorMessage(getApplicationContext(),SignUpActivity.this,rootView,"Register failed");
                         } else {
-                            userController = new UserController();
                             userController.createUser(pseudo,email);
                             startActivity(new Intent(SignUpActivity.this, AccountSettingsActivity.class));
                             finish();

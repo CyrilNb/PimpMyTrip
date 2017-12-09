@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Trip;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 
 public class RecyclerAdapterRefTrip extends RecyclerView.Adapter<RecyclerAdapterRefTrip.MyHolder> {
@@ -34,7 +34,7 @@ public class RecyclerAdapterRefTrip extends RecyclerView.Adapter<RecyclerAdapter
     public void onBindViewHolder(MyHolder holder, int position) {
         Trip trip = listRefTrips.get(position);
         holder.nameRefTrip.setText(trip.getName());
-        String distanceToDisplay = Double.toString(trip.getDistanceInMeters()) + " kms";
+        String distanceToDisplay = Double.toString(trip.getDistance()) + " kms";
         holder.distanceRefTrip.setText(distanceToDisplay);
         holder.imgView.setBackgroundColor(Color.parseColor(trip.getColor()));
     }

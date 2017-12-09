@@ -1,4 +1,4 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Fragments;
+package fr.univtln.cniobechoudayer.pimpmytrip.fragments;
 
 
 import android.Manifest;
@@ -43,7 +43,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -58,13 +57,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Position;
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Trip;
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.TypeWaypoint;
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Waypoint;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Position;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.TypeWaypoint;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Waypoint;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
-import fr.univtln.cniobechoudayer.pimpmytrip.Services.RecordUserLocationService;
-import fr.univtln.cniobechoudayer.pimpmytrip.Utils.Utils;
+import fr.univtln.cniobechoudayer.pimpmytrip.services.RecordUserLocationService;
+import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.StatisticsController;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.TripController;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
@@ -93,6 +92,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     private TripController tripController;
     private boolean isUserWalkingForRecordingPath = true;
     private StatisticsController statisticsController;
+    private UserController userController;
 
     private DatabaseReference dbTrips = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
 
@@ -131,6 +131,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
         tripController = TripController.getInstance();
         statisticsController = StatisticsController.getInstance();
+        userController = UserController.getInstance();
 
         //Setting lists to manage trips to display
         listReferenceTrip = new ArrayList<>();
@@ -484,7 +485,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         builder.setTitle("Stop recording & save trip ?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Trip addedTrip = tripController.createTrip(true, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), UserController.getConnectedUserId());
+                        Trip addedTrip = tripController.insertTrip(true, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), userController.getConnectedUserId());
                         statisticsController.updateStats(addedTrip, isUserWalkingForRecordingPath);
                         buttonRecordTrip.setImageResource(R.drawable.ic_play_arrow_white_48dp);
                         isUserRecording = false;

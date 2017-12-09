@@ -1,4 +1,4 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Entities;
+package fr.univtln.cniobechoudayer.pimpmytrip.entities;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -1,7 +1,6 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.controllers;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -10,8 +9,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Statistics;
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Trip;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Statistics;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 
 public class StatisticsController {
 
@@ -68,15 +67,15 @@ public class StatisticsController {
             if(isUserWalking){
                 userStats.setNbTripsSUVCreated(userStats.getNbTripsSUVCreated() + 1);
                 userStats.setTotalTimeDrove(userStats.getTotalTimeDrove() + 1);
-                userStats.setTotalDistanceBySUV(userStats.getTotalDistanceBySUV() + savedTrip.getDistanceInMeters());
+                userStats.setTotalDistanceBySUV(userStats.getTotalDistanceBySUV() + savedTrip.getDistance());
             }else{
                 userStats.setNbTripsWalkingCreated(userStats.getNbTripsWalkingCreated() + 1);
-                userStats.setTotalTimeWalked(userStats.getTotalTimeWalked() + savedTrip.getDurationInSeconds());
-                userStats.setTotalDistanceByWalk(userStats.getTotalDistanceByWalk() + savedTrip.getDistanceInMeters());
+                userStats.setTotalTimeWalked(userStats.getTotalTimeWalked() + savedTrip.getDistance());
+                userStats.setTotalDistanceByWalk(userStats.getTotalDistanceByWalk() + savedTrip.getDistance());
             }
 
-            userStats.setTotalDistance(userStats.getTotalDistance() + savedTrip.getDistanceInMeters());
-            userStats.setTotalTimeTravelled(userStats.getTotalTimeTravelled() + savedTrip.getDurationInSeconds());
+            userStats.setTotalDistance(userStats.getTotalDistance() + savedTrip.getDistance());
+            userStats.setTotalTimeTravelled(userStats.getTotalTimeTravelled() + savedTrip.getDistance());
 
             dbUserStats.setValue(userStats);
         }else{

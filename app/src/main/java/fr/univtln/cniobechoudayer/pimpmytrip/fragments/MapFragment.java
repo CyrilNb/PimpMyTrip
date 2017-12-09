@@ -1,9 +1,8 @@
-package fr.univtln.cniobechoudayer.pimpmytrip.Fragments;
+package fr.univtln.cniobechoudayer.pimpmytrip.fragments;
 
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.IntentService;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -62,17 +61,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Position;
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Trip;
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.TypeWaypoint;
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Waypoint;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Position;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.TypeWaypoint;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Waypoint;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
-import fr.univtln.cniobechoudayer.pimpmytrip.Services.RecordUserLocationService;
-import fr.univtln.cniobechoudayer.pimpmytrip.Services.UserLocationReceiver;
-import fr.univtln.cniobechoudayer.pimpmytrip.Utils.Utils;
+import fr.univtln.cniobechoudayer.pimpmytrip.services.RecordUserLocationService;
+import fr.univtln.cniobechoudayer.pimpmytrip.services.UserLocationReceiver;
+import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.TripController;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
-
 
 public class MapFragment extends Fragment implements View.OnClickListener {
 
@@ -86,7 +84,6 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private Button colorButton;
     private AlertDialog.Builder builder;
     private boolean isUserWalkingForRecordingPath = true;
-    private UserLocationReceiver userLocationReceiver;
     private Handler handler;
     private Intent intentRecordUserLocationService;
     private List<Position> listPositions;
@@ -94,10 +91,13 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private String currentChosenColor;
     private Spinner choicesTypeWaypoint;
     private boolean isUserSaving = false;
+        private UserController userController;
 
+    private Context context;
 
     private List<Trip> listReferenceTrip;
     private List<Trip> listMyTrips;
+    private ArrayList<Trip> listSwipedTrips;
     private IconGenerator factory;
     private ValueEventListener listenerDbTrips;
     private ValueEventListener listenerDbMyTrips;
@@ -126,9 +126,9 @@ public class MapFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-
+        this.context = getContext();
+        factory = new IconGenerator(getActivity());
     }
 
     @Override
@@ -142,20 +142,22 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         listPositions = new ArrayList<>();
         listWaypoints = new ArrayList<>();
 
+        userController = UserController.getInstance();
+
         //TODO
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
                 Log.d("listPositions service", String.valueOf(reply.get("listPositionsTrip")));
-                if(reply.get("listPositionsTrip") != null){
+                if (reply.get("listPositionsTrip") != null) {
                     listPositions = reply.getParcelableArrayList("listPositionsTrip");
                     Log.d("listPos recorded size", String.valueOf(listPositions.size()));
-                    if(isUserSaving){
-                        Trip addedTrip = tripController.createTrip(true, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), UserController.getConnectedUserId());
+                    if (isUserSaving) {
+                        Trip addedTrip = tripController.insertTrip(true, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), userController.getConnectedUserId());
                         isUserSaving = false;
                     }
-                }else{
+                } else {
                     listPositions = new ArrayList<>();
                     Log.d("listPositions", "null");
                 }
@@ -172,8 +174,6 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         titleEditText = new EditText(getContext());
         colorButton = new Button(getContext());
 
-        factory = new IconGenerator(getActivity());
-
         //Get the mapView
         mMapView = (MapView) rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
@@ -188,12 +188,13 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                 Log.d("#Hex no alpha", String.format("#%06X", (0xFFFFFF & color)));
 
                 mColorPicker.dismiss();
-                if(colorButton != null){
+                if (colorButton != null) {
                     colorButton.setBackgroundColor(Color.parseColor(String.format("#%06X", (0xFFFFFF & color))));
                     currentChosenColor = String.format("#%06X", (0xFFFFFF & color));
                 }
             }
         });
+
 
         //Initializing map
         try {
@@ -202,155 +203,143 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             e.printStackTrace();
         }
 
-        /**
-         * Loading the map asynchronously and adding a OnMapReadyCallback for displaying locations
-         */
-        mMapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(GoogleMap mMap) {
-                mGoogleMap = mMap;
-
-                // For showing a move to my location button
-                //Checking if user's location is accessible
-                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    //Requesting location permission
-                    ActivityCompat.requestPermissions(getActivity(),
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                            MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-                    return;
-                }
-                mGoogleMap.setMyLocationEnabled(true);
+        Bundle extras = getArguments();
+        if (extras != null){
+            listSwipedTrips = extras.getParcelableArrayList("listSwipedTrips");
+            if(listSwipedTrips != null){
 
                 /**
-                 * Loading and displaying the current location of user
+                 * Loading the map asynchronously and adding a OnMapReadyCallback for displaying locations
                  */
-                LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-                Criteria criteria = new Criteria();
-
-                Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
-                if (location != null)
-                {
-                    mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13));
-
-                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
-                            .zoom(12)                   // Sets the zoom
-                            .build();                   // Creates a CameraPosition from the builder
-                    mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                }
-
-                mGoogleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                mMapView.getMapAsync(new OnMapReadyCallback() {
                     @Override
-                    public void onMapLongClick(LatLng point) {
-                        if(isUserRecording)
-                            displayDialogSaveMarker(point);
+                    public void onMapReady(GoogleMap mMap) {
+                        mGoogleMap = mMap;
+                        System.out.println("googlemapBUNDLE: " + mGoogleMap);
+                        displaySwipedTrip(listSwipedTrips.get(0));
                     }
                 });
-            }
-        });
 
-        listenerDbTrips = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Trip currentTrip = null;
-                for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
-                    String tripKey = tripSnapshot.getKey();
-                    Log.d("Trip key ", tripKey);
-                    Object currentObj = tripSnapshot.child(tripKey).getValue(Object.class);
-                    //Log.d("object", currentObj.toString());
-                    Log.d("datasnap", String.valueOf(tripSnapshot));
-                    if(currentTrip != null){
+
+            }
+        }else {
+            /**
+             * Loading the map asynchronously and adding a OnMapReadyCallback for displaying locations
+             */
+            mMapView.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap mMap) {
+                    mGoogleMap = mMap;
+                    System.out.println("googlemapPASBUNDLE: " + mGoogleMap);
+
+                    // For showing a move to my location button
+                    // Checking if user's location is accessible
+                    if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        //Requesting location permission
+                        ActivityCompat.requestPermissions(getActivity(),
+                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+                        return;
+                    }
+                    mGoogleMap.setMyLocationEnabled(true);
+
+                    /**
+                     * Loading and displaying the current location of user
+                     */
+                    LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+                    Criteria criteria = new Criteria();
+
+                    Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
+                    if (location != null)
+                    {
+                        zoomInMap(new LatLng(location.getLatitude(),location.getLongitude()),10);
+                    }
+                }
+            });
+            listenerDbTrips = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
+                        Trip currentTrip = (Trip) tripSnapshot.getValue(Trip.class);
+                        Log.d("New trip retrieved", String.valueOf(currentTrip.getName()));
                         if (currentTrip.isReference()) {
-                            Log.d("adding ref trip", currentTrip.getName());
+                            listReferenceTrip.add(currentTrip);
+                        }
+                    }
+
+                    Log.d("listReferenceTrip size:", String.valueOf(listReferenceTrip.size()));
+
+                    MapFragment myFragment = (MapFragment) getActivity().getSupportFragmentManager().findFragmentByTag("MapFragment");
+                    if (myFragment != null && myFragment.isVisible()) {
+                        loadReferenceTrip();
+                    }
+
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            };
+
+            listenerDbMyTrips = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
+                        Trip currentTrip = (Trip) tripSnapshot.getValue(Trip.class);
+                        listMyTrips.add(currentTrip);
+                    }
+                    Log.d("listMyTrips", "updated");
+                    loadMyTrips();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            };
+
+
+            dbRefTrips.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
+                        Trip currentTrip = (Trip) tripSnapshot.getValue(Trip.class);
+                        Log.d("dbRefTrips", "starting");
+                        Log.d("New reftrip retrieved", String.valueOf(currentTrip.getName()));
+                        Log.d("value reference trip ", String.valueOf(currentTrip.isReference()));
+                        if (currentTrip.isReference()) {
                             listReferenceTrip.add(currentTrip);
                         }
                     }
                 }
 
-                Log.d("listReferenceTrip size:", String.valueOf(listReferenceTrip.size()));
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-
-                loadReferenceTrip();
-
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-
-        listenerDbMyTrips = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
-                    Trip currentTrip = (Trip) tripSnapshot.getValue(Trip.class);
-                    listMyTrips.add(currentTrip);
                 }
-                Log.d("listMyTrips", "updated");
-                    loadMyTrips();
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-            }
-        };
-
-        dbRefTrips.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
-                    Trip currentTrip = (Trip) tripSnapshot.getValue(Trip.class);
-                    Log.d("dbRefTrips", "starting");
-                    Log.d("New reftrip retrieved", String.valueOf(currentTrip.getName()));
-                    Log.d("value reference trip ", String.valueOf(currentTrip.isReference()));
-                    if (currentTrip.isReference()) {
-                        listReferenceTrip.add(currentTrip);
-                    }
                 }
-            }
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-            }
+                }
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-            }
+                }
+            });
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
+        }
         return rootView;
     }
-
-    /**
-     * Method to react once user gives an requested permission
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch(requestCode){
-            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION:
-
-                break;
-        }
-    };
 
     /**
      * Method to update the action bar title
@@ -363,10 +352,6 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-
-
-
-
     /**
      * Handle different fragment states and adapt the map
      */
@@ -376,13 +361,22 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         super.onStart();
         dbMyTrips.addValueEventListener(listenerDbMyTrips);
         dbTrips.addListenerForSingleValueEvent(listenerDbTrips);
+
+        //TODO REFACTOR IN a classe mere fragment
+        if (listenerDbMyTrips != null)
+            dbMyTrips.addValueEventListener(listenerDbMyTrips);
+        if(listenerDbTrips != null)
+            dbTrips.addValueEventListener(listenerDbTrips);
+
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        dbMyTrips.removeEventListener(listenerDbMyTrips);
-        dbTrips.removeEventListener(listenerDbTrips);
+        if (listenerDbMyTrips != null)
+            dbMyTrips.removeEventListener(listenerDbMyTrips);
+        if(listenerDbTrips != null)
+            dbTrips.removeEventListener(listenerDbTrips);
     }
 
     @Override
@@ -611,6 +605,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    //TODO WHEN IT IS CALLED ???
     /**
      * Method to compute the total distance of a trip
      * @param listPositions
@@ -648,6 +643,13 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private void loadMyTrips(){
         for(Trip myTrip : listMyTrips){
             displayTrip(myTrip);
+        }
+    }
+
+    private void loadSwipedTrips(){
+        Bundle extras = getArguments();
+        if (extras != null){
+            ArrayList<Trip> listSwipedTrips = extras.getParcelableArrayList("listSwipedTrips");
         }
     }
 
@@ -712,12 +714,36 @@ public class MapFragment extends Fragment implements View.OnClickListener {
 
     }
 
+
     /**
-     * Method that display the waypoints related to a specific displayed trip
+     * Method that display the passed trip in google maps
+     * @param tripToDisplay
+     */
+    public void displaySwipedTrip(Trip tripToDisplay){
+        List<Position> positionList = tripToDisplay.getListPositions();
+        PolylineOptions pathTrip = new PolylineOptions();
+
+        ListIterator<Position> iterator = positionList.listIterator();
+        while(iterator.hasNext()){
+            Position pos = null;
+            pos = iterator.next();
+            pathTrip.add(new LatLng(pos.getCoordX(), pos.getCoordY()));
+        }
+
+        pathTrip.color(Color.parseColor(tripToDisplay.getColor()));
+        mGoogleMap.addPolyline(pathTrip);
+
+        double latitude = tripToDisplay.getListPositions().get(0).getCoordX();
+        double longitude = tripToDisplay.getListPositions().get(0).getCoordY();
+        zoomInMap(new LatLng(latitude,longitude),7);
+
+
+    }
+    /**
+     * Method that displays the waypoints related to a specific displayed trip
      * @param tripToLoadWaypoints
      */
     private void displayWaypoints(Trip tripToLoadWaypoints){
-
         if(tripToLoadWaypoints.getListWaypoints() != null){
             ListIterator<Waypoint> listIterator = tripToLoadWaypoints.getListWaypoints().listIterator();
             while (listIterator.hasNext()){
@@ -741,7 +767,21 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             }
         }
 
+    }
 
+    /**
+     * Method that zooms in the Google map on a specific zone
+     * @param latLng latlng to zoom in
+     * @param zoomDegree intensity of the zoom
+     */
+    private void zoomInMap(LatLng latLng, float zoomDegree){
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(latLng)      // Sets the center of the map to location user
+                .zoom(zoomDegree)            // Sets the zoom
+                .build();                   // Creates a CameraPosition from the builder
+        mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
 }
+
+

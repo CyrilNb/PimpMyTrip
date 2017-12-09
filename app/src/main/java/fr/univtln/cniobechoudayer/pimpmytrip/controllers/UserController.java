@@ -1,4 +1,5 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.controllers;
+
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -9,24 +10,34 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import fr.univtln.cniobechoudayer.pimpmytrip.Entities.User;
+
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.User;
 
 /**
- * Controller of User class
- * Created by Cyril Niobé on 24/11/2017.
+ * Class which represents a User controller
+ * to manage CRUD operations and operations on User class
+ * NB: THIS IS A SINGLETON
  */
 
 public class UserController {
+
     private static final String TAG = "UserController";
 
-    //FirebaseAuth
+    /***********
+     * MEMBERS *
+     **********/
+
     private FirebaseAuth firebaseAuth;
     private DatabaseReference database;
     private FirebaseUser currentUser;
     private static String currentUserId;
+    private static UserController instance;
 
-    //TODO singleton
-    public UserController() {
+    /***************
+     * CONSTRUCTOR *
+     ***************/
+
+    protected UserController() {
         firebaseAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase");
         currentUser = firebaseAuth.getCurrentUser();
@@ -34,6 +45,22 @@ public class UserController {
             currentUserId = firebaseAuth.getCurrentUser().getUid();
         }
     }
+
+    /**
+     * Method which returns the singleton
+     * @return the unique instance
+     */
+    public static UserController getInstance() {
+        if (instance == null) {
+            instance = new UserController();
+        }
+        return instance;
+    }
+
+
+    /***************
+     *   METHODS   *
+     ***************/
 
     /**
      * Creating new user node under 'users'
@@ -51,16 +78,27 @@ public class UserController {
 
     }
 
+    /**
+     * Method that updates the pseudo of the connected user
+     * @param pseudo new pseudo
+     */
     public void updatePseudoUser(String pseudo) {
-        database.child(currentUserId).child("pseudo").setValue(pseudo);
+        database.child("users").child(currentUserId).child("pseudo").setValue(pseudo);
     }
 
+    /**
+     * Method that updates the email of the connected user
+     * @param email new email
+     */
     public void updateEmailUser(String email) {
-        database.child(currentUserId).child("email").setValue(email);
+        database.child("users").child(currentUserId).child("email").setValue(email);
     }
 
+    /**
+     * Method that delete the connected user
+     */
     public void deleteUser() {
-        database.child(currentUserId).removeValue();
+        database.child("users").child(currentUserId).removeValue();
     }
 
 
@@ -96,8 +134,27 @@ public class UserController {
         });
     }
 
-    public static String getConnectedUserId(){
+    /**
+     * Method that returns the ID of the current connected user
+     *
+     * @return
+     */
+    public String getConnectedUserId() {
         return currentUserId;
+    }
+
+    /**
+     * Method that updates in database the fact that a user is connected
+     */
+    public void setUserAsConnected() {
+        database.child("connectedUsers").child(currentUserId).setValue(currentUser);
+    }
+
+    /**
+     * Method that updates in database the fact that a user is disconnected
+     */
+    public void setUserAsDisconnected() {
+        database.child("connectedUsers").child(currentUserId).removeValue();
     }
 
 }
