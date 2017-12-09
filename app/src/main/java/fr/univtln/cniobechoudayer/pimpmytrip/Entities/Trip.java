@@ -1,11 +1,14 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.Entities;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.firebase.database.Exclude;
 
 import java.util.Date;
 import java.util.List;
 
-public class Trip {
+public class Trip implements Parcelable{
 
     @Exclude
     private String id; //exclude this member from being serialized and inserted in firebase database
@@ -18,6 +21,9 @@ public class Trip {
     private List<Position> listPositions;
     private List<Waypoint> listWaypoints;
     private String creator;
+
+    @Exclude
+    boolean isSelected; //only use to handle multiple and single selection in RecyclerVieW
 
     public Trip() {
     }
@@ -34,6 +40,31 @@ public class Trip {
         this.distance = tripBuilder.distance;
     }
 
+    /**
+     * Used for parcelable
+     * @param in
+     */
+    protected Trip(Parcel in) {
+        id = in.readString();
+        reference = in.readByte() != 0;
+        name = in.readString();
+        duration = in.readInt();
+        distance = in.readInt();
+        color = in.readString();
+        creator = in.readString();
+    }
+
+    public static final Creator<Trip> CREATOR = new Creator<Trip>() {
+        @Override
+        public Trip createFromParcel(Parcel in) {
+            return new Trip(in);
+        }
+
+        @Override
+        public Trip[] newArray(int size) {
+            return new Trip[size];
+        }
+    };
 
     public boolean isReference() {
         return reference;
@@ -119,6 +150,32 @@ public class Trip {
     @Exclude
     public void setId(String id) {
         this.id = id;
+    }
+
+    @Exclude
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    @Exclude
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeByte((byte) (reference ? 1 : 0));
+        dest.writeString(name);
+        dest.writeInt(duration);
+        dest.writeInt(distance);
+        dest.writeString(color);
+        dest.writeString(creator);
     }
 
     /**

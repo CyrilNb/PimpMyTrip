@@ -40,6 +40,7 @@ public class TripsFragment extends Fragment {
     private RecyclerView recyclerView;
     private RecyclerAdapterTrip adapterTrip;
     private FragmentManager fragmentManager;
+    private MapFragment mapFragment;
 
     private ValueEventListener listenerDbMyTrips;
 
