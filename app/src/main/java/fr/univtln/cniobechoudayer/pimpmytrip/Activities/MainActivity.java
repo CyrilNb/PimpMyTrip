@@ -26,6 +26,7 @@ import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.RefTripsFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.Fragments.TripsFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.Utils.CircleTransform;
+import fr.univtln.cniobechoudayer.pimpmytrip.controllers.StatisticsController;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawer;
 
     private ImageView imageViewProfile;
+    private StatisticsController statsController = StatisticsController.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

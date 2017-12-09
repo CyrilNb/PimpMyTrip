@@ -35,10 +35,6 @@ public class Trip {
         return reference;
     }
 
-    public void setIsReference(boolean isReference) {
-        this.reference = isReference;
-    }
-
     public String getName() {
         return name;
     }
