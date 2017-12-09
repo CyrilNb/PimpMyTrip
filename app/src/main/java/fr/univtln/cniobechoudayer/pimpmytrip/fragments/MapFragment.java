@@ -359,14 +359,13 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
-        dbMyTrips.addValueEventListener(listenerDbMyTrips);
-        dbTrips.addListenerForSingleValueEvent(listenerDbTrips);
 
         //TODO REFACTOR IN a classe mere fragment
         if (listenerDbMyTrips != null)
             dbMyTrips.addValueEventListener(listenerDbMyTrips);
         if(listenerDbTrips != null)
             dbTrips.addValueEventListener(listenerDbTrips);
+            //dbTrips.addListenerForSingleValueEvent(listenerDbTrips);
 
     }
 
@@ -596,17 +595,6 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * Method that loads and display the current referenced trip
-     */
-    private void loadReferenceTrip(){
-        for(Trip refTrip : listReferenceTrip){
-            displayTrip(refTrip);
-            displayWaypoints(refTrip);
-        }
-    }
-
-    //TODO WHEN IT IS CALLED ???
-    /**
      * Method to compute the total distance of a trip
      * @param listPositions
      * @return
@@ -638,6 +626,16 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
+     * Method that loads and display the current referenced trip
+     */
+    private void loadReferenceTrip(){
+        for(Trip refTrip : listReferenceTrip){
+            displayTrip(refTrip);
+            displayWaypoints(refTrip);
+        }
+    }
+
+    /**
      * Method that loads and display all the trips created by the current user
      */
     private void loadMyTrips(){
@@ -646,12 +644,6 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void loadSwipedTrips(){
-        Bundle extras = getArguments();
-        if (extras != null){
-            ArrayList<Trip> listSwipedTrips = extras.getParcelableArrayList("listSwipedTrips");
-        }
-    }
 
     /**
      * Method that display the passed trip in google maps
@@ -660,7 +652,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private void displayTrip(Trip tripToDisplay){
         List<Position> positionList = tripToDisplay.getListPositions();
         PolylineOptions pathTrip = new PolylineOptions();
-        factory = new IconGenerator(getActivity());
+        factory = new IconGenerator(this.context);
         if(positionList != null){
             ListIterator<Position> iterator = positionList.listIterator();
             while(iterator.hasNext()){
@@ -721,22 +713,25 @@ public class MapFragment extends Fragment implements View.OnClickListener {
      */
     public void displaySwipedTrip(Trip tripToDisplay){
         List<Position> positionList = tripToDisplay.getListPositions();
-        PolylineOptions pathTrip = new PolylineOptions();
 
-        ListIterator<Position> iterator = positionList.listIterator();
-        while(iterator.hasNext()){
-            Position pos = null;
-            pos = iterator.next();
-            pathTrip.add(new LatLng(pos.getCoordX(), pos.getCoordY()));
+        if(positionList != null && !positionList.isEmpty()) {
+
+            PolylineOptions pathTrip = new PolylineOptions();
+
+            ListIterator<Position> iterator = positionList.listIterator();
+            while (iterator.hasNext()) {
+                Position pos = null;
+                pos = iterator.next();
+                pathTrip.add(new LatLng(pos.getCoordX(), pos.getCoordY()));
+            }
+
+            pathTrip.color(Color.parseColor(tripToDisplay.getColor()));
+            mGoogleMap.addPolyline(pathTrip);
+
+            double latitude = tripToDisplay.getListPositions().get(0).getCoordX();
+            double longitude = tripToDisplay.getListPositions().get(0).getCoordY();
+            zoomInMap(new LatLng(latitude, longitude), 7);
         }
-
-        pathTrip.color(Color.parseColor(tripToDisplay.getColor()));
-        mGoogleMap.addPolyline(pathTrip);
-
-        double latitude = tripToDisplay.getListPositions().get(0).getCoordX();
-        double longitude = tripToDisplay.getListPositions().get(0).getCoordY();
-        zoomInMap(new LatLng(latitude,longitude),7);
-
 
     }
     /**

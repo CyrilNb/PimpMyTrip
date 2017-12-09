@@ -53,7 +53,7 @@ public class Utils {
         String unit = "m";
         if (distance < 1) {
             distance *= 1000;
-            unit = "mm";
+            unit = "m";
         } else if (distance > 1000) {
             distance /= 1000;
             unit = "kms";
