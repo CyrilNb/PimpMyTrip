@@ -10,6 +10,11 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.Parcelable;
+import android.os.RemoteException;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
@@ -17,7 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Position;
+import fr.univtln.cniobechoudayer.pimpmytrip.Entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.controllers.TripController;
+import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
 public class RecordUserLocationService extends IntentService {
 
@@ -28,6 +36,11 @@ public class RecordUserLocationService extends IntentService {
     public static final String EXTRA_KEY_OUT = "EXTRA_OUT";
     public static final String EXTRA_KEY_UPDATE = "EXTRA_UPDATE";
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private LocationManager locationManager;
+    private Messenger messenger;
+    private Message msg;
+    private static Intent currentIntent;
+    private Bundle retrievedBundle;
 
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
@@ -45,14 +58,23 @@ public class RecordUserLocationService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        recordUserPositions(true);
-
+        Log.d("onHandleIntent", "reached");
+        Bundle bundle = intent.getExtras();
+        retrievedBundle = bundle;
+        Log.d("bundle content", String.valueOf(bundle));
+        if (bundle != null) {
+            Log.d("passed bundle", "not null");
+            recordUserPositions(bundle.getBoolean("isUserWalking"));
+        }else{
+            Log.d("passed bundle", "null");
+        }
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d("onCreate", "reached");
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
     }
 
     @Override
@@ -62,6 +84,26 @@ public class RecordUserLocationService extends IntentService {
 
     @Override
     public void onDestroy() {
+        Bundle bundleToSend = new Bundle();
+        bundleToSend.putParcelableArrayList("listPositionsTrip", (ArrayList<? extends Parcelable>) positionList);
+        msg = Message.obtain();
+        msg.setData(bundleToSend); //put the data here
+        messenger = (Messenger) retrievedBundle.get("messenger");
+        if(msg != null){
+            if(messenger != null){
+                try {
+                    messenger.send(msg);
+                    Log.d("service","message sent !");
+                } catch (RemoteException e) {
+                    Log.i("error", "error");
+                }
+            }else{
+                Log.d("messenger service", "null");
+            }
+
+        }else{
+            Log.d("message service", "null");
+        }
         super.onDestroy();
     }
 
@@ -79,7 +121,6 @@ public class RecordUserLocationService extends IntentService {
             intervalInMs = getResources().getInteger(R.integer.intervalRecordUserBySUV);
         }
 
-        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -93,7 +134,10 @@ public class RecordUserLocationService extends IntentService {
 
                     }
                     Log.d("positionsList size", String.valueOf(positionList.size()));
+                    Log.d("added element", String.valueOf(location.getLatitude() + location.getLongitude()));
                 }
+            }else{
+                Log.d("Location in service", "null");
             }
 
         }else{

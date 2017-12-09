@@ -38,10 +38,10 @@ public class TripController {
         return singleton;
     }
 
-    public void createTrip(boolean isReference, List<Position> listPositions, List<Waypoint> listMarkers, String color, String name, int distance, String creatorId){
+    public Trip createTrip(boolean isReference, List<Position> listPositions, List<Waypoint> listMarkers, String color, String name, int distance, String creatorId){
         Trip newTrip = new Trip(color, Calendar.getInstance().getTime(), name, isReference, listPositions, listMarkers, distance, creatorId);
         database.child("trips").child(currentUserId).push().setValue(newTrip);
-
+        return newTrip;
     }
 
     public void deleteTrip(String id){
