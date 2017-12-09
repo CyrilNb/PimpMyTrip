@@ -130,9 +130,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onStop() {
         UserController.getInstance().setUserAsDisconnected();
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        UserController.getInstance().setUserAsDisconnected();
+        super.onDestroy();
     }
 
     /**
