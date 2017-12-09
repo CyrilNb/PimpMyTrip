@@ -28,13 +28,13 @@ public class TripController {
     private DatabaseReference database;
     private FirebaseUser currentUser;
     private String currentUserId;
-    private static TripController singleton;
+    private static TripController instance;
 
     /***************
      * CONSTRUCTOR *
      ***************/
 
-    public TripController() {
+    protected TripController() {
         firebaseAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase");
         currentUser = firebaseAuth.getCurrentUser();
@@ -44,15 +44,19 @@ public class TripController {
     }
 
     /**
-     * Return the singleton
-     * @return
+     * Returns the singleton
+     * @return the unique instance
      */
     public static TripController getInstance(){
-        if(singleton == null){
-            singleton = new TripController();
+        if(instance == null){
+            instance = new TripController();
         }
-        return singleton;
+        return instance;
     }
+
+    /***************
+     *   METHODS   *
+     ***************/
 
     /**
      * Insert a trip in db from a given trip
