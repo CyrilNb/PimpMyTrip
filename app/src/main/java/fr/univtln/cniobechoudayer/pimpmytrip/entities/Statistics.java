@@ -109,4 +109,20 @@ public class Statistics {
     public void setTotalTimeDrove(int totalTimeDrove) {
         this.totalTimeDrove = totalTimeDrove;
     }
+
+    @Override
+    public String toString() {
+        return "Statistics{" +
+                "nbMyTripsTravelled=" + nbMyTripsTravelled +
+                ", totalDistance=" + totalDistance +
+                ", totalDistanceBySUV=" + totalDistanceBySUV +
+                ", totalDistanceByWalk=" + totalDistanceByWalk +
+                ", nbTripsCreated=" + nbTripsCreated +
+                ", nbTripsWalkingCreated=" + nbTripsWalkingCreated +
+                ", nbTripsSUVCreated=" + nbTripsSUVCreated +
+                ", totalTimeTravelled=" + totalTimeTravelled +
+                ", totalTimeWalked=" + totalTimeWalked +
+                ", totalTimeDrove=" + totalTimeDrove +
+                '}';
+    }
 }

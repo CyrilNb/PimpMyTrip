@@ -37,8 +37,6 @@ public class StatisticsController {
                     if(userStats != null){
                         Log.d("userStats", "retrieved : " + userStats.toString());
                     }
-
-
             }
 
             @Override
@@ -53,7 +51,6 @@ public class StatisticsController {
         if(singleton == null){
             singleton = new StatisticsController();
         }
-
         return singleton;
     }
 
@@ -85,13 +82,9 @@ public class StatisticsController {
 
     }
 
-    public static Statistics getUserStats(){
+    public Statistics getUserStats(){
         return userStats;
     }
 
-    private static void setUpDataFromDatabase(){
-
-
-    }
 
 }

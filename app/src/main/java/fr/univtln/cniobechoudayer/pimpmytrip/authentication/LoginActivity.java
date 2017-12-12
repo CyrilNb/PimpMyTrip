@@ -30,6 +30,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.activities.MainActivity;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.controllers.StatisticsController;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
@@ -60,6 +61,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     public static GoogleApiClient googleApiClient;
 
     private UserController userController;
+    private StatisticsController statisticsController;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -78,6 +80,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         auth = FirebaseAuth.getInstance();
 
         userController = UserController.getInstance();
+        statisticsController = StatisticsController.getInstance();
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

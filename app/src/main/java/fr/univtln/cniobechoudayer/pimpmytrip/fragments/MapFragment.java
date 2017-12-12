@@ -495,7 +495,9 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         params.setMargins(Utils.convertPixelsToDp(20, getContext()), Utils.convertPixelsToDp(40, getContext()), Utils.convertPixelsToDp(20, getContext()), Utils.convertPixelsToDp(40, getContext()));
         alertLayout.setLayoutParams(params);
 
-        //Setting view for save alert dialog
+        /**
+         * Setting view for save alert dialog
+         */
         titleEditText = new EditText(getContext());
         colorButton = new Button(getContext());
 

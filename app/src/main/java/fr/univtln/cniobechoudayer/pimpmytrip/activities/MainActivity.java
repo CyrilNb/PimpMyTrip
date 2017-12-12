@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
@@ -32,9 +33,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navigationView;
     private Toolbar toolbar;
     private DrawerLayout drawer;
+    private UserController userController;
 
     private ImageView imageViewProfile;
-    private StatisticsController statsController = StatisticsController.getInstance();
+    private TextView textViewPseudoUser;
+    private TextView textViewStats;
+    private StatisticsController statsController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +47,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        userController = UserController.getInstance();
+        statsController = StatisticsController.getInstance();
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -72,9 +79,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
          */
         View header = navigationView.getHeaderView(0);
         imageViewProfile = (ImageView) header.findViewById(R.id.imageView);
-        if(imageViewProfile != null)
-          Picasso.with(this).load(R.drawable.test_profile).transform(new CircleTransform()).into(imageViewProfile);
+        textViewPseudoUser = (TextView) header.findViewById(R.id.textViewPseudoUser);
+        textViewStats = (TextView) header.findViewById(R.id.textViewStats);
 
+        if(imageViewProfile != null)
+            imageViewProfile.setImageBitmap(new CircleTransform().transform(userController.getConnectedUser().getConvertedPhoto()));
+        if(userController.getConnectedUser() != null)
+            textViewPseudoUser.setText(userController.getConnectedUser().getPseudo());
+        if(statsController.getUserStats() != null)
+            textViewStats.setText(statsController.getUserStats().getNbTripsCreated());
         //Setting listener to display from on nav header click
         header.setOnClickListener(new View.OnClickListener() {
             @Override

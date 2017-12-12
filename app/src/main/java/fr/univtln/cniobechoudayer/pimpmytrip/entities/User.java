@@ -1,6 +1,8 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.entities;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 
 /**
  * User abtrsact class
@@ -16,7 +18,7 @@ public class User {
     private int idUser;
     private String pseudo;
     private String email;
-    private Bitmap photo;
+    private String photo;
 
     /**
      * Constructor of a user
@@ -99,7 +101,7 @@ public class User {
      * Get the photo of the user
      * @return photo of the user
      */
-    public Bitmap getPhoto() {
+    public String getPhoto() {
         return photo;
     }
 
@@ -107,8 +109,14 @@ public class User {
      * Set the photo of the user
      * @param photo
      */
-    private void setPhoto(Bitmap photo) {
+    private void setPhoto(String photo) {
         this.photo = photo;
+    }
+
+    public Bitmap getConvertedPhoto(){
+        byte[] decodedString = Base64.decode(this.photo, Base64.DEFAULT);
+        Bitmap decodedBytePhoto = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        return decodedBytePhoto;
     }
 
 
@@ -137,6 +145,8 @@ public class User {
         return "User{" +
                 "idUser=" + idUser +
                 ", pseudo='" + pseudo + '\'' +
+                ", email='" + email + '\'' +
+                ", photo='" + photo + '\'' +
                 '}';
     }
 }
