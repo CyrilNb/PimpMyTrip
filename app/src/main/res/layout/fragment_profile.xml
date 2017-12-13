@@ -75,7 +75,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="match_parent"
         android:background="@color/colorPrimaryDark"
         android:id="@+id/statsProfile"
         android:gravity="center_horizontal"
@@ -84,7 +84,8 @@
         android:orientation="vertical">
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="50dp"
+            android:id="@+id/labelStats"
             android:text="@string/titleStats"
             android:background="@color/colorAccent"
             android:gravity="center|center_horizontal|center_vertical"
@@ -93,7 +94,10 @@
         <ListView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/listViewStats">
+            android:layout_below="@+id/labelStats"
+            android:id="@+id/listViewStats"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp">
 
         </ListView>
 

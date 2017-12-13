@@ -4,6 +4,7 @@ package fr.univtln.cniobechoudayer.pimpmytrip.fragments;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,6 +27,7 @@ import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerAdapterTrip;
 import fr.univtln.cniobechoudayer.pimpmytrip.callbacks.SimpleItemTouchHelperCallback;
+import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -106,6 +108,12 @@ public class TripsFragment extends Fragment {
 
             }
         };
+
+        /**
+         * Setting up fragment title
+         */
+        Utils.setActionBarTitle((AppCompatActivity) getActivity(), getString(R.string.titleMyTrips));
+
 
         return rootView;
     }

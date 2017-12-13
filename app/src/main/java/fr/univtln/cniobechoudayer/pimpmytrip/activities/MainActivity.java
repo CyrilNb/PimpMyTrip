@@ -33,12 +33,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navigationView;
     private Toolbar toolbar;
     private DrawerLayout drawer;
-    private UserController userController;
 
     private ImageView imageViewProfile;
     private TextView textViewPseudoUser;
     private TextView textViewStats;
     private StatisticsController statsController;
+    private UserController userController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +53,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                if(imageViewProfile != null)
+                    imageViewProfile.setImageBitmap(new CircleTransform().transform(userController.getConnectedUser().getConvertedPhoto()));
+                if(userController.getConnectedUser() != null)
+                    textViewPseudoUser.setText(userController.getConnectedUser().getPseudo());
+                if(statsController.getUserStats() != null)
+                    textViewStats.setText(String.valueOf(statsController.getUserStats().getNbTripsCreated()) + " " + getString(R.string.tripsLabel));
+
+            }
+        };
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -75,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         displayFragment(new MapFragment());
 
         /**
-         * Getting header and loading picture //TODO avoid drawer lagging
+         * Getting header and loading picture
          */
         View header = navigationView.getHeaderView(0);
         imageViewProfile = (ImageView) header.findViewById(R.id.imageView);
@@ -87,8 +98,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(userController.getConnectedUser() != null)
             textViewPseudoUser.setText(userController.getConnectedUser().getPseudo());
         if(statsController.getUserStats() != null)
-            textViewStats.setText(statsController.getUserStats().getNbTripsCreated());
-        //Setting listener to display from on nav header click
+            textViewStats.setText(String.valueOf(statsController.getUserStats().getNbTripsCreated()) + " " + getString(R.string.tripsLabel));
+        /**
+         * Setting listener to display from on nav header click
+         */
         header.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -163,7 +176,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Toast.makeText(MainActivity.this, "cxcxcxcx", Toast.LENGTH_SHORT).show();
         switch (item.getItemId()) {
             case android.R.id.home:
                 drawer.openDrawer(GravityCompat.START);

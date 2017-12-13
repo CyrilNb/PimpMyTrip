@@ -26,13 +26,15 @@
         android:id="@+id/textViewPseudoUser"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:gravity="center"
-        android:textColor="#541D5D"/>
+        android:textStyle="bold"
+        android:textColor="@color/white"/>
 
     <TextView
         android:id="@+id/textViewStats"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
         android:gravity="center"
-        android:textColor="#541D5D"/>
+        android:textColor="@color/white"/>
 
 </LinearLayout>

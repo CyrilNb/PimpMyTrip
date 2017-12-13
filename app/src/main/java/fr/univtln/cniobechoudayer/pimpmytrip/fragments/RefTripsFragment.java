@@ -1,7 +1,11 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +26,7 @@ import java.util.List;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerAdapterRefTrip;
+import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -72,6 +77,11 @@ public class RefTripsFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(recyclerAdapterRefTrip);
+
+        /**
+         * Setting up fragment title
+         */
+        Utils.setActionBarTitle((AppCompatActivity) getActivity(), getString(R.string.titleRefTrips));
 
         return rootView;
     }

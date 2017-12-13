@@ -31,6 +31,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -91,7 +92,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private String currentChosenColor;
     private Spinner choicesTypeWaypoint;
     private boolean isUserSaving = false;
-        private UserController userController;
+    private UserController userController;
 
     private Context context;
 
@@ -154,7 +155,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                     listPositions = reply.getParcelableArrayList("listPositionsTrip");
                     Log.d("listPos recorded size", String.valueOf(listPositions.size()));
                     if (isUserSaving) {
-                        Trip addedTrip = tripController.insertTrip(true, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), userController.getConnectedUserId());
+                        Trip addedTrip = tripController.insertTrip(false, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), userController.getConnectedUserId());
                         isUserSaving = false;
                     }
                 } else {
@@ -195,6 +196,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             }
         });
 
+        Utils.setActionBarTitle((AppCompatActivity) getActivity(), getString(R.string.titleMap));
 
         //Initializing map
         try {
@@ -339,17 +341,6 @@ public class MapFragment extends Fragment implements View.OnClickListener {
 
         }
         return rootView;
-    }
-
-    /**
-     * Method to update the action bar title
-     */
-    public void setActionBarTitle() {
-        if (getActivity() instanceof AppCompatActivity) {
-            AppCompatActivity activity = ((AppCompatActivity) getActivity());
-            if (activity.getSupportActionBar() != null)
-                activity.getSupportActionBar().setTitle(getString(R.string.titleMap));
-        }
     }
 
     /**
@@ -532,6 +523,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                         }else{
                             Log.d("can't save cause","listPos is null");
                         }
+                        Toast.makeText(getContext(), "Your trip has been saved successfully !", Toast.LENGTH_LONG).show();
                     }
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -577,6 +569,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                         }else{
                             isUserWalkingForRecordingPath = false;
                         }
+                        Log.d("transportation mode", "selected");
                         intentRecordUserLocationService = new Intent(getContext(), RecordUserLocationService.class);
                         intentRecordUserLocationService.putExtra("isUserWalking", isUserWalkingForRecordingPath);
                         intentRecordUserLocationService.putExtra("messenger", new Messenger(handler));
