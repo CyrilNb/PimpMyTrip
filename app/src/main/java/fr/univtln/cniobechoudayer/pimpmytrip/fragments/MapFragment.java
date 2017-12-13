@@ -3,6 +3,7 @@ package fr.univtln.cniobechoudayer.pimpmytrip.fragments;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -66,6 +67,7 @@ import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.TypeWaypoint;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Waypoint;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.services.ConnectedUserLocationService;
 import fr.univtln.cniobechoudayer.pimpmytrip.services.RecordUserLocationService;
 import fr.univtln.cniobechoudayer.pimpmytrip.services.UserLocationReceiver;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
@@ -129,6 +131,8 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         this.context = getContext();
         factory = new IconGenerator(getActivity());
+        //getActivity().startService(new Intent(getActivity(), ConnectedUserLocationService.class));
+
     }
 
     @Override
@@ -777,6 +781,23 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
+    /**
+     * Method to handle a new user location
+     * @param location location to be handle
+     */
+    private void handleNewLocation(Location location) {
+        Log.d("handlenewlocation: ", location.toString());
+
+        double currentLatitude = location.getLatitude();
+        double currentLongitude = location.getLongitude();
+        LatLng latLng = new LatLng(currentLatitude, currentLongitude);
+
+        MarkerOptions options = new MarkerOptions()
+                .position(latLng)
+                .title("I am here!");
+        mGoogleMap.addMarker(options);
+        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+    }
 }
 
 
