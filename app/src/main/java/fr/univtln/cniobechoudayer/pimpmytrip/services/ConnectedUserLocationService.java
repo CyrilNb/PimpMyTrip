@@ -8,13 +8,18 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
+
+import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
 public class ConnectedUserLocationService extends Service
 {
     private static final String TAG = "BOOMBOOMTESTGPS";
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 3000; //milliseconds
-    private static final float LOCATION_DISTANCE = 2; //meters
+    private static final float LOCATION_DISTANCE = 0; //meters
+
+    private UserController userController;
 
     private class LocationListener implements android.location.LocationListener
     {
@@ -29,9 +34,11 @@ public class ConnectedUserLocationService extends Service
         @Override
         public void onLocationChanged(Location location)
         {
+            Toast.makeText(ConnectedUserLocationService.this, String.valueOf(location.getLatitude() + " / " + location.getLongitude()), Toast.LENGTH_SHORT).show();
             System.out.println("LOCATION CHANGED");
-            Log.e(TAG, "onLocationChanged: " + location);
+            System.out.println(location.getLatitude() + " / " + location.getLongitude());
             mLastLocation.set(location);
+            userController.updateLastKnownUserLocation(mLastLocation);
         }
 
         @Override
@@ -68,7 +75,7 @@ public class ConnectedUserLocationService extends Service
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         System.out.println("onstartcommand");
-        Log.e(TAG, "onStartCommand");
+        userController = UserController.getInstance();
         super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
@@ -81,15 +88,6 @@ public class ConnectedUserLocationService extends Service
         initializeLocationManager();
         try {
             mLocationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
-                    mLocationListeners[1]);
-        } catch (java.lang.SecurityException ex) {
-            Log.i(TAG, "fail to request location update, ignore", ex);
-        } catch (IllegalArgumentException ex) {
-            Log.d(TAG, "network provider does not exist, " + ex.getMessage());
-        }
-        try {
-            mLocationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
                     mLocationListeners[0]);
         } catch (java.lang.SecurityException ex) {
@@ -97,19 +95,29 @@ public class ConnectedUserLocationService extends Service
         } catch (IllegalArgumentException ex) {
             Log.d(TAG, "gps provider does not exist " + ex.getMessage());
         }
+        try {
+            mLocationManager.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
+                    mLocationListeners[1]);
+        } catch (java.lang.SecurityException ex) {
+            Log.i(TAG, "fail to request location update, ignore", ex);
+        } catch (IllegalArgumentException ex) {
+            Log.d(TAG, "network provider does not exist, " + ex.getMessage());
+        }
+
     }
 
     @Override
     public void onDestroy()
     {
-        Log.e(TAG, "onDestroy");
+        System.out.println("ON DESTROY");
         super.onDestroy();
         if (mLocationManager != null) {
             for (int i = 0; i < mLocationListeners.length; i++) {
                 try {
                     mLocationManager.removeUpdates(mLocationListeners[i]);
                 } catch (Exception ex) {
-                    Log.i(TAG, "fail to remove location listners, ignore", ex);
+                    Log.i(TAG, "fail to remove location listeners, ignore", ex);
                 }
             }
         }

@@ -1,5 +1,6 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.controllers;
 
+import android.location.Location;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -155,6 +156,14 @@ public class UserController {
      */
     public void setUserAsDisconnected() {
         database.child("connectedUsers").child(currentUserId).removeValue();
+    }
+
+    /**
+     * Method that updates both in database and the attribute of the connected user instance his last known location
+     * @param location new last known location
+     */
+    public void updateLastKnownUserLocation(Location location){
+        database.child("connectedUsers").child(currentUserId).child("lastKnownLocation").setValue(location);
     }
 
 }
