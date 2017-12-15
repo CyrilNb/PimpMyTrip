@@ -62,6 +62,7 @@ import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
 import com.pes.androidmaterialcolorpickerdialog.ColorPickerCallback;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -98,7 +99,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private Spinner choicesTypeWaypoint;
     private boolean isUserSaving = false;
     private UserController userController;
-    private List<User> listConnectedUsers;
+    private HashMap<String,Marker> connectedUsersMarkersHashMap;
 
     public static final int LOCATION_UPDATE_MIN_DISTANCE = 3; //meters
     public static final int LOCATION_UPDATE_MIN_TIME = 3000; //milliseconds
@@ -143,7 +144,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         this.context = getContext();
         factory = new IconGenerator(getActivity());
-        listConnectedUsers = new ArrayList<>();
+        connectedUsersMarkersHashMap = new HashMap<>();
         getActivity().startService(new Intent(getActivity(), ConnectedUserLocationService.class));
 
     }
@@ -358,11 +359,20 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                     System.out.println("onchildchanged");
                     String idUser = dataSnapshot.getKey();
                     System.out.println(idUser);
-                    double latitude = (double) dataSnapshot.child("lastKnownLocation").child("latitude").getValue();
-                    double longitude = (double) dataSnapshot.child("lastKnownLocation").child("longitude").getValue();
-                    System.out.println(latitude + " / " + longitude);
-                    Position position = new Position(latitude,longitude);
-                    drawMarker(position,idUser);
+                    if(FirebaseAuth.getInstance().getCurrentUser() != null){
+                        if(FirebaseAuth.getInstance().getCurrentUser().getUid().equals(idUser)){
+                            if(connectedUsersMarkersHashMap.containsKey(idUser)){
+                                connectedUsersMarkersHashMap.get(idUser).remove();
+                            }
+                            double latitude = (double) dataSnapshot.child("lastKnownLocation").child("latitude").getValue();
+                            double longitude = (double) dataSnapshot.child("lastKnownLocation").child("longitude").getValue();
+                            System.out.println(latitude + " / " + longitude);
+                            Position position = new Position(latitude,longitude);
+                            drawMarker(position,idUser);
+                        }
+
+                    }
+
                 }
 
                 @Override
@@ -929,22 +939,19 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * Draw a marker on the google map
+     * Draw a marker on the google map of the last know location of user connected
      *
      * @param position location where to draw
      */
-    private void drawMarker(Position position,String title) {
+    private void drawMarker(Position position,String idUser) {
         if (mGoogleMap != null) {
-            mGoogleMap.clear();
             LatLng gps = new LatLng(position.getCoordX(), position.getCoordY());
-            mGoogleMap.addMarker(new MarkerOptions()
+            Marker marker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(gps)
-                    .title(title));
-            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(gps, 12));
+                    .title(idUser));
+            connectedUsersMarkersHashMap.put(idUser,marker);
         }
-
     }
-
 
 }
 
