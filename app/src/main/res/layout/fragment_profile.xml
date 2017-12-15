@@ -97,7 +97,13 @@
             android:layout_below="@+id/labelStats"
             android:id="@+id/listViewStats"
             android:paddingTop="20dp"
-            android:paddingBottom="20dp">
+            android:paddingBottom="20dp"
+            android:layout_weight="1"
+            android:scrollbarSize="3dp"
+            android:scrollbarStyle="outsideOverlay"
+            android:scrollbars="vertical"
+            android:scrollingCache="true"
+            android:smoothScrollbar="true">
 
         </ListView>
 
@@ -119,47 +125,5 @@
 
         />
 </android.support.design.widget.CoordinatorLayout>
-    <!--
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:padding="20dp"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:id="@+id/headerProfile">
 
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_margin="10dp"
-            android:id="@+id/profilePicture"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:text="CorentinBrut"
-            android:id="@+id/pseudoUser"
-            android:textSize="30sp"/>
-
-    </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@color/colorPrimaryDark"
-            android:id="@+id/statsProfile"
-            android:layout_below="@+id/headerProfile"
-            android:gravity="center_horizontal"
-            >
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="Stats"
-                android:background="@color/colorAccent"
-                android:gravity="center|center_horizontal|center_vertical"
-                android:textSize="30sp"/>
-
-        </LinearLayout>
-        -->
 

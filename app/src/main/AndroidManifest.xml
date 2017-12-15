@@ -3,13 +3,11 @@
     package="fr.univtln.cniobechoudayer.pimpmytrip">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
-    <!--
-         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the 'MyLocation' functionality.
-    -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+    <supports-gl-texture android:name="GL_OES_compressed_ETC1_RGB8_texture" />
+    <supports-gl-texture android:name="GL_OES_compressed_paletted_texture" />
 
     <application
         android:icon="@mipmap/ic_launcher"
@@ -28,6 +26,13 @@
         <activity
             android:name=".activities.MainActivity"
             android:hardwareAccelerated="true"/>
+        <activity android:name=".opengl.OpenGLActivity">
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>-->
+        </activity>
         <activity android:name=".authentication.AccountSettingsActivity"></activity>
         <activity android:name=".authentication.SignUpActivity" />
         <activity android:name=".authentication.LoginActivity">
