@@ -28,9 +28,7 @@ import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerAdapterTrip;
 import fr.univtln.cniobechoudayer.pimpmytrip.callbacks.SimpleItemTouchHelperCallback;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link RefTripsFragment newInstance} factory method to
- * create an instance of this fragment.
+ * Fragment representing the Trip Fragment
  */
 public class TripsFragment extends Fragment {
     private static String TAG = "DATABASE";

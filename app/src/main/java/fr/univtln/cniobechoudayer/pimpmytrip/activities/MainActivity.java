@@ -1,5 +1,6 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.activities;
 
+import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -24,6 +25,7 @@ import fr.univtln.cniobechoudayer.pimpmytrip.fragments.ProfileFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.RefTripsFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.TripsFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.services.ConnectedUserLocationService;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.CircleTransform;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.StatisticsController;
 
@@ -140,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onDestroy() {
         UserController.getInstance().setUserAsDisconnected();
+        stopService(new Intent(this, ConnectedUserLocationService.class));
         super.onDestroy();
     }
 
@@ -150,7 +153,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Toast.makeText(MainActivity.this, "cxcxcxcx", Toast.LENGTH_SHORT).show();
         switch (item.getItemId()) {
             case android.R.id.home:
                 drawer.openDrawer(GravityCompat.START);

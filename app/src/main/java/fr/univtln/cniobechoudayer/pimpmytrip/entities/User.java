@@ -1,6 +1,7 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.entities;
 
 import android.graphics.Bitmap;
+import android.location.Location;
 
 /**
  * User abtrsact class
@@ -110,7 +111,6 @@ public class User {
     private void setPhoto(Bitmap photo) {
         this.photo = photo;
     }
-
 
 
     @Override

@@ -43,6 +43,12 @@
             android:name=".activities.ScrollingActivity"
             android:label="@string/title_activity_scrolling"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <service
+            android:enabled="true"
+            android:name=".services.ConnectedUserLocationService"
+            android:label="Connected User Location Service" >
+        </service>
     </application>
 
 </manifest>
