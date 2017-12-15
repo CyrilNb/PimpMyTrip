@@ -1,10 +1,7 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.controllers;
 
-<<<<<<< HEAD
 import android.location.Location;
-=======
 import android.graphics.Bitmap;
->>>>>>> da9dad3fa0a918d7e0d1c1d5caa13a7183671481
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -187,7 +184,6 @@ public class UserController {
         database.child("connectedUsers").child(currentUserId).removeValue();
     }
 
-<<<<<<< HEAD
     /**
      * Method that updates both in database and the attribute of the connected user instance his last known location
      * @param location new last known location
@@ -196,10 +192,8 @@ public class UserController {
         database.child("connectedUsers").child(currentUserId).child("lastKnownLocation").setValue(location);
     }
 
-=======
     @Override
     protected void finalize() throws Throwable {
         dbUser.removeEventListener(listenerUser);
     }
->>>>>>> da9dad3fa0a918d7e0d1c1d5caa13a7183671481
 }

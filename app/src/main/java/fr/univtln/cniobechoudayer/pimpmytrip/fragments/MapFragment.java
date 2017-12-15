@@ -99,15 +99,12 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private Spinner choicesTypeWaypoint;
     private boolean isUserSaving = false;
     private UserController userController;
-<<<<<<< HEAD
     private List<User> listConnectedUsers;
 
     public static final int LOCATION_UPDATE_MIN_DISTANCE = 3; //meters
     public static final int LOCATION_UPDATE_MIN_TIME = 3000; //milliseconds
     private LocationManager mLocationManager;
     private LocationListener mLocationListener;
-=======
->>>>>>> da9dad3fa0a918d7e0d1c1d5caa13a7183671481
 
     private Context context;
 
@@ -216,12 +213,9 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-<<<<<<< HEAD
         mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-=======
         Utils.setActionBarTitle((AppCompatActivity) getActivity(), getString(R.string.titleMap));
 
->>>>>>> da9dad3fa0a918d7e0d1c1d5caa13a7183671481
         //Initializing map
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
