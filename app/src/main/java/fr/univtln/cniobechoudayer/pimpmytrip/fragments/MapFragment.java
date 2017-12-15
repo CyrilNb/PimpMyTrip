@@ -34,6 +34,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -98,12 +99,15 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     private Spinner choicesTypeWaypoint;
     private boolean isUserSaving = false;
     private UserController userController;
+<<<<<<< HEAD
     private List<User> listConnectedUsers;
 
     public static final int LOCATION_UPDATE_MIN_DISTANCE = 3; //meters
     public static final int LOCATION_UPDATE_MIN_TIME = 3000; //milliseconds
     private LocationManager mLocationManager;
     private LocationListener mLocationListener;
+=======
+>>>>>>> da9dad3fa0a918d7e0d1c1d5caa13a7183671481
 
     private Context context;
 
@@ -171,7 +175,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                     listPositions = reply.getParcelableArrayList("listPositionsTrip");
                     Log.d("listPos recorded size", String.valueOf(listPositions.size()));
                     if (isUserSaving) {
-                        Trip addedTrip = tripController.insertTrip(true, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), userController.getConnectedUserId());
+                        Trip addedTrip = tripController.insertTrip(false, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), userController.getConnectedUserId());
                         isUserSaving = false;
                     }
                 } else {
@@ -212,7 +216,12 @@ public class MapFragment extends Fragment implements View.OnClickListener {
             }
         });
 
+<<<<<<< HEAD
         mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+=======
+        Utils.setActionBarTitle((AppCompatActivity) getActivity(), getString(R.string.titleMap));
+
+>>>>>>> da9dad3fa0a918d7e0d1c1d5caa13a7183671481
         //Initializing map
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
@@ -389,17 +398,6 @@ public class MapFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * Method to update the action bar title
-     */
-    public void setActionBarTitle() {
-        if (getActivity() instanceof AppCompatActivity) {
-            AppCompatActivity activity = ((AppCompatActivity) getActivity());
-            if (activity.getSupportActionBar() != null)
-                activity.getSupportActionBar().setTitle(getString(R.string.titleMap));
-        }
-    }
-
-    /**
      * Handle different fragment states and adapt the map
      */
 
@@ -550,7 +548,9 @@ public class MapFragment extends Fragment implements View.OnClickListener {
         params.setMargins(Utils.convertPixelsToDp(20, getContext()), Utils.convertPixelsToDp(40, getContext()), Utils.convertPixelsToDp(20, getContext()), Utils.convertPixelsToDp(40, getContext()));
         alertLayout.setLayoutParams(params);
 
-        //Setting view for save alert dialog
+        /**
+         * Setting view for save alert dialog
+         */
         titleEditText = new EditText(getContext());
         colorButton = new Button(getContext());
 
@@ -585,6 +585,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                         } else {
                             Log.d("can't save cause", "listPos is null");
                         }
+                        Toast.makeText(getContext(), "Your trip has been saved successfully !", Toast.LENGTH_LONG).show();
                     }
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -630,6 +631,7 @@ public class MapFragment extends Fragment implements View.OnClickListener {
                         } else {
                             isUserWalkingForRecordingPath = false;
                         }
+                        Log.d("transportation mode", "selected");
                         intentRecordUserLocationService = new Intent(getContext(), RecordUserLocationService.class);
                         intentRecordUserLocationService.putExtra("isUserWalking", isUserWalkingForRecordingPath);
                         intentRecordUserLocationService.putExtra("messenger", new Messenger(handler));

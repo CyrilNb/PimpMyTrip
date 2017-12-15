@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
@@ -36,7 +37,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawer;
 
     private ImageView imageViewProfile;
-    private StatisticsController statsController = StatisticsController.getInstance();
+    private TextView textViewPseudoUser;
+    private TextView textViewStats;
+    private StatisticsController statsController;
+    private UserController userController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +50,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        userController = UserController.getInstance();
+        statsController = StatisticsController.getInstance();
+
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                if(imageViewProfile != null)
+                    imageViewProfile.setImageBitmap(new CircleTransform().transform(userController.getConnectedUser().getConvertedPhoto()));
+                if(userController.getConnectedUser() != null)
+                    textViewPseudoUser.setText(userController.getConnectedUser().getPseudo());
+                if(statsController.getUserStats() != null)
+                    textViewStats.setText(String.valueOf(statsController.getUserStats().getNbTripsCreated()) + " " + getString(R.string.tripsLabel));
+
+            }
+        };
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -70,14 +88,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         displayFragment(new MapFragment());
 
         /**
-         * Getting header and loading picture //TODO avoid drawer lagging
+         * Getting header and loading picture
          */
         View header = navigationView.getHeaderView(0);
         imageViewProfile = (ImageView) header.findViewById(R.id.imageView);
-        if(imageViewProfile != null)
-          Picasso.with(this).load(R.drawable.test_profile).transform(new CircleTransform()).into(imageViewProfile);
+        textViewPseudoUser = (TextView) header.findViewById(R.id.textViewPseudoUser);
+        textViewStats = (TextView) header.findViewById(R.id.textViewStats);
 
-        //Setting listener to display from on nav header click
+        if(imageViewProfile != null)
+            imageViewProfile.setImageBitmap(new CircleTransform().transform(userController.getConnectedUser().getConvertedPhoto()));
+        if(userController.getConnectedUser() != null)
+            textViewPseudoUser.setText(userController.getConnectedUser().getPseudo());
+        if(statsController.getUserStats() != null)
+            textViewStats.setText(String.valueOf(statsController.getUserStats().getNbTripsCreated()) + " " + getString(R.string.tripsLabel));
+        /**
+         * Setting listener to display from on nav header click
+         */
         header.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

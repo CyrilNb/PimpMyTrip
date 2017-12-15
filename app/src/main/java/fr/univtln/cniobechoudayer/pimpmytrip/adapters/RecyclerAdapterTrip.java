@@ -49,7 +49,7 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
     public void onBindViewHolder(MyHolder holder, int position) {
         Trip trip = listTrips.get(position);
         holder.nameTrip.setText(trip.getName());
-        holder.distanceTrip.setText(Utils.formatedTripDistance(trip.getDistance()));
+        holder.distanceTrip.setText(Utils.formatTripDistance(trip.getDistance()));
         if(trip.getColor() != null)
             holder.imgView.setBackgroundColor(Color.parseColor(trip.getColor()));
         else{

@@ -25,12 +25,6 @@ import fr.univtln.cniobechoudayer.pimpmytrip.R;
 public class RecordUserLocationService extends IntentService {
 
     private List<Position> positionList = new ArrayList<>();
-    public static final String ACTION_MyIntentService = "com.example.androidintentservice.RESPONSE";
-    public static final String ACTION_MyUpdate = "com.example.androidintentservice.UPDATE";
-    public static final String EXTRA_KEY_IN = "EXTRA_IN";
-    public static final String EXTRA_KEY_OUT = "EXTRA_OUT";
-    public static final String EXTRA_KEY_UPDATE = "EXTRA_UPDATE";
-    private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private LocationManager locationManager;
     private Messenger messenger;
     private Message msg;
@@ -136,7 +130,7 @@ public class RecordUserLocationService extends IntentService {
             }
 
         }else{
-
+            Log.d("permission location", "denied");
         }
 
 

@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
-    android:background="@drawable/template_bg_header"
+    android:background="@drawable/background_profile"
     android:gravity="bottom"
     android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -17,24 +17,24 @@
         android:layout_width="84dp"
         android:layout_height="84dp"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:src="@drawable/template_profile"
         android:layout_gravity="center"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="4dp"
-        android:text="Corentin"
+        android:id="@+id/textViewPseudoUser"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:gravity="center"
-        android:textColor="#541D5D"/>
+        android:textStyle="bold"
+        android:textColor="@color/white"/>
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/textViewStats"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="54 itinéraires"
+        android:textStyle="bold"
         android:gravity="center"
-        android:textColor="#541D5D"/>
+        android:textColor="@color/white"/>
 
 </LinearLayout>

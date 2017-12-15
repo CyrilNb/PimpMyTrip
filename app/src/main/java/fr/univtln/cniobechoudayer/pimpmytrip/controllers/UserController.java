@@ -1,7 +1,12 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.controllers;
 
+<<<<<<< HEAD
 import android.location.Location;
+=======
+import android.graphics.Bitmap;
+>>>>>>> da9dad3fa0a918d7e0d1c1d5caa13a7183671481
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -11,6 +16,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.io.ByteArrayOutputStream;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.User;
 
@@ -33,6 +40,9 @@ public class UserController {
     private FirebaseUser currentUser;
     private static String currentUserId;
     private static UserController instance;
+    private static User connectedUser;
+    private ValueEventListener listenerUser;
+    private DatabaseReference dbUser = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
     /***************
      * CONSTRUCTOR *
@@ -45,6 +55,22 @@ public class UserController {
         if (currentUser != null) {
             currentUserId = firebaseAuth.getCurrentUser().getUid();
         }
+        /**
+         * Setting up listener to retrieve user from firebase db
+         */
+        listenerUser = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                connectedUser = dataSnapshot.getValue(User.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        dbUser.addValueEventListener(listenerUser);
+        dbUser.keepSynced(true);
     }
 
     /**
@@ -58,6 +84,13 @@ public class UserController {
         return instance;
     }
 
+    public User getConnectedUser() {
+        return connectedUser;
+    }
+
+    public static void setConnectedUser(User connectedUser) {
+        UserController.connectedUser = connectedUser;
+    }
 
     /***************
      *   METHODS   *
@@ -96,43 +129,23 @@ public class UserController {
     }
 
     /**
+     * Methd to update user profile picture of connected user
+     * @param photo
+     */
+    public void updatePhotoUser(Bitmap photo){
+        Log.d("updating photo user", "reached" );
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        photo.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+        database.child("users").child(currentUserId).child("photo").setValue(encoded);
+    }
+
+    /**
      * Method that delete the connected user
      */
     public void deleteUser() {
         database.child("users").child(currentUserId).removeValue();
-    }
-
-
-    //TODO this method will be used in the view of the user profile
-    /**
-     * User data change listener
-     */
-    private void addUserChangeListener() {
-        // User data change listener
-        database.child(currentUserId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-
-                // Check for null
-                if (user == null) {
-                    Log.e(TAG, "User data is null!");
-                    return;
-                }
-
-                Log.e(TAG, "User data is changed!" + user.getPseudo() + ", " + user.getEmail());
-
-                // Display newly updated name and email
-                //txtDetails.setText(user.getPseudo() + ", " + user.getEmail());
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.e(TAG, "Failed to read user", error.toException());
-            }
-        });
     }
 
     /**
@@ -152,12 +165,29 @@ public class UserController {
     }
 
     /**
+     * Methods to get the current connected user
+     * @return
+     */
+    public FirebaseUser getCurrentUser() {
+        return currentUser;
+    }
+
+    /**
+     * Method to update the current connecter user
+     * @param currentUser
+     */
+    public void setCurrentUser(FirebaseUser currentUser) {
+        this.currentUser = currentUser;
+    }
+
+    /**
      * Method that updates in database the fact that a user is disconnected
      */
     public void setUserAsDisconnected() {
         database.child("connectedUsers").child(currentUserId).removeValue();
     }
 
+<<<<<<< HEAD
     /**
      * Method that updates both in database and the attribute of the connected user instance his last known location
      * @param location new last known location
@@ -166,4 +196,10 @@ public class UserController {
         database.child("connectedUsers").child(currentUserId).child("lastKnownLocation").setValue(location);
     }
 
+=======
+    @Override
+    protected void finalize() throws Throwable {
+        dbUser.removeEventListener(listenerUser);
+    }
+>>>>>>> da9dad3fa0a918d7e0d1c1d5caa13a7183671481
 }
