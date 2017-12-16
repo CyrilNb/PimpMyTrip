@@ -116,6 +116,10 @@ public class TripsFragment extends Fragment {
         return rootView;
     }
 
+    /**
+     * Handling life cycle methods
+     */
+
     @Override
     public void onStart() {
         super.onStart();
