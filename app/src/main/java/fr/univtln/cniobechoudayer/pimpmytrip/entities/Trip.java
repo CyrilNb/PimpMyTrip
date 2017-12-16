@@ -8,6 +8,12 @@ import com.google.firebase.database.Exclude;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Class that represents trips
+ * NB : BUILDER PATTERN IMPLEMENTED
+ * Also Parcelable
+ */
+
 public class Trip implements Parcelable{
 
     @Exclude
@@ -27,6 +33,11 @@ public class Trip implements Parcelable{
 
     public Trip() {
     }
+
+    /**
+     * Constructor using builder
+     * @param tripBuilder
+     */
 
     private Trip(TripBuilder tripBuilder){
         this.id = tripBuilder.id;
@@ -65,6 +76,11 @@ public class Trip implements Parcelable{
             return new Trip[size];
         }
     };
+
+    /**
+     * Getters and setters
+     * @return
+     */
 
     public boolean isReference() {
         return reference;
