@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 displayFragment(TripsFragment.getInstance());
                 break;
             case R.id.tabAR:
-                //TODO
+                //TODO display activity for ar
                 break;
             case R.id.titleTripsManagement:
                 displayFragment(ManagerTripFragment.getInstance());
@@ -211,8 +211,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * @return
      */
     private boolean checkIfUserIsManager(){
-        return true;
-        //TODO verifier si l'utilisateur qui se connecte est un manager
+        if(userController.getConnectedUser().isManager())
+            return true;
+        else
+            return false;
     }
 
 }

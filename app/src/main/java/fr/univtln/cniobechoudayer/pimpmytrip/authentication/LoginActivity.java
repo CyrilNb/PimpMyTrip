@@ -166,7 +166,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         super.onResume();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = auth.getCurrentUser();
-        //TODO launch mapsfragment
+        if(currentUser != null){
+            Intent startMainActivity = new Intent(this, MainActivity.class);
+            startActivity(startMainActivity);
+        }
     }
 
     @Override
@@ -174,8 +177,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = auth.getCurrentUser();
-        //TODO launch mapsfragment
-
+        if (currentUser != null) {
+            Intent startMainActivity = new Intent(this, MainActivity.class);
+            startActivity(startMainActivity);
+        }
     }
 
     /**

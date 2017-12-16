@@ -54,9 +54,11 @@ public class UserController {
         if (currentUser != null) {
             currentUserId = firebaseAuth.getCurrentUser().getUid();
             dbUser = database.child("users").child(currentUserId);
+            databaseUsersConnectedReference = database.child("connectedUsers").child(currentUserId);
+        }else{
+            Log.d("user connected", "null");
         }
 
-        databaseUsersConnectedReference = database.child("connectedUsers").child(currentUserId);
 
         /**
          * Setting up listener to retrieve user from firebase db
@@ -72,8 +74,11 @@ public class UserController {
 
             }
         };
-        dbUser.addValueEventListener(listenerUser);
-        dbUser.keepSynced(true);
+        if(dbUser != null){
+            dbUser.addValueEventListener(listenerUser);
+            dbUser.keepSynced(true);
+        }
+
 
     }
 
@@ -188,7 +193,8 @@ public class UserController {
      * Method that updates in database the fact that a user is disconnected
      */
     public void setUserAsDisconnected() {
-        databaseUsersConnectedReference.removeValue();
+        if(databaseUsersConnectedReference != null)
+            databaseUsersConnectedReference.removeValue();
     }
 
 
@@ -202,7 +208,8 @@ public class UserController {
      * @param location new last known location
      */
     public void updateLastKnownUserLocation(Location location){
-        databaseUsersConnectedReference.child("lastKnownLocation").setValue(location);
+        if(databaseUsersConnectedReference != null)
+            databaseUsersConnectedReference.child("lastKnownLocation").setValue(location);
     }
 
 

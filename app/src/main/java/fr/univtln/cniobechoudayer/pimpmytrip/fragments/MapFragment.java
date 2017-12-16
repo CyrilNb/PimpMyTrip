@@ -98,14 +98,10 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private Spinner choicesTypeWaypoint;
     private boolean isUserSaving = false;
     private UserController userController;
-<<<<<<< HEAD
-    private List<User> listConnectedUsers;
-=======
     private LocationManager locationManager;
     private LocationListener locationListener;
     private HashMap<String,Marker> connectedUsersMarkersHashMap;
     private List<User> connectedUserlist;
->>>>>>> 7f3fcdc30d818308474df61f91e3527aa5db1673
 
     public static final int LOCATION_UPDATE_MIN_DISTANCE = 3; //meters
     public static final int LOCATION_UPDATE_MIN_TIME = 3000; //milliseconds
@@ -163,6 +159,8 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
+
+        requestLocationPermissions();
 
         /**
          * Initializing location manager
@@ -1082,6 +1080,39 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         };
         dbUsers.addValueEventListener(listenerDbUserPhoto);
         return userRetrieved[0].getConvertedPhoto();
+    };
+
+    /**
+     * Method to ask user to give the app rights to access the location
+     */
+    private void requestLocationPermissions(){
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            //Requesting location permission
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            return;
+        }
+    }
+
+    /**
+     * Method to react once user gives an requested permission
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch(requestCode){
+            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION:
+                if(grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    buttonRecordTrip.setVisibility(View.GONE);
+                }else{
+                    buttonRecordTrip.setVisibility(View.VISIBLE);
+                }
+                break;
+        }
     };
 
 }
