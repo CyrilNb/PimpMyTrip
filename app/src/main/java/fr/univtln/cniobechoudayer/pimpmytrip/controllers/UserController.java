@@ -39,7 +39,7 @@ public class UserController {
     private static UserController instance;
     private static User connectedUser;
     private ValueEventListener listenerUser;
-    private DatabaseReference dbUser = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+    private DatabaseReference dbUser;
 
     /***************
      * CONSTRUCTOR *
@@ -51,6 +51,7 @@ public class UserController {
         currentUser = firebaseAuth.getCurrentUser();
         if (currentUser != null) {
             currentUserId = firebaseAuth.getCurrentUser().getUid();
+            dbUser = database.child("users").child(currentUserId);
         }
         /**
          * Setting up listener to retrieve user from firebase db
