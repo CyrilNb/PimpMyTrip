@@ -86,6 +86,10 @@ public class RefTripsFragment extends Fragment {
         return rootView;
     }
 
+    /**
+     * Setting up database listeners
+     * when fragment starts
+     */
     @Override
     public void onStart() {
         super.onStart();

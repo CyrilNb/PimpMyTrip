@@ -7,6 +7,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 
+/**
+ * Simple pager adapter
+ */
+
 public class PagerAdapter extends FragmentPagerAdapter {
 
     private Context mContext;

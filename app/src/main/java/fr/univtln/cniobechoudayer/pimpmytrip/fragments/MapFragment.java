@@ -201,7 +201,10 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
         userController = UserController.getInstance();
 
-        //TODO
+        /**
+         * Handler to get a message that returns position from
+         * RecordUserLocationService
+         */
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
