@@ -23,6 +23,12 @@ import static android.support.design.widget.Snackbar.*;
 
 public class Utils {
 
+    /**
+     * Method that convert pixels to dp
+     * @param px
+     * @param context
+     * @return
+     */
     public static int convertPixelsToDp(float px, Context context){
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
@@ -50,6 +56,11 @@ public class Utils {
         }
     }
 
+    /**
+     * Method that returns a well formatted trip distance
+     * @param distance
+     * @return
+     */
     public static String formatTripDistance(double distance) {
         String unit = "m";
         if (distance < 1) {
@@ -63,6 +74,11 @@ public class Utils {
         return String.format("%4.3f%s", distance, unit);
     }
 
+    /**
+     * Method that returns a well formatted trip duration
+     * @param duration
+     * @return
+     */
     public static String formatTripTime(int duration){
         String finalresult = "";
         Double computedDuration = 0.0;

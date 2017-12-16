@@ -103,6 +103,9 @@ public class RecordUserLocationService extends IntentService implements Location
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, mLocationListener);
     }
 
+    /**
+     * Initialize location manager in order to get user position
+     */
     private void initializeLocationManager() {
         Log.e(TAG, "initializeLocationManager");
         if (mLocationManager == null || locationManager == null) {
@@ -116,6 +119,9 @@ public class RecordUserLocationService extends IntentService implements Location
         return super.onStartCommand(intent, flags, startId);
     }
 
+    /**
+     * Sending positions lists back to the caller of this service
+     */
     @Override
     public void onDestroy() {
         Bundle bundleToSend = new Bundle();
@@ -184,6 +190,9 @@ public class RecordUserLocationService extends IntentService implements Location
 
     }
 
+    /**
+     * Implementing LocationListener interface
+     */
     @Override
     public void onLocationChanged(Location location) {
         Log.d(TAG, String.valueOf(location.getAltitude()));
