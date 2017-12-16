@@ -501,7 +501,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
     private void displayAlertDialogSaveTrip(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
+            builder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
         } else {
             builder = new AlertDialog.Builder(getContext());
         }
@@ -565,7 +565,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
      */
     private void displayDialogSaveMarker(final LatLng pointToSave){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
+            builder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
         } else {
             builder = new AlertDialog.Builder(getContext());
         }
@@ -702,7 +702,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     private void displayAlertDialogChoiceTransportationMode(){
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
+            builder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
         } else {
             builder = new AlertDialog.Builder(getContext());
         }

@@ -26,4 +26,13 @@
         <item name="android:textSize">30sp</item>
     </style>
 
+    <style name="CustomDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <!--buttons color-->
+        <item name="colorAccent">@color/white</item>
+        <!--title and message color-->
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <!--dialog background-->
+        <item name="android:windowBackground">@drawable/custom_alert_dialog</item>
+    </style>
+
 </resources>
