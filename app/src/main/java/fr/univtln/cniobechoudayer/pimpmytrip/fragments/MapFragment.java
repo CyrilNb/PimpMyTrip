@@ -3,6 +3,7 @@ package fr.univtln.cniobechoudayer.pimpmytrip.fragments;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.support.annotation.ColorInt;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -53,6 +55,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Logger;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
@@ -61,14 +64,18 @@ import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
 import com.pes.androidmaterialcolorpickerdialog.ColorPickerCallback;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Position;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.TypeWaypoint;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.User;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Waypoint;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.services.ConnectedUserLocationService;
 import fr.univtln.cniobechoudayer.pimpmytrip.services.RecordUserLocationService;
 import fr.univtln.cniobechoudayer.pimpmytrip.services.UserLocationReceiver;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.CircleTransform;
@@ -98,6 +105,13 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private UserController userController;
     private LocationManager locationManager;
     private LocationListener locationListener;
+    private HashMap<String,Marker> connectedUsersMarkersHashMap;
+    private List<User> connectedUserlist;
+
+    public static final int LOCATION_UPDATE_MIN_DISTANCE = 3; //meters
+    public static final int LOCATION_UPDATE_MIN_TIME = 3000; //milliseconds
+    private LocationManager mLocationManager;
+    private LocationListener mLocationListener;
 
     private Context context;
 
@@ -107,11 +121,14 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private IconGenerator factory;
     private ValueEventListener listenerDbTrips;
     private ValueEventListener listenerDbMyTrips;
+    private ValueEventListener listenerDbUserPhoto;
     private TripController tripController = TripController.getInstance();
 
     private DatabaseReference dbTrips = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
     private Query dbRefTrips = dbTrips.orderByChild("reference").equalTo(true);
     private DatabaseReference dbMyTrips = (DatabaseReference) dbTrips.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+    private DatabaseReference dbUsersConnected = (DatabaseReference) FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("connectedUsers");
+    private DatabaseReference dbUsers = (DatabaseReference) FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("users");
 
 
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
@@ -137,6 +154,10 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         super.onCreate(savedInstanceState);
         this.context = getContext();
         factory = new IconGenerator(getActivity());
+        connectedUsersMarkersHashMap = new HashMap<>();
+        connectedUserlist = new ArrayList<>();
+        getActivity().startService(new Intent(getActivity(), ConnectedUserLocationService.class));
+
     }
 
     @Override
@@ -233,6 +254,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
         Utils.setActionBarTitle((AppCompatActivity) getActivity(), getString(R.string.titleMap));
 
+        mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         //Initializing map
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
@@ -241,25 +263,24 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         }
 
         Bundle extras = getArguments();
-        if (extras != null){
+        if (extras != null) {
             listSwipedTrips = extras.getParcelableArrayList("listSwipedTrips");
-            if(listSwipedTrips != null){
+            if (listSwipedTrips != null) {
 
                 /**
-                 * Loading the map asynchronously and adding a OnMapReadyCallback for displaying locations
+                 * Loading the map asynchronously and display the trip swiped
                  */
                 mMapView.getMapAsync(new OnMapReadyCallback() {
                     @Override
                     public void onMapReady(GoogleMap mMap) {
                         mGoogleMap = mMap;
-                        System.out.println("googlemapBUNDLE: " + mGoogleMap);
                         displaySwipedTrip(listSwipedTrips.get(0));
                     }
                 });
 
 
             }
-        }else {
+        } else {
             /**
              * Loading the map asynchronously and adding a OnMapReadyCallback for displaying locations
              */
@@ -267,7 +288,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                 @Override
                 public void onMapReady(GoogleMap mMap) {
                     mGoogleMap = mMap;
-                    System.out.println("googlemapPASBUNDLE: " + mGoogleMap);
 
                     // For showing a move to my location button
                     // Checking if user's location is accessible
@@ -292,6 +312,10 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                         zoomInMap(new LatLng(location.getLatitude(),location.getLongitude()),10);
                         displayUserOnMap();
                     }
+                    //getCurrentLocation();
+                    /*if (currentLocation != null) {
+                        zoomInMap(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 10);
+                    }*/
                 }
             });
             listenerDbTrips = new ValueEventListener() {
@@ -326,7 +350,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
-                        Trip currentTrip = (Trip) tripSnapshot.getValue(Trip.class);
+                        Trip currentTrip = tripSnapshot.getValue(Trip.class);
                         listMyTrips.add(currentTrip);
                     }
                     Log.d("listMyTrips", "updated");
@@ -339,7 +363,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                 }
             };
 
-
+            //TODO
             dbRefTrips.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -375,6 +399,57 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                 }
             });
 
+            dbUsersConnected.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    //User connectedUser = dataSnapshot.getValue(User.class);
+                    //listConnectedUsers.add(connectedUser);
+                    //System.out.println(listConnectedUsers.size());
+                    System.out.println("new connected User added: " + dataSnapshot.getKey());
+                    connectedUserlist.add(dataSnapshot.getValue(User.class));
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    System.out.println("onchildchanged");
+                    String idUser = dataSnapshot.getKey();
+                    System.out.println(idUser);
+                    if(FirebaseAuth.getInstance().getCurrentUser() != null){
+                        if(FirebaseAuth.getInstance().getCurrentUser().getUid().equals(idUser)){
+                            if(connectedUsersMarkersHashMap.containsKey(idUser)){
+                                connectedUsersMarkersHashMap.get(idUser).remove();
+                                connectedUserlist.remove(dataSnapshot.getValue(User.class));
+                            }
+                            double latitude = (double) dataSnapshot.child("lastKnownLocation").child("latitude").getValue();
+                            double longitude = (double) dataSnapshot.child("lastKnownLocation").child("longitude").getValue();
+                            System.out.println(latitude + " / " + longitude);
+                            Position position = new Position(latitude,longitude);
+                            drawMarker(position,idUser);
+                        }
+
+                    }
+
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    //User connectedUser = dataSnapshot.getValue(User.class);
+                    //listConnectedUsers.remove(connectedUser);
+                    //System.out.println(listConnectedUsers.size());
+                    System.out.println(" connected User removed: " + dataSnapshot.getKey());
+
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
         }
         return rootView;
     }
@@ -390,10 +465,16 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         //TODO REFACTOR IN a classe mere fragment
         if (listenerDbMyTrips != null)
             dbMyTrips.addValueEventListener(listenerDbMyTrips);
-        if(listenerDbTrips != null)
+        if (listenerDbTrips != null)
             dbTrips.addValueEventListener(listenerDbTrips);
-            //dbTrips.addListenerForSingleValueEvent(listenerDbTrips);
+        //dbTrips.addListenerForSingleValueEvent(listenerDbTrips);
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //getCurrentLocation();
     }
 
     @Override
@@ -401,13 +482,15 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         super.onStop();
         if (listenerDbMyTrips != null)
             dbMyTrips.removeEventListener(listenerDbMyTrips);
-        if(listenerDbTrips != null)
+        if (listenerDbTrips != null)
             dbTrips.removeEventListener(listenerDbTrips);
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        mMapView.onPause();
+        //mLocationManager.removeUpdates(mLocationListener);
     }
 
     @Override
@@ -427,11 +510,11 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
     @Override
     public void onClick(View v) {
-        switch(v.getId()){
+        switch (v.getId()) {
             case R.id.buttonRecordTrip:
-                if(isUserRecording){
+                if (isUserRecording) {
                     displayAlertDialogSaveTrip();
-                }else{
+                } else {
                     displayAlertDialogChoiceTransportationMode();
                     isUserRecording = true;
                     buttonRecordTrip.setImageResource(R.drawable.ic_stop_white_48dp);
@@ -443,7 +526,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     /**
      * Method to display an alert dialog to save a specific marker
      */
-    private void displayDialogSaveMarker(final LatLng pointToSave){
+    private void displayDialogSaveMarker(final LatLng pointToSave) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
         } else {
@@ -457,7 +540,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
         choicesTypeWaypoint = new Spinner(getContext());
 
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String> (getContext(), android.R.layout.simple_list_item_1 , getResources().getStringArray(R.array.spinnerChoicesMarker));
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.spinnerChoicesMarker));
         choicesTypeWaypoint.setAdapter(spinnerArrayAdapter);
 
         titleEditText = new EditText(getContext());
@@ -513,7 +596,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     /**
      * Method that create and display the alert dialog to save a trip to database
      */
-    private void displayAlertDialogSaveTrip(){
+    private void displayAlertDialogSaveTrip() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
         } else {
@@ -556,11 +639,11 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                         getActivity().stopService(intentRecordUserLocationService);
                         buttonRecordTrip.setImageResource(R.drawable.ic_play_arrow_white_48dp);
                         isUserRecording = false;
-                        if(listPositions != null){
+                        if (listPositions != null) {
                             Log.d("add trip ?", "reached");
                             isUserSaving = true;
-                        }else{
-                            Log.d("can't save cause","listPos is null");
+                        } else {
+                            Log.d("can't save cause", "listPos is null");
                         }
                         Toast.makeText(getContext(), "Your trip has been saved successfully !", Toast.LENGTH_LONG).show();
                     }
@@ -579,7 +662,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     /**
      * Method that create and displays alert dialog to choose the transportation mode
      */
-    private void displayAlertDialogChoiceTransportationMode(){
+    private void displayAlertDialogChoiceTransportationMode() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
@@ -593,7 +676,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         alertLayout.setLayoutParams(params);
 
         final Spinner choiceTransportationMode = new Spinner(getContext());
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String> (getContext(), android.R.layout.simple_list_item_1 , getResources().getStringArray(R.array.spinnerChoicesTransportationMode));
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.spinnerChoicesTransportationMode));
         choiceTransportationMode.setAdapter(spinnerArrayAdapter);
 
         alertLayout.addView(choiceTransportationMode);
@@ -603,9 +686,9 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                     public void onClick(DialogInterface dialog, int which) {
                         buttonRecordTrip.setImageResource(R.drawable.ic_stop_white_48dp);
                         isUserRecording = true;
-                        if(choiceTransportationMode.getSelectedItemPosition() == 0){
+                        if (choiceTransportationMode.getSelectedItemPosition() == 0) {
                             isUserWalkingForRecordingPath = true;
-                        }else{
+                        } else {
                             isUserWalkingForRecordingPath = false;
                         }
                         Log.d("transportation mode", "selected");
@@ -630,10 +713,11 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
     /**
      * Method to compute the total distance of a trip
-     * @param listPositions
+     *
+     * @param listPositions list of positions of the trip
      * @return
      */
-    private int computeTotalTripDistance(List<Position> listPositions){
+    private int computeTotalTripDistance(List<Position> listPositions) {
 
         Marker prevMarker = null;
         Marker currentMarker = null;
@@ -641,10 +725,10 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
         ListIterator<Position> listIterator = listPositions.listIterator();
         while (listIterator.hasNext()) {
-            if(!listIterator.hasPrevious()){
+            if (!listIterator.hasPrevious()) {
                 Position pos = listIterator.next();
                 prevMarker = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(pos.getCoordX(), pos.getCoordY())).visible(false));
-            }else{
+            } else {
                 Position pos = listIterator.next();
                 currentMarker = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(pos.getCoordX(), pos.getCoordY())).visible(false));
                 distance += SphericalUtil.computeDistanceBetween(prevMarker.getPosition(), currentMarker.getPosition());
@@ -655,15 +739,15 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
         Log.d("distance computed : ", String.valueOf(distance));
 
-        return (int)distance;
+        return (int) distance;
 
     }
 
     /**
      * Method that loads and display the current referenced trip
      */
-    private void loadReferenceTrip(){
-        for(Trip refTrip : listReferenceTrip){
+    private void loadReferenceTrip() {
+        for (Trip refTrip : listReferenceTrip) {
             displayTrip(refTrip);
             displayWaypoints(refTrip);
         }
@@ -672,34 +756,34 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     /**
      * Method that loads and display all the trips created by the current user
      */
-    private void loadMyTrips(){
-        for(Trip myTrip : listMyTrips){
+    private void loadMyTrips() {
+        for (Trip myTrip : listMyTrips) {
             displayTrip(myTrip);
         }
     }
 
-
     /**
      * Method that display the passed trip in google maps
+     *
      * @param tripToDisplay
      */
-    private void displayTrip(Trip tripToDisplay){
+    private void displayTrip(Trip tripToDisplay) {
         List<Position> positionList = tripToDisplay.getListPositions();
         PolylineOptions pathTrip = new PolylineOptions();
         factory = new IconGenerator(this.context);
-        if(positionList != null){
+        if (positionList != null) {
             ListIterator<Position> iterator = positionList.listIterator();
-            while(iterator.hasNext()){
+            while (iterator.hasNext()) {
 
                 Position pos = null;
                 String titleLabel = "";
                 Bitmap icon = null;
 
-                if(!iterator.hasPrevious()){
-                    if(tripToDisplay.isReference()){
+                if (!iterator.hasPrevious()) {
+                    if (tripToDisplay.isReference()) {
                         titleLabel = "REFERENCE TRIP \n Departure " + tripToDisplay.getName();
                         factory.setColor(Color.YELLOW);
-                    } else{
+                    } else {
                         factory.setColor(Color.parseColor(tripToDisplay.getColor()));
                         titleLabel = "Departure " + tripToDisplay.getName();
                     }
@@ -710,15 +794,15 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                                     .position(new LatLng(pos.getCoordX(), pos.getCoordY()))
                                     .icon(BitmapDescriptorFactory.fromBitmap(icon))
                     );
-                }else{
+                } else {
                     pos = iterator.next();
                 }
 
-                if(!iterator.hasNext()){
-                    if(tripToDisplay.isReference()){
+                if (!iterator.hasNext()) {
+                    if (tripToDisplay.isReference()) {
                         titleLabel = "REFERENCE TRIP \n Arrival " + tripToDisplay.getName();
                         factory.setColor(Color.YELLOW);
-                    } else{
+                    } else {
                         factory.setColor(Color.parseColor(tripToDisplay.getColor()));
                         titleLabel = "Arrival " + tripToDisplay.getName();
                     }
@@ -740,15 +824,15 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
     }
 
-
     /**
      * Method that display the passed trip in google maps
+     *
      * @param tripToDisplay
      */
-    public void displaySwipedTrip(Trip tripToDisplay){
+    public void displaySwipedTrip(Trip tripToDisplay) {
         List<Position> positionList = tripToDisplay.getListPositions();
 
-        if(positionList != null && !positionList.isEmpty()) {
+        if (positionList != null && !positionList.isEmpty()) {
 
             PolylineOptions pathTrip = new PolylineOptions();
 
@@ -768,17 +852,19 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         }
 
     }
+
     /**
      * Method that displays the waypoints related to a specific displayed trip
+     *
      * @param tripToLoadWaypoints
      */
-    private void displayWaypoints(Trip tripToLoadWaypoints){
-        if(tripToLoadWaypoints.getListWaypoints() != null){
+    private void displayWaypoints(Trip tripToLoadWaypoints) {
+        if (tripToLoadWaypoints.getListWaypoints() != null) {
             ListIterator<Waypoint> listIterator = tripToLoadWaypoints.getListWaypoints().listIterator();
-            while (listIterator.hasNext()){
+            while (listIterator.hasNext()) {
                 Waypoint waypoint = listIterator.next();
                 BitmapDescriptor iconForMarker = null;
-                switch (waypoint.getType()){
+                switch (waypoint.getType()) {
                     case DANGER:
                         iconForMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE);
                         break;
@@ -800,10 +886,11 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
     /**
      * Method that zooms in the Google map on a specific zone
-     * @param latLng latlng to zoom in
+     *
+     * @param latLng     latlng to zoom in
      * @param zoomDegree intensity of the zoom
      */
-    private void zoomInMap(LatLng latLng, float zoomDegree){
+    private void zoomInMap(LatLng latLng, float zoomDegree) {
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(latLng)      // Sets the center of the map to location user
                 .zoom(zoomDegree)            // Sets the zoom
@@ -860,6 +947,141 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     public void onProviderDisabled(String provider) {
 
     }
+     /* Method to handle a new user location
+     *
+     * @param location location to be handle
+     */
+    private void handleNewLocation(Location location) {
+        Log.d("handlenewlocation: ", location.toString());
+
+        double currentLatitude = location.getLatitude();
+        double currentLongitude = location.getLongitude();
+        LatLng latLng = new LatLng(currentLatitude, currentLongitude);
+
+        MarkerOptions options = new MarkerOptions()
+                .position(latLng)
+                .title("I am here!");
+        mGoogleMap.addMarker(options);
+        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+    }
+
+    /**
+     * Get the lastknow location of the user
+     *
+     * @return
+     */
+    private void getCurrentLocation() {
+
+        /*mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+
+        // For showing a move to my location button
+        // Checking if user's location is accessible
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            //Requesting location permission
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            return null;
+        }
+        return mLocationManager.getLastKnownLocation(mLocationManager.getBestProvider(criteria, false));*/
+
+        boolean isGPSEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean isNetworkEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        Location location = null;
+        if (!(isGPSEnabled || isNetworkEnabled))
+            Snackbar.make(mMapView, "error location provider", Snackbar.LENGTH_INDEFINITE).show();
+        else {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                //TODO
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            if (isNetworkEnabled) {
+                mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                        LOCATION_UPDATE_MIN_TIME, LOCATION_UPDATE_MIN_DISTANCE, mLocationListener);
+                location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }
+
+            if (isGPSEnabled) {
+                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                        LOCATION_UPDATE_MIN_TIME, LOCATION_UPDATE_MIN_DISTANCE, mLocationListener);
+                location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            }
+        }
+        if (location != null) {
+            System.out.println(location);
+            drawMarker(location, "current position");
+        }
+    }
+
+    /**
+     * Draw a marker on the google map
+     *
+     * @param location location where to draw
+     */
+    private void drawMarker(Location location,String title) {
+        if (mGoogleMap != null) {
+            mGoogleMap.clear();
+            LatLng gps = new LatLng(location.getLatitude(), location.getLongitude());
+            mGoogleMap.addMarker(new MarkerOptions()
+                    .position(gps)
+                    .title(title));
+            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(gps, 12));
+        }
+
+    }
+
+    /**
+     * Draw a marker on the google map of the last know location of user connected
+     *
+     * @param position location where to draw
+     */
+    private void drawMarker(Position position, final String idUser) {
+        if (mGoogleMap != null) {
+            getUserPhoto(idUser);
+            LatLng gps = new LatLng(position.getCoordX(), position.getCoordY());
+            Marker marker;
+            User userToDisplay = new User();
+            for(User user : connectedUserlist){
+                if(String.valueOf(user.getIdUser())== idUser){
+                    userToDisplay = user;
+                }
+            }
+            marker = mGoogleMap.addMarker(new MarkerOptions()
+                        .position(gps)
+                        .icon(BitmapDescriptorFactory.fromBitmap(userToDisplay.getConvertedPhoto()))
+                        .title(idUser));
+
+
+            connectedUsersMarkersHashMap.put(idUser, marker);
+        }
+    }
+
+    private Bitmap getUserPhoto(String idUser){
+        dbUsers.child(idUser);
+        final User[] userRetrieved = {new User()};
+        listenerDbUserPhoto = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                userRetrieved[0] = dataSnapshot.getValue(User.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        dbUsers.addValueEventListener(listenerDbUserPhoto);
+        return userRetrieved[0].getConvertedPhoto();
+    };
+
 }
 
 

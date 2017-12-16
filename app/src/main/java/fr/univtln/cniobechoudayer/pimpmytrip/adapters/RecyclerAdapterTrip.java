@@ -32,19 +32,37 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
     private TripController tripController;
     private MapFragment mapFragment;
 
+    /**
+     * Constructor for recycler adapter
+     * @param list
+     * @param context
+     * @param fragmentManager
+     */
     public RecyclerAdapterTrip(List<Trip> list, Context context, android.support.v4.app.FragmentManager fragmentManager) {
         this.listTrips = list;
         this.context = context;
         this.fragmentManager = fragmentManager;
         tripController = TripController.getInstance();
+        mapFragment = MapFragment.getInstance();
     }
 
+    /**
+     * Inflating the view with a custom card view layout
+     * @param parent
+     * @param viewType
+     * @return
+     */
     @Override
     public MyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.cardview_trip, parent, false);
         return new MyHolder(view);
     }
 
+    /**
+     * Binding the cardview with data
+     * @param holder
+     * @param position
+     */
     @Override
     public void onBindViewHolder(MyHolder holder, int position) {
         Trip trip = listTrips.get(position);
@@ -57,6 +75,10 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
         }
     }
 
+    /**
+     * Get total number of items in passed list
+     * @return
+     */
     @Override
     public int getItemCount() {
         if (listTrips == null) {
@@ -70,6 +92,13 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
         notifyDataSetChanged();
     }
 
+    /**
+     * Method that handles gesture of user
+     * @param fromPosition The start position of the moved item.
+     * @param toPosition   Then resolved position of the moved item.
+     *
+     * @return
+     */
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
         if (fromPosition < toPosition) {
@@ -85,6 +114,11 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
         return true;
     }
 
+    /**
+     * Method that handles delete of an item
+     * @param position The position of the item dismissed.
+     *
+     */
     @Override
     public void onItemDismiss(final int position) {
         swipedTrip = listTrips.get(position);
@@ -93,6 +127,10 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
         tripController.deleteTrip(swipedTrip);
     }
 
+    /**
+     * To reinsert a previously deleted item
+     * @param position
+     */
     public void restoreItem(final int position){
         listTrips.add(position, swipedTrip);
         notifyItemInserted(position);
@@ -110,8 +148,6 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
             System.out.println("swipedlist from recycler: "+listTripToBePassed.get(0).getName() );
             Bundle bundle = new Bundle();
             bundle.putParcelableArrayList("listSwipedTrips",listTripToBePassed);
-
-            MapFragment mapFragment = MapFragment.getInstance();
             mapFragment.setArguments(bundle);
             fragmentManager.beginTransaction().replace(R.id.mainContent, mapFragment, MapFragment.getInstance().getClass().getSimpleName()).commit();
 
@@ -121,6 +157,9 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
 
     }
 
+    /**
+     * Retrieving graphic elements from layout view
+     */
     public class MyHolder extends RecyclerView.ViewHolder {
 
         TextView nameTrip, distanceTrip;

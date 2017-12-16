@@ -42,6 +42,10 @@ public class ResetPasswordActivity extends AppCompatActivity{
 
         auth = FirebaseAuth.getInstance();
 
+        /**
+         * Setting up click listeners
+         */
+
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,11 +81,18 @@ public class ResetPasswordActivity extends AppCompatActivity{
         });
     }
 
+    /**
+     * Handles hardware back button when pressed
+     */
     @Override
     public void onBackPressed() {
         returnToLoginActivity();
     }
 
+
+    /**
+     * Method that allows to go back to login activity
+     */
     private void returnToLoginActivity(){
         //Return to the Login activity
         Intent intent = new Intent(getApplicationContext(),LoginActivity.class);

@@ -3,6 +3,7 @@ package fr.univtln.cniobechoudayer.pimpmytrip.entities;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
+import android.location.Location;
 
 /**
  * User abtrsact class
@@ -118,7 +119,6 @@ public class User {
         Bitmap decodedBytePhoto = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
         return decodedBytePhoto;
     }
-
 
 
     @Override

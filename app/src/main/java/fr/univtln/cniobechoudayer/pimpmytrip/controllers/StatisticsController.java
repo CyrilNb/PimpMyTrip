@@ -12,6 +12,11 @@ import com.google.firebase.database.ValueEventListener;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Statistics;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 
+/**
+ * Controller to manage CRUD of user statistics
+ * NB : SINGLETON PATTERN IMPLEMENTED
+ */
+
 public class StatisticsController {
 
     private static FirebaseAuth firebaseAuth;
@@ -24,15 +29,19 @@ public class StatisticsController {
 
 
     public StatisticsController() {
+
+        /**
+         * Getting useful singletons
+         */
         firebaseAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase");
-        //setUpDataFromDatabase();
+
+        /**
+         * Setting up database listeners
+         */
         listenerDbStats = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                    String statsKey = dataSnapshot.getKey();
-                    Log.d("statsKey", statsKey);
-                    Log.d("datasnap", String.valueOf(dataSnapshot));
                     userStats = dataSnapshot.getValue(Statistics.class);
                     if(userStats != null){
                         Log.d("userStats", "retrieved : " + userStats.toString());
@@ -47,6 +56,10 @@ public class StatisticsController {
         dbUserStats.addValueEventListener(listenerDbStats);
     }
 
+    /**
+     * Singleton pattern
+     * @return
+     */
     public static StatisticsController getInstance(){
         if(singleton == null){
             singleton = new StatisticsController();
@@ -54,6 +67,11 @@ public class StatisticsController {
         return singleton;
     }
 
+    /**
+     * Method that update statistics of user when creating a new trip
+     * @param savedTrip
+     * @param isUserWalking
+     */
     public static void updateStats(Trip savedTrip, boolean isUserWalking){
 
         if(userStats != null){
@@ -82,6 +100,10 @@ public class StatisticsController {
 
     }
 
+    /**
+     * Getter for user stats
+     * @return
+     */
     public Statistics getUserStats(){
         return userStats;
     }

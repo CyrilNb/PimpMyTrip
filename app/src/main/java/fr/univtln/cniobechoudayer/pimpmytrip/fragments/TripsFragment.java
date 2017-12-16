@@ -30,9 +30,7 @@ import fr.univtln.cniobechoudayer.pimpmytrip.callbacks.SimpleItemTouchHelperCall
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link RefTripsFragment newInstance} factory method to
- * create an instance of this fragment.
+ * Fragment representing the Trip Fragment
  */
 public class TripsFragment extends Fragment {
     private static String TAG = "DATABASE";

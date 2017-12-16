@@ -1,5 +1,6 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.activities;
 
+import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -25,6 +26,7 @@ import fr.univtln.cniobechoudayer.pimpmytrip.fragments.ProfileFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.RefTripsFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.TripsFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.services.ConnectedUserLocationService;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.CircleTransform;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.StatisticsController;
 
@@ -52,6 +54,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         statsController = StatisticsController.getInstance();
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        /**
+         * Handling the navigation drawer slide to display user data in real time
+         */
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
             @Override
@@ -99,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             textViewPseudoUser.setText(userController.getConnectedUser().getPseudo());
         if(statsController.getUserStats() != null)
             textViewStats.setText(String.valueOf(statsController.getUserStats().getNbTripsCreated()) + " " + getString(R.string.tripsLabel));
+
         /**
          * Setting listener to display from on nav header click
          */
@@ -166,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onDestroy() {
         UserController.getInstance().setUserAsDisconnected();
+        stopService(new Intent(this, ConnectedUserLocationService.class));
         super.onDestroy();
     }
 
