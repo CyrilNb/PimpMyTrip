@@ -17,6 +17,11 @@ public class Position implements Parcelable{
         this.coordY = coordY;
     }
 
+    //Default constructor required by Firebase
+    public Position(){
+
+    }
+
     protected Position(Parcel in) {
         coordX = in.readDouble();
         coordY = in.readDouble();

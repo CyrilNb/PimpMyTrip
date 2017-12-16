@@ -943,12 +943,14 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
 
     private void displayUserOnMap(){
-
+        Bitmap icon = null;
         Criteria blankCriteria = new Criteria();
         Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(blankCriteria, false));
         factory = new IconGenerator(this.context);
         factory.setColor(getResources().getColor(R.color.colorPrimaryDark));
-        Bitmap icon = Bitmap.createScaledBitmap(new CircleTransform().transform(userController.getConnectedUser().getConvertedPhoto()), 200, 200, false);
+        if(userController.getConnectedUser().getConvertedPhoto() != null)
+            icon = Bitmap.createScaledBitmap(new CircleTransform().transform(userController.getConnectedUser().getConvertedPhoto()), 200, 200, false);
+        if(icon != null)
         mGoogleMap.addMarker(
                 new MarkerOptions()
                         .position(new LatLng(location.getLatitude(), location.getLongitude()))
