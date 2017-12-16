@@ -3,13 +3,14 @@ package fr.univtln.cniobechoudayer.pimpmytrip.entities;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * Position class to manage easily positions of markers and users on map
+ */
+
 public class Position implements Parcelable{
 
     private double coordX;
     private double coordY;
-
-    public Position() {
-    }
 
     public Position(double coordX, double coordY) {
         this.coordX = coordX;
@@ -48,6 +49,10 @@ public class Position implements Parcelable{
     public void setCoordY(float coordY) {
         this.coordY = coordY;
     }
+
+    /**
+     * Implementing methods to make it parcelable
+     */
 
     @Override
     public int describeContents() {

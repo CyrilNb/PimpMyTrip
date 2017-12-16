@@ -71,6 +71,10 @@ import fr.univtln.cniobechoudayer.pimpmytrip.controllers.StatisticsController;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.TripController;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
+/**
+ * Fragment that allows a manager to create / view references trips
+ * NB : SINGLETON PATTERN IMPLEMENTED
+ */
 
 public class CreationTripFragment extends Fragment implements View.OnClickListener {
 
@@ -105,7 +109,9 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     private List<Trip> listReferenceTrip;
     private IconGenerator factory;
 
-
+    /**
+     * Constructor
+     */
 
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
 
@@ -177,6 +183,11 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
         //Default color
         currentChosenColor = "#F2F2F2";
+
+        /**
+         * Callback for color picker
+         * when creating a new trip
+         */
 
         mColorPicker = new ColorPicker(getActivity(), 127, 127, 127);
         mColorPicker.setCallback(new ColorPickerCallback() {
@@ -291,6 +302,9 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         return rootView;
     }
 
+    /**
+     * Setting up database listener on fragment start
+     */
     @Override
     public void onStart() {
         super.onStart();
@@ -481,6 +495,10 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         }
     }
 
+    /**
+     * Method that shows alert dialog to save trip
+     */
+
     private void displayAlertDialogSaveTrip(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
@@ -605,60 +623,6 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                    }
-                })
-                .setIcon(android.R.drawable.ic_menu_save)
-                .setView(alertLayout)
-                .show();
-    }
-
-    private void displayAlertDialogManageTrip(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
-        } else {
-            builder = new AlertDialog.Builder(getContext());
-        }
-        LinearLayout alertLayout = new LinearLayout(getContext());
-        alertLayout.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(Utils.convertPixelsToDp(20, getContext()), Utils.convertPixelsToDp(40, getContext()), Utils.convertPixelsToDp(20, getContext()), Utils.convertPixelsToDp(40, getContext()));
-        alertLayout.setLayoutParams(params);
-
-        //Setting view for save alert dialog
-        titleEditText = new EditText(getContext());
-        colorButton = new Button(getContext());
-
-        titleEditText.setHint("Choose a title");
-        titleEditText.setSingleLine(false);
-        titleEditText.setMaxLines(2);
-        titleEditText.setHorizontalScrollBarEnabled(false);
-        titleEditText.setHintTextColor(Color.WHITE);
-        titleEditText.setTextColor(Color.WHITE);
-
-        colorButton.setText("Choose a color");
-        colorButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mColorPicker.show();
-            }
-        });
-
-        alertLayout.addView(titleEditText);
-        alertLayout.addView(colorButton);
-
-
-        builder.setTitle("Stop recording & save trip ?")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        buttonRecordTrip.setImageResource(R.drawable.ic_play_arrow_white_48dp);
-                        isUserRecording = false;
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        isUserRecording = true;
                     }
                 })
                 .setIcon(android.R.drawable.ic_menu_save)

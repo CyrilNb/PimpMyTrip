@@ -14,7 +14,7 @@ import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Fragment that show tabs to manage trips
  */
 public class ManagerTripFragment extends Fragment {
 

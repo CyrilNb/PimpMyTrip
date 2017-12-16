@@ -82,6 +82,9 @@ public class SignUpActivity extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
     }
 
+    /**
+     * Handle back button pressed
+     */
     @Override
     public void onBackPressed() {
         //Return to the Login activity
@@ -91,6 +94,9 @@ public class SignUpActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
     }
 
+    /**
+     * Method to sign up with email
+     */
     private void signUpWithEmail(){
         email = inputEmail.getText().toString().trim();
         password = inputPassword.getText().toString().trim();
@@ -123,6 +129,10 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Check and validate inputs when user is signing up
+     * @return
+     */
     public boolean validateInputs() {
         boolean valid = true;
 

@@ -52,6 +52,9 @@ import fr.univtln.cniobechoudayer.pimpmytrip.entities.User;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Waypoint;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 
+/**
+ * Fragment that manages user profile
+ */
 
 public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener{
 
@@ -233,6 +236,13 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         return rootView;
     }
 
+
+    /**
+     * Methods that is used to get the picture that the user uploaded
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -255,6 +265,11 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         }
     }
 
+    /**
+     * Method to animate profile picture
+     * @param appBarLayout
+     * @param i
+     */
     @Override
     public void onOffsetChanged(AppBarLayout appBarLayout, int i) {
         if (mMaxScrollSize == 0)
@@ -280,6 +295,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         }
     }
 
+    /**
+     * Display alert dialog to update user pseudo
+     */
     private void displayAlertDialogUpdateName() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);

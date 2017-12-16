@@ -2,6 +2,10 @@ package fr.univtln.cniobechoudayer.pimpmytrip.entities;
 
 import android.graphics.Color;
 
+/**
+ * Class that represents waypoint
+ */
+
 public class Waypoint {
 
     private int idWayPoint;
@@ -9,6 +13,13 @@ public class Waypoint {
     private String label;
     private Position position;
     private Color color;
+
+    /**
+     * Constructor
+     * @param position
+     * @param label
+     * @param type
+     */
 
     public Waypoint(Position position, String label, TypeWaypoint type) {
         this.position = position;
@@ -18,6 +29,11 @@ public class Waypoint {
 
     public Waypoint() {
     }
+
+    /**
+     * Getters and Setters
+     * @return
+     */
 
     public int getIdWayPoint() {
         return idWayPoint;
