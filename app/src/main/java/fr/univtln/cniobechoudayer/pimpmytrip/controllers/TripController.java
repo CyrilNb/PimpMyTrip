@@ -64,7 +64,6 @@ public class TripController {
      */
     public void insertTrip(Trip tripToInsert){
         database.child("trips").child(currentUserId).child(tripToInsert.getId()).setValue(tripToInsert);
-
     }
 
     /**

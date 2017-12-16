@@ -1,5 +1,9 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.entities;
 
+/**
+ * Class that represents and calculate user statistics
+ */
+
 public class Statistics {
 
     private int nbMyTripsTravelled;
@@ -13,6 +17,10 @@ public class Statistics {
     private int totalTimeWalked;
     private int totalTimeDrove;
 
+
+    /**
+     * Constructors
+     */
 
     public Statistics() {
     }
@@ -29,6 +37,11 @@ public class Statistics {
         this.totalTimeWalked = totalTimeWalked;
         this.totalTimeDrove = totalTimeDrove;
     }
+
+
+    /**
+     * Getters and setters
+     */
 
     public int getTotalDistanceBySUV() {
         return totalDistanceBySUV;
@@ -108,5 +121,21 @@ public class Statistics {
 
     public void setTotalTimeDrove(int totalTimeDrove) {
         this.totalTimeDrove = totalTimeDrove;
+    }
+
+    @Override
+    public String toString() {
+        return "Statistics{" +
+                "nbMyTripsTravelled=" + nbMyTripsTravelled +
+                ", totalDistance=" + totalDistance +
+                ", totalDistanceBySUV=" + totalDistanceBySUV +
+                ", totalDistanceByWalk=" + totalDistanceByWalk +
+                ", nbTripsCreated=" + nbTripsCreated +
+                ", nbTripsWalkingCreated=" + nbTripsWalkingCreated +
+                ", nbTripsSUVCreated=" + nbTripsSUVCreated +
+                ", totalTimeTravelled=" + totalTimeTravelled +
+                ", totalTimeWalked=" + totalTimeWalked +
+                ", totalTimeDrove=" + totalTimeDrove +
+                '}';
     }
 }

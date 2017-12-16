@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Message;
@@ -22,20 +23,20 @@ import java.util.List;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Position;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 
-public class RecordUserLocationService extends IntentService {
+public class RecordUserLocationService extends IntentService implements LocationListener {
 
     private List<Position> positionList = new ArrayList<>();
-    public static final String ACTION_MyIntentService = "com.example.androidintentservice.RESPONSE";
-    public static final String ACTION_MyUpdate = "com.example.androidintentservice.UPDATE";
-    public static final String EXTRA_KEY_IN = "EXTRA_IN";
-    public static final String EXTRA_KEY_OUT = "EXTRA_OUT";
-    public static final String EXTRA_KEY_UPDATE = "EXTRA_UPDATE";
-    private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private LocationManager locationManager;
     private Messenger messenger;
     private Message msg;
     private static Intent currentIntent;
     private Bundle retrievedBundle;
+
+    private static final String TAG = "Debug GPS Service";
+    private LocationManager mLocationManager = null;
+    private static final int LOCATION_INTERVAL = 1000;
+    private static final float LOCATION_DISTANCE = 10f;
+    LocationListener mLocationListener;
 
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
@@ -60,7 +61,7 @@ public class RecordUserLocationService extends IntentService {
         if (bundle != null) {
             Log.d("passed bundle", "not null");
             recordUserPositions(bundle.getBoolean("isUserWalking"));
-        }else{
+        } else {
             Log.d("passed bundle", "null");
         }
     }
@@ -69,7 +70,48 @@ public class RecordUserLocationService extends IntentService {
     public void onCreate() {
         super.onCreate();
         Log.d("onCreate", "reached");
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        initializeLocationManager();
+
+        mLocationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                // A new location update is received.  Do something useful with it
+
+                String latitude = "latitude: " + location.getLatitude();
+                String longitude = "longitude: " + location.getLongitude();
+                String toastString = "location is" + latitude + "," +longitude;
+                Log.d(TAG, toastString);
+
+            }
+            @Override
+            public void onProviderDisabled(String provider) {
+                // No code here
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+                // No code here
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status,Bundle extras)
+            {
+                // No code here
+            }
+        };
+
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, mLocationListener);
+    }
+
+    /**
+     * Initialize location manager in order to get user position
+     */
+    private void initializeLocationManager() {
+        Log.e(TAG, "initializeLocationManager");
+        if (mLocationManager == null || locationManager == null) {
+            mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+            locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        }
     }
 
     @Override
@@ -77,6 +119,9 @@ public class RecordUserLocationService extends IntentService {
         return super.onStartCommand(intent, flags, startId);
     }
 
+    /**
+     * Sending positions lists back to the caller of this service
+     */
     @Override
     public void onDestroy() {
         Bundle bundleToSend = new Bundle();
@@ -84,22 +129,25 @@ public class RecordUserLocationService extends IntentService {
         msg = Message.obtain();
         msg.setData(bundleToSend); //put the data here
         messenger = (Messenger) retrievedBundle.get("messenger");
-        if(msg != null){
-            if(messenger != null){
+        if (msg != null) {
+            if (messenger != null) {
                 try {
                     messenger.send(msg);
-                    Log.d("service","message sent !");
+                    Log.d("service", "message sent !");
                 } catch (RemoteException e) {
                     Log.i("error", "error");
                 }
-            }else{
+            } else {
                 Log.d("messenger service", "null");
             }
 
-        }else{
+        } else {
             Log.d("message service", "null");
         }
         super.onDestroy();
+        if(locationManager != null){
+            locationManager.removeUpdates(mLocationListener);
+        }
     }
 
     /**
@@ -136,9 +184,32 @@ public class RecordUserLocationService extends IntentService {
             }
 
         }else{
-
+            Log.d("permission location", "denied");
         }
 
+
+    }
+
+    /**
+     * Implementing LocationListener interface
+     */
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d(TAG, String.valueOf(location.getAltitude()));
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
 
     }
 }

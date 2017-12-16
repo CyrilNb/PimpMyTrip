@@ -5,14 +5,16 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Fragment that show tabs to manage trips
  */
 public class ManagerTripFragment extends Fragment {
 
@@ -49,6 +51,12 @@ public class ManagerTripFragment extends Fragment {
         // Give the TabLayout the ViewPager
         TabLayout tabLayout = (TabLayout) rootView.findViewById(R.id.sliding_tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+        /**
+         * Setting up fragment title
+         */
+        Utils.setActionBarTitle((AppCompatActivity) getActivity(), getString(R.string.titleTripsAdd));
+
 
         return rootView;
     }

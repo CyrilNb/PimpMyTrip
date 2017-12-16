@@ -12,6 +12,10 @@ import android.widget.Toast;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
+/**
+ * Service that allows to get all current connected users
+ */
+
 public class ConnectedUserLocationService extends Service
 {
     private static final String TAG = "BOOMBOOMTESTGPS";

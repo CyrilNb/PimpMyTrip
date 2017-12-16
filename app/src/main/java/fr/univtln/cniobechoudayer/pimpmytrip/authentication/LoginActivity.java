@@ -30,6 +30,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.activities.MainActivity;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.controllers.StatisticsController;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
@@ -60,11 +61,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     public static GoogleApiClient googleApiClient;
 
     private UserController userController;
+    private StatisticsController statisticsController;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        /**
+         * Retrieving graphic elements from view layout
+         */
 
         rootView = (CoordinatorLayout) findViewById(R.id.coordinatorLayoutLogin);
         progressBar = (ProgressBar) findViewById(R.id.progressBarLogin);
@@ -78,6 +84,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         auth = FirebaseAuth.getInstance();
 
         userController = UserController.getInstance();
+        //statisticsController = StatisticsController.getInstance();
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -100,6 +107,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     }
                 })
                 .build();
+
+        /**
+         * Setting up click listeners
+         */
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -193,6 +204,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         return valid;
     }
 
+    /**
+     * Login with email
+     */
     private void loginWithEmail() {
         email = emailEditText.getText().toString();
         password = passwordEditText.getText().toString();
@@ -254,6 +268,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
     }
 
+    /**
+     * Signing in with Google
+     * @param acct
+     */
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         progressBar.setVisibility(View.VISIBLE);

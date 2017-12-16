@@ -1,5 +1,6 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.utils;
 
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import android.content.Context;
@@ -22,6 +23,12 @@ import static android.support.design.widget.Snackbar.*;
 
 public class Utils {
 
+    /**
+     * Method that convert pixels to dp
+     * @param px
+     * @param context
+     * @return
+     */
     public static int convertPixelsToDp(float px, Context context){
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
@@ -49,7 +56,12 @@ public class Utils {
         }
     }
 
-    public static String formatedTripDistance(double distance) {
+    /**
+     * Method that returns a well formatted trip distance
+     * @param distance
+     * @return
+     */
+    public static String formatTripDistance(double distance) {
         String unit = "m";
         if (distance < 1) {
             distance *= 1000;
@@ -60,6 +72,31 @@ public class Utils {
         }
 
         return String.format("%4.3f%s", distance, unit);
+    }
+
+    /**
+     * Method that returns a well formatted trip duration
+     * @param duration
+     * @return
+     */
+    public static String formatTripTime(int duration){
+        String finalresult = "";
+        Double computedDuration = 0.0;
+        if(duration > 60){
+            computedDuration = Double.valueOf(duration/60);
+            finalresult = computedDuration + "mins";
+        } if(computedDuration > 60){
+            finalresult = computedDuration + "h";
+        }
+        return finalresult;
+    }
+
+    /**
+     * Method to update the action bar title
+     */
+    public static void setActionBarTitle(AppCompatActivity activity, String titleToDisplay) {
+        if (activity.getSupportActionBar() != null)
+            activity.getSupportActionBar().setTitle(titleToDisplay);
     }
 
 

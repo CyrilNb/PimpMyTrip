@@ -3,7 +3,6 @@ package fr.univtln.cniobechoudayer.pimpmytrip.fragments;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -34,6 +33,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -53,7 +53,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Logger;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
@@ -75,12 +74,13 @@ import fr.univtln.cniobechoudayer.pimpmytrip.entities.Waypoint;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.services.ConnectedUserLocationService;
 import fr.univtln.cniobechoudayer.pimpmytrip.services.RecordUserLocationService;
-import fr.univtln.cniobechoudayer.pimpmytrip.services.UserLocationReceiver;
+import fr.univtln.cniobechoudayer.pimpmytrip.utils.CircleTransform;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.TripController;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
-public class MapFragment extends Fragment implements View.OnClickListener{
+
+public class MapFragment extends Fragment implements View.OnClickListener, LocationListener {
 
     public static MapFragment singleton;
     private GoogleMap mGoogleMap;
@@ -102,6 +102,9 @@ public class MapFragment extends Fragment implements View.OnClickListener{
     private HashMap<String, Marker> connectedUsersMarkersHashMap;
     private HashMap<String, MarkerOptions> markerOptionsHashMap;
     private String idLastMarker;
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+    private List<User> connectedUserlist;
 
     public static final int LOCATION_UPDATE_MIN_DISTANCE = 3; //meters
     public static final int LOCATION_UPDATE_MIN_TIME = 1000; //milliseconds
@@ -119,6 +122,7 @@ public class MapFragment extends Fragment implements View.OnClickListener{
     private IconGenerator factory;
     private ValueEventListener listenerDbTrips;
     private ValueEventListener listenerDbMyTrips;
+    private ValueEventListener listenerDbUserPhoto;
     private TripController tripController = TripController.getInstance();
 
     private DatabaseReference dbTrips = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
@@ -129,6 +133,8 @@ public class MapFragment extends Fragment implements View.OnClickListener{
 
 
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private static final int LOCATION_INTERVAL = 1000;
+    private static final float LOCATION_DISTANCE = 10f;
 
     public MapFragment() {
         // Required empty public constructor
@@ -151,6 +157,7 @@ public class MapFragment extends Fragment implements View.OnClickListener{
         factory = new IconGenerator(getActivity());
         connectedUsersMarkersHashMap = new HashMap<>();
         markerOptionsHashMap = new HashMap<>();
+        connectedUserlist = new ArrayList<>();
         getActivity().startService(new Intent(getActivity(), ConnectedUserLocationService.class));
 
 
@@ -161,6 +168,34 @@ public class MapFragment extends Fragment implements View.OnClickListener{
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
+        /**
+         * Initializing location manager
+         */
+        initializeLocationManager();
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE, locationListener);
+
         //Setting lists to manage trips to display
         listReferenceTrip = new ArrayList<>();
         listMyTrips = new ArrayList<>();
@@ -169,7 +204,10 @@ public class MapFragment extends Fragment implements View.OnClickListener{
 
         userController = UserController.getInstance();
 
-        //TODO
+        /**
+         * Handler to get a message that returns position from
+         * RecordUserLocationService
+         */
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -179,7 +217,7 @@ public class MapFragment extends Fragment implements View.OnClickListener{
                     listPositions = reply.getParcelableArrayList("listPositionsTrip");
                     Log.d("listPos recorded size", String.valueOf(listPositions.size()));
                     if (isUserSaving) {
-                        Trip addedTrip = tripController.insertTrip(true, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), userController.getConnectedUserId());
+                        Trip addedTrip = tripController.insertTrip(false, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), userController.getConnectedUserId());
                         isUserSaving = false;
                     }
                 } else {
@@ -221,6 +259,8 @@ public class MapFragment extends Fragment implements View.OnClickListener{
         });
 
         mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        Utils.setActionBarTitle((AppCompatActivity) getActivity(), getString(R.string.titleMap));
+
         //Initializing map
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
@@ -265,6 +305,19 @@ public class MapFragment extends Fragment implements View.OnClickListener{
                         return;
                     }
                     mGoogleMap.setMyLocationEnabled(true);
+
+                    /**
+                     * Loading and displaying the current location of user
+                     */
+                    LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+                    Criteria criteria = new Criteria();
+
+                    Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
+                    if (location != null)
+                    {
+                        zoomInMap(new LatLng(location.getLatitude(),location.getLongitude()),10);
+                        displayUserOnMap();
+                    }
                     //getCurrentLocation();
                     /*if (currentLocation != null) {
                         zoomInMap(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 10);
@@ -359,19 +412,22 @@ public class MapFragment extends Fragment implements View.OnClickListener{
                     //listConnectedUsers.add(connectedUser);
                     //System.out.println(listConnectedUsers.size());
                     System.out.println("new connected User added: " + dataSnapshot.getKey());
+                    connectedUserlist.add(dataSnapshot.getValue(User.class));
                 }
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                     String idUser = dataSnapshot.getKey();
+
                     System.out.println("CHANGED: "+idUser);
                     //if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                       //  if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(idUser)) {
                             //System.out.println("getcurrent equals"+ idUser);
-                           if(connectedUsersMarkersHashMap.containsKey(idLastMarker)){
-                                connectedUsersMarkersHashMap.remove(idLastMarker).remove();
-                                markerOptionsHashMap.remove(idUser);
-                            }
+                           if(connectedUsersMarkersHashMap.containsKey(idLastMarker)) {
+                               connectedUsersMarkersHashMap.remove(idLastMarker).remove();
+                               markerOptionsHashMap.remove(idUser);
+                               connectedUserlist.remove(dataSnapshot.getValue(User.class));
+                           }
                             double latitude = (double) dataSnapshot.child("lastKnownLocation").child("latitude").getValue();
                             double longitude = (double) dataSnapshot.child("lastKnownLocation").child("longitude").getValue();
                             LatLng latLng = new LatLng(latitude, longitude);
@@ -419,17 +475,6 @@ public class MapFragment extends Fragment implements View.OnClickListener{
            handlerMarkers.postDelayed(runnable,HANDLER_TIMER);
         }
         return rootView;
-    }
-
-    /**
-     * Method to update the action bar title
-     */
-    public void setActionBarTitle() {
-        if (getActivity() instanceof AppCompatActivity) {
-            AppCompatActivity activity = ((AppCompatActivity) getActivity());
-            if (activity.getSupportActionBar() != null)
-                activity.getSupportActionBar().setTitle(getString(R.string.titleMap));
-        }
     }
 
     /**
@@ -483,6 +528,9 @@ public class MapFragment extends Fragment implements View.OnClickListener{
     public void onDestroy() {
         super.onDestroy();
         mMapView.onDestroy();
+        if(locationManager != null){
+            locationManager.removeUpdates(locationListener);
+        }
     }
 
     @Override
@@ -591,7 +639,9 @@ public class MapFragment extends Fragment implements View.OnClickListener{
         params.setMargins(Utils.convertPixelsToDp(20, getContext()), Utils.convertPixelsToDp(40, getContext()), Utils.convertPixelsToDp(20, getContext()), Utils.convertPixelsToDp(40, getContext()));
         alertLayout.setLayoutParams(params);
 
-        //Setting view for save alert dialog
+        /**
+         * Setting view for save alert dialog
+         */
         titleEditText = new EditText(getContext());
         colorButton = new Button(getContext());
 
@@ -626,6 +676,7 @@ public class MapFragment extends Fragment implements View.OnClickListener{
                         } else {
                             Log.d("can't save cause", "listPos is null");
                         }
+                        Toast.makeText(getContext(), "Your trip has been saved successfully !", Toast.LENGTH_LONG).show();
                     }
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -671,6 +722,7 @@ public class MapFragment extends Fragment implements View.OnClickListener{
                         } else {
                             isUserWalkingForRecordingPath = false;
                         }
+                        Log.d("transportation mode", "selected");
                         intentRecordUserLocationService = new Intent(getContext(), RecordUserLocationService.class);
                         intentRecordUserLocationService.putExtra("isUserWalking", isUserWalkingForRecordingPath);
                         intentRecordUserLocationService.putExtra("messenger", new Messenger(handler));
@@ -878,7 +930,54 @@ public class MapFragment extends Fragment implements View.OnClickListener{
     }
 
     /**
-     * Method to handle a new user location
+     * Method that initializes location manager
+     */
+
+    private void initializeLocationManager(){
+
+        if(locationManager == null){
+            locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        }
+
+    }
+
+
+    private void displayUserOnMap(){
+
+        Criteria blankCriteria = new Criteria();
+        Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(blankCriteria, false));
+        factory = new IconGenerator(this.context);
+        factory.setColor(getResources().getColor(R.color.colorPrimaryDark));
+        Bitmap icon = Bitmap.createScaledBitmap(new CircleTransform().transform(userController.getConnectedUser().getConvertedPhoto()), 200, 200, false);
+        mGoogleMap.addMarker(
+                new MarkerOptions()
+                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                        .snippet(userController.getConnectedUser().getPseudo())
+                        .icon(BitmapDescriptorFactory.fromBitmap(icon))
+        );
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+     /* Method to handle a new user location
      *
      * @param location location to be handle
      */
@@ -969,6 +1068,34 @@ public class MapFragment extends Fragment implements View.OnClickListener{
 
     }
 
+
+
+    /**
+     * Draw a marker on the google map of the last know location of user connected
+     *
+     * @param position location where to draw
+     */
+    private void drawMarker(Position position, final String idUser) {
+        if (mGoogleMap != null) {
+            getUserPhoto(idUser);
+            LatLng gps = new LatLng(position.getCoordX(), position.getCoordY());
+            Marker marker;
+            User userToDisplay = new User();
+            for(User user : connectedUserlist){
+                if(String.valueOf(user.getIdUser())== idUser){
+                    userToDisplay = user;
+                }
+            }
+            marker = mGoogleMap.addMarker(new MarkerOptions()
+                        .position(gps)
+                        .icon(BitmapDescriptorFactory.fromBitmap(userToDisplay.getConvertedPhoto()))
+                        .title(idUser));
+
+
+            connectedUsersMarkersHashMap.put(idUser, marker);
+        }
+    }
+
     private void drawAllUsersConnectedMarkers() {
         connectedUsersMarkersHashMap.clear();
         for (Map.Entry<String, MarkerOptions> entry : markerOptionsHashMap.entrySet()) {
@@ -979,6 +1106,24 @@ public class MapFragment extends Fragment implements View.OnClickListener{
             }
         }
     }
+
+    private Bitmap getUserPhoto(String idUser){
+        dbUsers.child(idUser);
+        final User[] userRetrieved = {new User()};
+        listenerDbUserPhoto = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                userRetrieved[0] = dataSnapshot.getValue(User.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        dbUsers.addValueEventListener(listenerDbUserPhoto);
+        return userRetrieved[0].getConvertedPhoto();
+    };
 
 }
 

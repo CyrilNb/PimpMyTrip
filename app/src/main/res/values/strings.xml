@@ -3,6 +3,7 @@
     <string name="app_name">PimpMyTrip</string>
 
     <!-- NAVIGATION DRAWER -->
+    <string name="titleProfile">Profile</string>
     <string name="titleMap">Map</string>
     <string name="titleRefTrips">Reference Trips</string>
     <string name="titleMyTrips">My Trips</string>
@@ -158,9 +159,19 @@
     <string name="titleStats">Statistics</string>
     <string name="titleMemberSince">Member since ??</string>
     <string name="pseudoUser">Corentin</string>
+    <string name="tripsLabel">Trips</string>
         <!-- STATISTICS -->
-        <string name="totalDistanceLabel">Total Distance</string>
-        <string name="dd">dd</string>
+        <string name="totalDistanceLabel">Total Distance : </string>
+        <string name="nbMyTripsCreatedLabel">Trips Created : </string>
+        <string name="totalDistanceBySUVLAbel">Total Distance by SUV : </string>
+        <string name="totalDistanceByWalkLabel">Total Distance by walk : </string>
+        <string name="nbTripsCreatedLabel">Trips Created : </string>
+        <string name="nbTripsWalkingCreatedLabel">Trips Created by walk : </string>
+        <string name="nbTripsSUVCreatedLabel">Trips Created by SUV : </string>
+        <string name="totalTimeTravelledLabel">Time Travelled : </string>
+        <string name="totalTimeWalkedLabel">Time Travelled by walk : </string>
+        <string name="totalTimeDroveLabel">Time Travelled by SUV : </string>
+        <string name="nbMyTripsTravelledLabel">Trips Travelled : </string>
 
     <!-- TRIP CARDVIEW -->
     <string name="delete">DELETE</string>
