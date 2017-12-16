@@ -64,7 +64,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Position;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
@@ -79,7 +78,6 @@ import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.TripController;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
-
 public class MapFragment extends Fragment implements View.OnClickListener, LocationListener {
 
     public static MapFragment singleton;
@@ -92,6 +90,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private Button colorButton;
     private AlertDialog.Builder builder;
     private boolean isUserWalkingForRecordingPath = true;
+    private Handler handler;
     private Intent intentRecordUserLocationService;
     private List<Position> listPositions;
     private List<Waypoint> listWaypoints;
@@ -99,20 +98,19 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private Spinner choicesTypeWaypoint;
     private boolean isUserSaving = false;
     private UserController userController;
-    private HashMap<String, Marker> connectedUsersMarkersHashMap;
-    private HashMap<String, MarkerOptions> markerOptionsHashMap;
-    private String idLastMarker;
+<<<<<<< HEAD
+    private List<User> listConnectedUsers;
+=======
     private LocationManager locationManager;
     private LocationListener locationListener;
+    private HashMap<String,Marker> connectedUsersMarkersHashMap;
     private List<User> connectedUserlist;
+>>>>>>> 7f3fcdc30d818308474df61f91e3527aa5db1673
 
     public static final int LOCATION_UPDATE_MIN_DISTANCE = 3; //meters
-    public static final int LOCATION_UPDATE_MIN_TIME = 1000; //milliseconds
-    public static final int HANDLER_TIMER = 10000;
+    public static final int LOCATION_UPDATE_MIN_TIME = 3000; //milliseconds
     private LocationManager mLocationManager;
     private LocationListener mLocationListener;
-    private Handler handler;
-    private Handler handlerMarkers;
 
     private Context context;
 
@@ -156,15 +154,13 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         this.context = getContext();
         factory = new IconGenerator(getActivity());
         connectedUsersMarkersHashMap = new HashMap<>();
-        markerOptionsHashMap = new HashMap<>();
         connectedUserlist = new ArrayList<>();
         getActivity().startService(new Intent(getActivity(), ConnectedUserLocationService.class));
-
 
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
@@ -417,31 +413,23 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    System.out.println("onchildchanged");
                     String idUser = dataSnapshot.getKey();
-
-                    System.out.println("CHANGED: "+idUser);
-                    //if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                      //  if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(idUser)) {
-                            //System.out.println("getcurrent equals"+ idUser);
-                           if(connectedUsersMarkersHashMap.containsKey(idLastMarker)) {
-                               connectedUsersMarkersHashMap.remove(idLastMarker).remove();
-                               markerOptionsHashMap.remove(idUser);
-                               connectedUserlist.remove(dataSnapshot.getValue(User.class));
-                           }
+                    System.out.println(idUser);
+                    if(FirebaseAuth.getInstance().getCurrentUser() != null){
+                        if(FirebaseAuth.getInstance().getCurrentUser().getUid().equals(idUser)){
+                            if(connectedUsersMarkersHashMap.containsKey(idUser)){
+                                connectedUsersMarkersHashMap.get(idUser).remove();
+                                connectedUserlist.remove(dataSnapshot.getValue(User.class));
+                            }
                             double latitude = (double) dataSnapshot.child("lastKnownLocation").child("latitude").getValue();
                             double longitude = (double) dataSnapshot.child("lastKnownLocation").child("longitude").getValue();
-                            LatLng latLng = new LatLng(latitude, longitude);
-                            MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(idUser);
-                            markerOptionsHashMap.put(idUser,markerOptions);
-                            markerOptions.visible(false);
-                            Marker marker = mGoogleMap.addMarker(markerOptions);
-                            connectedUsersMarkersHashMap.put(marker.getId(),marker);
-                            //userController.updateIdLastMarker(marker.getId());
-                            idLastMarker = marker.getId();
+                            System.out.println(latitude + " / " + longitude);
+                            Position position = new Position(latitude,longitude);
+                            drawMarker(position,idUser);
+                        }
 
-                        //}
-                    //}
-                    drawAllUsersConnectedMarkers();
+                    }
 
                 }
 
@@ -464,15 +452,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
                 }
             });
-            handlerMarkers = new Handler();
-            final Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    //drawAllUsersConnectedMarkers();
-                    handlerMarkers.postDelayed(this,HANDLER_TIMER);
-                }
-            };
-           handlerMarkers.postDelayed(runnable,HANDLER_TIMER);
         }
         return rootView;
     }
@@ -497,15 +476,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     @Override
     public void onResume() {
         super.onResume();
-        handlerMarkers = new Handler();
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                //drawAllUsersConnectedMarkers();
-                handlerMarkers.postDelayed(this,HANDLER_TIMER);
-            }
-        };
-        handlerMarkers.postDelayed(runnable,HANDLER_TIMER);
+        //getCurrentLocation();
     }
 
     @Override
@@ -559,7 +530,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
      */
     private void displayDialogSaveMarker(final LatLng pointToSave) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
+            builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
         } else {
             builder = new AlertDialog.Builder(getContext());
         }
@@ -629,7 +600,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
      */
     private void displayAlertDialogSaveTrip() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
+            builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
         } else {
             builder = new AlertDialog.Builder(getContext());
         }
@@ -696,7 +667,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private void displayAlertDialogChoiceTransportationMode() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
+            builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
         } else {
             builder = new AlertDialog.Builder(getContext());
         }
@@ -943,14 +914,13 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
 
     private void displayUserOnMap(){
-        Bitmap icon = null;
+
         Criteria blankCriteria = new Criteria();
         Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(blankCriteria, false));
+
         factory = new IconGenerator(this.context);
         factory.setColor(getResources().getColor(R.color.colorPrimaryDark));
-        if(userController.getConnectedUser().getConvertedPhoto() != null)
-            icon = Bitmap.createScaledBitmap(new CircleTransform().transform(userController.getConnectedUser().getConvertedPhoto()), 200, 200, false);
-        if(icon != null)
+        Bitmap icon = Bitmap.createScaledBitmap(new CircleTransform().transform(userController.getConnectedUser().getConvertedPhoto()), 200, 200, false);
         mGoogleMap.addMarker(
                 new MarkerOptions()
                         .position(new LatLng(location.getLatitude(), location.getLongitude()))
@@ -1058,7 +1028,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
      *
      * @param location location where to draw
      */
-    private void drawMarker(Location location, String title) {
+    private void drawMarker(Location location,String title) {
         if (mGoogleMap != null) {
             mGoogleMap.clear();
             LatLng gps = new LatLng(location.getLatitude(), location.getLongitude());
@@ -1069,8 +1039,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         }
 
     }
-
-
 
     /**
      * Draw a marker on the google map of the last know location of user connected
@@ -1095,17 +1063,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
 
             connectedUsersMarkersHashMap.put(idUser, marker);
-        }
-    }
-
-    private void drawAllUsersConnectedMarkers() {
-        connectedUsersMarkersHashMap.clear();
-        for (Map.Entry<String, MarkerOptions> entry : markerOptionsHashMap.entrySet()) {
-            MarkerOptions markerOptions = entry.getValue();
-            markerOptions.visible(true);
-            if (mGoogleMap != null) {
-                mGoogleMap.addMarker(markerOptions);
-            }
         }
     }
 
