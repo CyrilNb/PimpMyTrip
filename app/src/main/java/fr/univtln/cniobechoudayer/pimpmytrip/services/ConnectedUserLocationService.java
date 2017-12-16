@@ -21,7 +21,7 @@ public class ConnectedUserLocationService extends Service
     private static final String TAG = "BOOMBOOMTESTGPS";
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 3000; //milliseconds
-    private static final float LOCATION_DISTANCE = 0; //meters
+    private static final float LOCATION_DISTANCE = 1; //meters
 
     private UserController userController;
 
@@ -39,8 +39,8 @@ public class ConnectedUserLocationService extends Service
         public void onLocationChanged(Location location)
         {
             Toast.makeText(ConnectedUserLocationService.this, String.valueOf(location.getLatitude() + " / " + location.getLongitude()), Toast.LENGTH_SHORT).show();
-            System.out.println("LOCATION CHANGED");
-            System.out.println(location.getLatitude() + " / " + location.getLongitude());
+            //System.out.println("LOCATION CHANGED");
+            //System.out.println(location.getLatitude() + " / " + location.getLongitude());
             mLastLocation.set(location);
             userController.updateLastKnownUserLocation(mLastLocation);
         }
@@ -78,7 +78,6 @@ public class ConnectedUserLocationService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        System.out.println("onstartcommand");
         userController = UserController.getInstance();
         super.onStartCommand(intent, flags, startId);
         return START_STICKY;
@@ -87,8 +86,6 @@ public class ConnectedUserLocationService extends Service
     @Override
     public void onCreate()
     {
-        System.out.println("oncreate");
-        Log.e(TAG, "onCreate");
         initializeLocationManager();
         try {
             mLocationManager.requestLocationUpdates(
@@ -114,7 +111,6 @@ public class ConnectedUserLocationService extends Service
     @Override
     public void onDestroy()
     {
-        System.out.println("ON DESTROY");
         super.onDestroy();
         if (mLocationManager != null) {
             for (int i = 0; i < mLocationListeners.length; i++) {
@@ -128,7 +124,6 @@ public class ConnectedUserLocationService extends Service
     }
 
     private void initializeLocationManager() {
-        Log.e(TAG, "initializeLocationManager");
         if (mLocationManager == null) {
             mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         }

@@ -61,13 +61,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
-                if(imageViewProfile != null)
+                if(userController != null){  if(imageViewProfile != null)
+                    if(userController.getConnectedUser().getConvertedPhoto() != null)
                     imageViewProfile.setImageBitmap(new CircleTransform().transform(userController.getConnectedUser().getConvertedPhoto()));
-                if(userController.getConnectedUser() != null)
-                    textViewPseudoUser.setText(userController.getConnectedUser().getPseudo());
-                if(statsController.getUserStats() != null)
-                    textViewStats.setText(String.valueOf(statsController.getUserStats().getNbTripsCreated()) + " " + getString(R.string.tripsLabel));
-
+                    if(userController.getConnectedUser() != null)
+                        textViewPseudoUser.setText(userController.getConnectedUser().getPseudo());
+                    if(statsController.getUserStats() != null)
+                        textViewStats.setText(String.valueOf(statsController.getUserStats().getNbTripsCreated()) + " " + getString(R.string.tripsLabel));
+                }
             }
         };
         drawer.addDrawerListener(toggle);
@@ -98,12 +99,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         textViewPseudoUser = (TextView) header.findViewById(R.id.textViewPseudoUser);
         textViewStats = (TextView) header.findViewById(R.id.textViewStats);
 
-        if(imageViewProfile != null)
-            imageViewProfile.setImageBitmap(new CircleTransform().transform(userController.getConnectedUser().getConvertedPhoto()));
-        if(userController.getConnectedUser() != null)
-            textViewPseudoUser.setText(userController.getConnectedUser().getPseudo());
-        if(statsController.getUserStats() != null)
-            textViewStats.setText(String.valueOf(statsController.getUserStats().getNbTripsCreated()) + " " + getString(R.string.tripsLabel));
+        if(userController != null){
+            if(imageViewProfile != null)
+                if(userController.getConnectedUser().getConvertedPhoto() != null)
+                    imageViewProfile.setImageBitmap(new CircleTransform().transform(userController.getConnectedUser().getConvertedPhoto()));
+            if(userController.getConnectedUser() != null)
+                textViewPseudoUser.setText(userController.getConnectedUser().getPseudo());
+            if(statsController.getUserStats() != null)
+                textViewStats.setText(String.valueOf(statsController.getUserStats().getNbTripsCreated()) + " " + getString(R.string.tripsLabel));
+
+        }
+
 
         /**
          * Setting listener to display from on nav header click

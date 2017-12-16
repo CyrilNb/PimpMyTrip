@@ -1,7 +1,8 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.controllers;
 
-import android.graphics.Bitmap;
 import android.location.Location;
+
+import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -34,6 +35,7 @@ public class UserController {
 
     private FirebaseAuth firebaseAuth;
     private DatabaseReference database;
+    private DatabaseReference databaseUsersConnectedReference;
     private FirebaseUser currentUser;
     private static String currentUserId;
     private static UserController instance;
@@ -53,6 +55,9 @@ public class UserController {
             currentUserId = firebaseAuth.getCurrentUser().getUid();
             dbUser = database.child("users").child(currentUserId);
         }
+
+        databaseUsersConnectedReference = database.child("connectedUsers").child(currentUserId);
+
         /**
          * Setting up listener to retrieve user from firebase db
          */
@@ -69,6 +74,7 @@ public class UserController {
         };
         dbUser.addValueEventListener(listenerUser);
         dbUser.keepSynced(true);
+
     }
 
     /**
@@ -182,19 +188,35 @@ public class UserController {
      * Method that updates in database the fact that a user is disconnected
      */
     public void setUserAsDisconnected() {
-        database.child("connectedUsers").child(currentUserId).removeValue();
+        databaseUsersConnectedReference.removeValue();
     }
+
 
     @Override
     protected void finalize() throws Throwable {
         dbUser.removeEventListener(listenerUser);
     }
+
     /**
-     * Method that updates both in database and the attribute of the connected user instance his last known location
+     * Method that updates in database the last known location of the connected user
      * @param location new last known location
      */
     public void updateLastKnownUserLocation(Location location){
-        database.child("connectedUsers").child(currentUserId).child("lastKnownLocation").setValue(location);
+        databaseUsersConnectedReference.child("lastKnownLocation").setValue(location);
     }
+
+
+    /**
+     * Method that updates in database the last known location of the connected user
+     * @param id id of the last marker
+     */
+    /*public void updateIdLastMarker(String id){
+        databaseUsersConnectedReference.child("idLastMarker").setValue(id);
+    }
+
+    public String getIdLastMarker(){
+        return databaseUsersConnectedReference.child("idLastMarker").getKey();
+    }*/
+
 
 }

@@ -1,9 +1,13 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.entities;
 
 import android.graphics.Bitmap;
+import android.location.Location;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.location.Location;
+
 
 /**
  * User abtrsact class
