@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -16,6 +17,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.User;
 
@@ -64,6 +66,7 @@ public class UserController {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 connectedUser = dataSnapshot.getValue(User.class);
+
             }
 
             @Override
@@ -216,6 +219,8 @@ public class UserController {
     public String getIdLastMarker(){
         return databaseUsersConnectedReference.child("idLastMarker").getKey();
     }*/
+
+
 
 
 }

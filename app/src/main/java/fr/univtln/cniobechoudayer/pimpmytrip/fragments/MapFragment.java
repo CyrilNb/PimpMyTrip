@@ -101,7 +101,8 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private UserController userController;
     private HashMap<String, Marker> connectedUsersMarkersHashMap;
     private HashMap<String, MarkerOptions> markerOptionsHashMap;
-    private String idLastMarker;
+    private Marker marker;
+    private List<Marker> mMarkers;
     private LocationManager locationManager;
     private LocationListener locationListener;
     private List<User> connectedUserlist;
@@ -158,6 +159,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         connectedUsersMarkersHashMap = new HashMap<>();
         markerOptionsHashMap = new HashMap<>();
         connectedUserlist = new ArrayList<>();
+        mMarkers = new ArrayList<>();
         getActivity().startService(new Intent(getActivity(), ConnectedUserLocationService.class));
 
 
@@ -417,31 +419,27 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    connectedUserlist.remove(dataSnapshot.getValue(User.class));
                     String idUser = dataSnapshot.getKey();
-
                     System.out.println("CHANGED: "+idUser);
                     //if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                       //  if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(idUser)) {
                             //System.out.println("getcurrent equals"+ idUser);
-                           if(connectedUsersMarkersHashMap.containsKey(idLastMarker)) {
-                               connectedUsersMarkersHashMap.remove(idLastMarker).remove();
-                               markerOptionsHashMap.remove(idUser);
-                               connectedUserlist.remove(dataSnapshot.getValue(User.class));
-                           }
+                            if(!getMarkers().isEmpty()){
+                                removeMarkers();
+                            }
                             double latitude = (double) dataSnapshot.child("lastKnownLocation").child("latitude").getValue();
                             double longitude = (double) dataSnapshot.child("lastKnownLocation").child("longitude").getValue();
                             LatLng latLng = new LatLng(latitude, longitude);
                             MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(idUser);
-                            markerOptionsHashMap.put(idUser,markerOptions);
-                            markerOptions.visible(false);
-                            Marker marker = mGoogleMap.addMarker(markerOptions);
-                            connectedUsersMarkersHashMap.put(marker.getId(),marker);
-                            //userController.updateIdLastMarker(marker.getId());
-                            idLastMarker = marker.getId();
+                            //markerOptionsHashMap.put(idUser,markerOptions);
+                            markerOptions.visible(true);
+                            marker = mGoogleMap.addMarker(markerOptions);
+                            addMarker(marker);
 
                         //}
                     //}
-                    drawAllUsersConnectedMarkers();
+                    //drawAllUsersConnectedMarkers();
 
                 }
 
@@ -979,7 +977,8 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     public void onProviderDisabled(String provider) {
 
     }
-     /* Method to handle a new user location
+
+    /* Method to handle a new user location
      *
      * @param location location to be handle
      */
@@ -1071,7 +1070,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     }
 
 
-
     /**
      * Draw a marker on the google map of the last know location of user connected
      *
@@ -1098,8 +1096,10 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         }
     }
 
+    /**
+     * Draw markers for each user connected related to their last known location
+     */
     private void drawAllUsersConnectedMarkers() {
-        connectedUsersMarkersHashMap.clear();
         for (Map.Entry<String, MarkerOptions> entry : markerOptionsHashMap.entrySet()) {
             MarkerOptions markerOptions = entry.getValue();
             markerOptions.visible(true);
@@ -1109,6 +1109,11 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         }
     }
 
+    /**
+     * Get the profile photo of a user
+     * @param idUser id of the user
+     * @return bitmap
+     */
     private Bitmap getUserPhoto(String idUser){
         dbUsers.child(idUser);
         final User[] userRetrieved = {new User()};
@@ -1127,6 +1132,31 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         return userRetrieved[0].getConvertedPhoto();
     };
 
+    /**
+     * Add a marker to the list of markers
+     * @param marker
+     */
+    public void addMarker(Marker marker){
+        this.mMarkers.add(marker);
+    }
+
+    /**
+     * Remove a marker from the list of markers
+     */
+    public void removeMarkers(){
+        for(Marker marker: mMarkers){
+            marker.remove();
+        }
+        mMarkers.clear();
+    }
+
+    /**
+     * Get the list list of markers
+     * @return list of markers
+     */
+    public List<Marker> getMarkers(){
+        return this.mMarkers;
+    }
 }
 
 
