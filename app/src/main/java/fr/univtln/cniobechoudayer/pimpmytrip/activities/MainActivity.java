@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         textViewPseudoUser = (TextView) header.findViewById(R.id.textViewPseudoUser);
         textViewStats = (TextView) header.findViewById(R.id.textViewStats);
 
-        if(userController != null){
+        if(userController.getConnectedUser() != null){
             if(imageViewProfile != null)
                 if(userController.getConnectedUser().getConvertedPhoto() != null)
                     imageViewProfile.setImageBitmap(new CircleTransform().transform(userController.getConnectedUser().getConvertedPhoto()));
@@ -147,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 displayFragment(TripsFragment.getInstance());
                 break;
             case R.id.tabAR:
-                //TODO
+                //TODO display activity for ar
                 break;
             case R.id.titleTripsManagement:
                 displayFragment(ManagerTripFragment.getInstance());
@@ -212,8 +213,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * @return
      */
     private boolean checkIfUserIsManager(){
-        return true;
-        //TODO verifier si l'utilisateur qui se connecte est un manager
+        if(userController.getConnectedUser() != null){
+            Log.d("getConnectedUser","isNotNull");
+            if(userController.getConnectedUser().isManager())
+                return true;
+            else
+                return false;
+        }else{
+            return false;
+        }
     }
 
 }

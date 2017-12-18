@@ -1,12 +1,8 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.entities;
 
 import android.graphics.Bitmap;
-import android.location.Location;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
-import android.location.Location;
 
 import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.database.Exclude;
@@ -30,6 +26,7 @@ public class User {
     private String pseudo;
     private String email;
     private String photo;
+    private boolean manager;
 
 
     /**
@@ -40,6 +37,7 @@ public class User {
     public User(String pseudo,String email) {
         this.pseudo = pseudo;
         this.email = email;
+        this.manager = false;
     }
 
     /**
@@ -131,6 +129,13 @@ public class User {
         return decodedBytePhoto;
     }
 
+    public boolean isManager() {
+        return manager;
+    }
+
+    public void setIsManager(boolean isManager) {
+        this.manager = isManager;
+    }
 
     @Override
     public boolean equals(Object o) {

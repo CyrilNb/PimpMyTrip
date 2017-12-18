@@ -38,13 +38,15 @@ public class UserController {
 
     private final FirebaseAuth firebaseAuth;
     private final DatabaseReference database;
-    private final DatabaseReference databaseUsersConnectedReference;
+    private DatabaseReference databaseUsersConnectedReference;
     private final FirebaseUser currentUser;
     private String currentUserId;
     private static UserController instance;
     private User connectedUser;
     private final ValueEventListener listenerUser;
-    private final DatabaseReference dbUser = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+    private DatabaseReference dbUser;
+
+
 
     /***************
      * CONSTRUCTOR *
@@ -56,9 +58,13 @@ public class UserController {
         currentUser = firebaseAuth.getCurrentUser();
         if (currentUser != null) {
             currentUserId = firebaseAuth.getCurrentUser().getUid();
+            dbUser = database.child("users").child(currentUserId);
+            Log.d("dbUser", dbUser.getKey());
+            databaseUsersConnectedReference = database.child("connectedUsers").child(currentUserId);
+        }else{
+            Log.d("user connected", "null");
         }
 
-        databaseUsersConnectedReference = database.child("connectedUsers").child(currentUserId);
 
         /**
          * Setting up listener to retrieve user from firebase db
@@ -66,6 +72,7 @@ public class UserController {
         listenerUser = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d("setting","connected user");
                 connectedUser = dataSnapshot.getValue(User.class);
             }
 
@@ -74,8 +81,12 @@ public class UserController {
 
             }
         };
-        dbUser.addValueEventListener(listenerUser);
-        dbUser.keepSynced(true);
+        if(dbUser != null){
+            Log.d("dbUser","not null");
+            dbUser.addValueEventListener(listenerUser);
+            //dbUser.keepSynced(true);
+        }
+
 
     }
 
@@ -95,7 +106,7 @@ public class UserController {
         return connectedUser;
     }
 
-    private void setConnectedUser(User connectedUser) {
+    public void setConnectedUser(User connectedUser) {
         this.connectedUser = connectedUser;
     }
 
@@ -189,8 +200,10 @@ public class UserController {
      * Method that updates in database the fact that a user is disconnected
      */
     public void setUserAsDisconnected() {
-        databaseUsersConnectedReference.removeValue();
+        if(databaseUsersConnectedReference != null)
+            databaseUsersConnectedReference.removeValue();
     }
+
 
 
     /**

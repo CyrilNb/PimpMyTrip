@@ -79,7 +79,6 @@ import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.TripController;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
-
 public class MapFragment extends Fragment implements View.OnClickListener, LocationListener {
 
     public static MapFragment mSingleton;
@@ -92,6 +91,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private Button colorButton;
     private AlertDialog.Builder builder;
     private boolean isUserWalkingForRecordingPath = true;
+    private Handler handler;
     private Intent intentRecordUserLocationService;
     private List<Position> listPositions;
     private List<Waypoint> listWaypoints;
@@ -99,16 +99,15 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private Spinner choicesTypeWaypoint;
     private boolean isUserSaving = false;
     private UserController userController;
-    private HashMap<String, Marker> mConnectedUsersMarkersHashMap;
     private LocationManager locationManager;
     private LocationListener locationListener;
+    private HashMap<String, Marker> mConnectedUsersMarkersHashMap;
     private List<User> connectedUserlist;
 
     public static final int LOCATION_UPDATE_MIN_DISTANCE = 3; //meters
     public static final int LOCATION_UPDATE_MIN_TIME = 1000; //milliseconds
-    private LocationManager mLocationManager;
     private LocationListener mLocationListener;
-    private Handler handler;
+    private LocationManager mLocationManager;
 
     private Context context;
 
@@ -150,15 +149,16 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         super.onCreate(savedInstanceState);
         this.context = getContext();
         factory = new IconGenerator(getActivity());
+
         mConnectedUsersMarkersHashMap = new HashMap<>();
         connectedUserlist = new ArrayList<>();
         getActivity().startService(new Intent(getActivity(), ConnectedUserLocationService.class));
-
+        requestLocationPermissions();
 
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
 
@@ -404,12 +404,12 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                     System.out.println("new connected User added: " + dataSnapshot.getKey());
                     String idUser = dataSnapshot.getKey();
                     //if (!idUser.equals(userController.getConnectedUserId())) {
-                        Position position = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
-                        LatLng latLng = new LatLng(position.getCoordX(), position.getCoordY());
-                        //LatLng latLng = getLastPositionFromDB(dataSnapshot, idUser);
-                        MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(idUser).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                        Marker marker = mGoogleMap.addMarker(markerOptions);
-                        mConnectedUsersMarkersHashMap.put(idUser, marker);
+                    Position position = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
+                    //LatLng latLng = getLastPositionFromDB(dataSnapshot, idUser);
+                    LatLng latLng = new LatLng(position.getCoordX(), position.getCoordY());
+                    MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(idUser).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    Marker marker = mGoogleMap.addMarker(markerOptions);
+                    mConnectedUsersMarkersHashMap.put(idUser, marker);
                     //}
                 }
 
@@ -417,13 +417,12 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                     System.out.println("onchild changed of user: " + dataSnapshot.getKey());
                     String idUser = dataSnapshot.getKey();
-                    //LatLng latLng = getLastPositionFromDB(dataSnapshot, idUser);
                     //if (!idUser.equals(userController.getConnectedUserId())) {
-                        Position position = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
-                        LatLng latLng = new LatLng(position.getCoordX(), position.getCoordY());
-                        Marker marker = mConnectedUsersMarkersHashMap.get(idUser);
-                        marker.setPosition(latLng);
-                    //}
+                    Position position = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
+                    //LatLng latLng = getLastPositionFromDB(dataSnapshot, idUser);
+                    LatLng latLng = new LatLng(position.getCoordX(), position.getCoordY());
+                    Marker marker = mConnectedUsersMarkersHashMap.get(idUser);
+                    marker.setPosition(latLng);
                 }
 
                 @Override
@@ -907,17 +906,24 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         Bitmap icon = null;
         Criteria blankCriteria = new Criteria();
         Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(blankCriteria, false));
+
         factory = new IconGenerator(this.context);
         factory.setColor(getResources().getColor(R.color.colorPrimaryDark));
-        if (userController.getConnectedUser().getConvertedPhoto() != null)
+        /*if (userController.getConnectedUser().getConvertedPhoto() != null)
             icon = Bitmap.createScaledBitmap(new CircleTransform().transform(userController.getConnectedUser().getConvertedPhoto()), 200, 200, false);
         if (icon != null)
+
+        if(userController.getConnectedUser() != null){
+            Bitmap icon = Bitmap.createScaledBitmap(new CircleTransform().transform(userController.getConnectedUser().getConvertedPhoto()), 200, 200, false);
             mGoogleMap.addMarker(
                     new MarkerOptions()
                             .position(new LatLng(location.getLatitude(), location.getLongitude()))
                             .snippet(userController.getConnectedUser().getPseudo())
                             .icon(BitmapDescriptorFactory.fromBitmap(icon))
             );
+
+        }*/
+
 
     }
 
@@ -1036,6 +1042,49 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         };
         dbUsers.addValueEventListener(listenerDbUserPhoto);
         return userRetrieved[0].getConvertedPhoto();
+
+    }
+
+    /**
+     * Method to ask user to give the app rights to access the location
+     */
+    private void requestLocationPermissions() {
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            //Requesting location permission
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            return;
+        } else {
+            launchServiceUserLocation();
+        }
+    }
+
+    /**
+     * Method to react once user gives an requested permission
+     *
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION:
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    buttonRecordTrip.setVisibility(View.GONE);
+                } else {
+                    buttonRecordTrip.setVisibility(View.VISIBLE);
+                    launchServiceUserLocation();
+                }
+                break;
+        }
+    }
+
+    ;
+
+    private void launchServiceUserLocation() {
+        getActivity().startService(new Intent(getActivity(), ConnectedUserLocationService.class));
     }
 
 
