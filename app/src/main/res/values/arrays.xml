@@ -7,7 +7,12 @@
     </string-array>
 
     <string-array name="spinnerChoicesTransportationMode">
-        <item>By walk</item>
-        <item>By SUV</item>
+        <item>Walk</item>
+        <item>SUV</item>
+    </string-array>
+
+    <string-array name="spinnerSelectLanguage">
+        <item>French</item>
+        <item>English</item>
     </string-array>
 </resources>

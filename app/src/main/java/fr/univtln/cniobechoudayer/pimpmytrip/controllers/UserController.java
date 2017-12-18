@@ -202,12 +202,6 @@ public class UserController {
             databaseUsersConnectedReference.removeValue();
     }
 
-
-    @Override
-    protected void finalize() throws Throwable {
-        dbUser.removeEventListener(listenerUser);
-    }
-
     /**
      * Method that updates in database the last known location of the connected user
      * @param location new last known location

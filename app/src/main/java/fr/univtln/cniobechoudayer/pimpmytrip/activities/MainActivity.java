@@ -20,7 +20,9 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import fr.univtln.cniobechoudayer.pimpmytrip.authentication.AccountSettingsActivity;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
+import fr.univtln.cniobechoudayer.pimpmytrip.fragments.AccountFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.ManagerTripFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.MapFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.ProfileFragment;
@@ -80,14 +82,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
 
         /**
-         * Checking if user is a trip manager
-         */
-        if(!checkIfUserIsManager()){
-            Menu navMenu = navigationView.getMenu();
-            navMenu.findItem(R.id.managementTripsCateg).setVisible(false);
-        }
-
-        /**
          * Displaying default fragment once MainActivity is loaded
          */
         displayFragment(new MapFragment());
@@ -108,6 +102,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 textViewPseudoUser.setText(userController.getConnectedUser().getPseudo());
             if(statsController.getUserStats() != null)
                 textViewStats.setText(String.valueOf(statsController.getUserStats().getNbTripsCreated()) + " " + getString(R.string.tripsLabel));
+
+            /**
+             * Checking if user is a trip manager
+             */
+            if(!checkIfUserIsManager()){
+                Menu navMenu = navigationView.getMenu();
+                navMenu.findItem(R.id.managementTripsCateg).setVisible(false);
+            }
 
         }
 
@@ -152,6 +154,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.titleTripsManagement:
                 displayFragment(ManagerTripFragment.getInstance());
                 break;
+            case R.id.titleSettings:
+                displayFragment(AccountFragment.getInstance());
         }
 
         drawer.closeDrawer(GravityCompat.START);
