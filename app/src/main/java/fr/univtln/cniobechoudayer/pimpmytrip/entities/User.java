@@ -4,6 +4,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
 
+import com.google.android.gms.maps.model.Marker;
+import com.google.firebase.database.Exclude;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * User abtrsact class
@@ -21,6 +27,7 @@ public class User {
     private String email;
     private String photo;
     private boolean manager;
+
 
     /**
      * Constructor of a user
@@ -80,7 +87,7 @@ public class User {
      * Set the email of the user
      * @param email
      */
-    public void setEmail(String email) {
+    private void setEmail(String email) {
         this.email = email;
     }
 
@@ -158,4 +165,5 @@ public class User {
                 ", photo='" + photo + '\'' +
                 '}';
     }
+
 }

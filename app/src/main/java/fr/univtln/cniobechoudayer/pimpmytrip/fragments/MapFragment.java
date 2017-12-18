@@ -64,6 +64,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Position;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
@@ -98,6 +99,9 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private Spinner choicesTypeWaypoint;
     private boolean isUserSaving = false;
     private UserController userController;
+    private HashMap<String, MarkerOptions> markerOptionsHashMap;
+    private Marker marker;
+    private List<Marker> mMarkers;
     private LocationManager locationManager;
     private LocationListener locationListener;
     private HashMap<String,Marker> connectedUsersMarkersHashMap;
@@ -151,7 +155,8 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         factory = new IconGenerator(getActivity());
         connectedUsersMarkersHashMap = new HashMap<>();
         connectedUserlist = new ArrayList<>();
-        getActivity().startService(new Intent(getActivity(), ConnectedUserLocationService.class));
+        mMarkers = new ArrayList<>();
+        requestLocationPermissions();
 
     }
 
@@ -159,8 +164,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
-
-        requestLocationPermissions();
 
         /**
          * Initializing location manager
@@ -428,6 +431,27 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                         }
 
                     }
+                    connectedUserlist.remove(dataSnapshot.getValue(User.class));
+                    String idUserChanged = dataSnapshot.getKey();
+                    System.out.println("CHANGED: "+idUserChanged);
+                    //if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                      //  if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals(idUser)) {
+                            //System.out.println("getcurrent equals"+ idUser);
+                            if(!getMarkers().isEmpty()){
+                                removeMarkers();
+                            }
+                            double latitude = (double) dataSnapshot.child("lastKnownLocation").child("latitude").getValue();
+                            double longitude = (double) dataSnapshot.child("lastKnownLocation").child("longitude").getValue();
+                            LatLng latLng = new LatLng(latitude, longitude);
+                            MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(idUserChanged);
+                            //markerOptionsHashMap.put(idUser,markerOptions);
+                            markerOptions.visible(true);
+                            marker = mGoogleMap.addMarker(markerOptions);
+                            addMarker(marker);
+
+                        //}
+                    //}
+                    //drawAllUsersConnectedMarkers();
 
                 }
 
@@ -918,13 +942,16 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
         factory = new IconGenerator(this.context);
         factory.setColor(getResources().getColor(R.color.colorPrimaryDark));
-        Bitmap icon = Bitmap.createScaledBitmap(new CircleTransform().transform(userController.getConnectedUser().getConvertedPhoto()), 200, 200, false);
-        mGoogleMap.addMarker(
-                new MarkerOptions()
-                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                        .snippet(userController.getConnectedUser().getPseudo())
-                        .icon(BitmapDescriptorFactory.fromBitmap(icon))
-        );
+        /*if(userController.getConnectedUser() != null){
+            Bitmap icon = Bitmap.createScaledBitmap(new CircleTransform().transform(userController.getConnectedUser().getConvertedPhoto()), 200, 200, false);
+            mGoogleMap.addMarker(
+                    new MarkerOptions()
+                            .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                            .snippet(userController.getConnectedUser().getPseudo())
+                            .icon(BitmapDescriptorFactory.fromBitmap(icon))
+            );
+        }*/
+
 
     }
 
@@ -947,7 +974,8 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     public void onProviderDisabled(String provider) {
 
     }
-     /* Method to handle a new user location
+
+    /* Method to handle a new user location
      *
      * @param location location to be handle
      */
@@ -1045,7 +1073,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
      */
     private void drawMarker(Position position, final String idUser) {
         if (mGoogleMap != null) {
-            getUserPhoto(idUser);
+            //fgetUserPhoto(idUser);
             LatLng gps = new LatLng(position.getCoordX(), position.getCoordY());
             Marker marker;
             User userToDisplay = new User();
@@ -1056,7 +1084,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
             }
             marker = mGoogleMap.addMarker(new MarkerOptions()
                         .position(gps)
-                        .icon(BitmapDescriptorFactory.fromBitmap(userToDisplay.getConvertedPhoto()))
+                        //.icon(BitmapDescriptorFactory.fromBitmap(userToDisplay.getConvertedPhoto()))
                         .title(idUser));
 
 
@@ -1064,6 +1092,24 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         }
     }
 
+    /**
+     * Draw markers for each user connected related to their last known location
+     */
+    private void drawAllUsersConnectedMarkers() {
+        for (Map.Entry<String, MarkerOptions> entry : markerOptionsHashMap.entrySet()) {
+            MarkerOptions markerOptions = entry.getValue();
+            markerOptions.visible(true);
+            if (mGoogleMap != null) {
+                mGoogleMap.addMarker(markerOptions);
+            }
+        }
+    }
+
+    /**
+     * Get the profile photo of a user
+     * @param idUser id of the user
+     * @return bitmap
+     */
     private Bitmap getUserPhoto(String idUser){
         dbUsers.child(idUser);
         final User[] userRetrieved = {new User()};
@@ -1092,6 +1138,8 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
             return;
+        }else{
+            launchServiceUserLocation();
         }
     }
 
@@ -1110,11 +1158,41 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                     buttonRecordTrip.setVisibility(View.GONE);
                 }else{
                     buttonRecordTrip.setVisibility(View.VISIBLE);
+                    launchServiceUserLocation();
                 }
                 break;
         }
     };
 
+    private void launchServiceUserLocation(){
+        getActivity().startService(new Intent(getActivity(), ConnectedUserLocationService.class));
+    }
+
+    /**
+     * Add a marker to the list of markers
+     * @param marker
+     */
+    public void addMarker(Marker marker){
+        this.mMarkers.add(marker);
+    }
+
+    /**
+     * Remove a marker from the list of markers
+     */
+    public void removeMarkers(){
+        for(Marker marker: mMarkers){
+            marker.remove();
+        }
+        mMarkers.clear();
+    }
+
+    /**
+     * Get the list list of markers
+     * @return list of markers
+     */
+    public List<Marker> getMarkers(){
+        return this.mMarkers;
+    }
 }
 
 

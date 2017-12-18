@@ -83,8 +83,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         auth = FirebaseAuth.getInstance();
 
-        userController = UserController.getInstance();
-
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -168,7 +166,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         FirebaseUser currentUser = auth.getCurrentUser();
         if(currentUser != null){
             Intent startMainActivity = new Intent(this, MainActivity.class);
-            startActivity(startMainActivity);
+            //startActivity(startMainActivity);
         }
     }
 
@@ -179,7 +177,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser != null) {
             Intent startMainActivity = new Intent(this, MainActivity.class);
-            startActivity(startMainActivity);
+            //startActivity(startMainActivity);
         }
     }
 
@@ -304,6 +302,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
      * and calls the main view
      */
     private void onConnectionSuccess() {
+        userController = UserController.getInstance();
         userController.setUserAsConnected();
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);

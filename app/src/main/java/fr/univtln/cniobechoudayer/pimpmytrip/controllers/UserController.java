@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -16,6 +17,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.User;
 
@@ -39,7 +41,7 @@ public class UserController {
     private FirebaseUser currentUser;
     private static String currentUserId;
     private static UserController instance;
-    private static User connectedUser;
+    private User connectedUser;
     private ValueEventListener listenerUser;
     private DatabaseReference dbUser;
 
@@ -54,6 +56,7 @@ public class UserController {
         if (currentUser != null) {
             currentUserId = firebaseAuth.getCurrentUser().getUid();
             dbUser = database.child("users").child(currentUserId);
+            Log.d("dbUser", dbUser.getKey());
             databaseUsersConnectedReference = database.child("connectedUsers").child(currentUserId);
         }else{
             Log.d("user connected", "null");
@@ -66,6 +69,7 @@ public class UserController {
         listenerUser = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d("setting","connected user");
                 connectedUser = dataSnapshot.getValue(User.class);
             }
 
@@ -75,8 +79,9 @@ public class UserController {
             }
         };
         if(dbUser != null){
+            Log.d("dbUser","not null");
             dbUser.addValueEventListener(listenerUser);
-            dbUser.keepSynced(true);
+            //dbUser.keepSynced(true);
         }
 
 
@@ -97,8 +102,8 @@ public class UserController {
         return connectedUser;
     }
 
-    public static void setConnectedUser(User connectedUser) {
-        UserController.connectedUser = connectedUser;
+    public void setConnectedUser(User connectedUser) {
+        this.connectedUser = connectedUser;
     }
 
     /***************
@@ -224,6 +229,8 @@ public class UserController {
     public String getIdLastMarker(){
         return databaseUsersConnectedReference.child("idLastMarker").getKey();
     }*/
+
+
 
 
 }
