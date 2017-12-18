@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerAdapterTrip;
+import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerViewAdapterReferenceTrip;
 
 import static android.support.design.widget.Snackbar.LENGTH_LONG;
 import static android.support.design.widget.Snackbar.make;
@@ -18,13 +19,13 @@ import static android.support.design.widget.Snackbar.make;
 public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
     public static final float ALPHA_FULL = 1.0f;
 
-    private final RecyclerAdapterTrip recyclerAdapterTrip;
+    private final RecyclerViewAdapterReferenceTrip recyclerAdapterTrip;
     private final RecyclerView recyclerView;
     private View itemView;
     //private final Bitmap iconDelete, iconDisplay;
 
 
-    public SimpleItemTouchHelperCallback(RecyclerAdapterTrip adapter, RecyclerView recyclerView) {
+    public SimpleItemTouchHelperCallback(RecyclerViewAdapterReferenceTrip adapter, RecyclerView recyclerView) {
         this.recyclerAdapterTrip = adapter;
         this.recyclerView = recyclerView;
         //this.iconDelete = iconDelete;

@@ -1,9 +1,7 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.fragments;
 
-import android.content.Intent;
+
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -63,13 +61,6 @@ public class RefTripsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         refTripsList = new ArrayList<>();
-        /*Trip trip = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, 89,  null);
-        Trip trip2 = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null, 89, null);
-        Trip trip3 = new Trip("#F2F2F2", Calendar.getInstance().getTime(), "trip", true, null, null,89, null);
-        System.out.println("color:"+trip.getColor());
-        refTripsList.add(trip);
-        refTripsList.add(trip2);
-        refTripsList.add(trip3);*/
         View rootView = inflater.inflate(R.layout.fragment_ref_trips, container, false);
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerViewRefTrips);
         recyclerAdapterRefTrip = new RecyclerAdapterRefTrip(refTripsList, getActivity());

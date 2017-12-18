@@ -19,6 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Position;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.User;
 
 /**
@@ -35,21 +36,21 @@ public class UserController {
      * MEMBERS *
      **********/
 
-    private FirebaseAuth firebaseAuth;
-    private DatabaseReference database;
-    private DatabaseReference databaseUsersConnectedReference;
-    private FirebaseUser currentUser;
-    private static String currentUserId;
+    private final FirebaseAuth firebaseAuth;
+    private final DatabaseReference database;
+    private final DatabaseReference databaseUsersConnectedReference;
+    private final FirebaseUser currentUser;
+    private String currentUserId;
     private static UserController instance;
-    private static User connectedUser;
-    private ValueEventListener listenerUser;
-    private DatabaseReference dbUser = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+    private User connectedUser;
+    private final ValueEventListener listenerUser;
+    private final DatabaseReference dbUser = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
     /***************
      * CONSTRUCTOR *
      ***************/
 
-    protected UserController() {
+    private UserController() {
         firebaseAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase");
         currentUser = firebaseAuth.getCurrentUser();
@@ -66,7 +67,6 @@ public class UserController {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 connectedUser = dataSnapshot.getValue(User.class);
-
             }
 
             @Override
@@ -80,7 +80,8 @@ public class UserController {
     }
 
     /**
-     * Method which returns the singleton
+     * Method which returns the mSingleton
+     *
      * @return the unique instance
      */
     public static UserController getInstance() {
@@ -94,8 +95,8 @@ public class UserController {
         return connectedUser;
     }
 
-    public static void setConnectedUser(User connectedUser) {
-        UserController.connectedUser = connectedUser;
+    private void setConnectedUser(User connectedUser) {
+        this.connectedUser = connectedUser;
     }
 
     /***************
@@ -120,6 +121,7 @@ public class UserController {
 
     /**
      * Method that updates the pseudo of the connected user
+     *
      * @param pseudo new pseudo
      */
     public void updatePseudoUser(String pseudo) {
@@ -128,6 +130,7 @@ public class UserController {
 
     /**
      * Method that updates the email of the connected user
+     *
      * @param email new email
      */
     public void updateEmailUser(String email) {
@@ -136,10 +139,11 @@ public class UserController {
 
     /**
      * Methd to update user profile picture of connected user
+     *
      * @param photo
      */
-    public void updatePhotoUser(Bitmap photo){
-        Log.d("updating photo user", "reached" );
+    public void updatePhotoUser(Bitmap photo) {
+        Log.d("updating photo user", "reached");
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         photo.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
@@ -168,22 +172,17 @@ public class UserController {
      */
     public void setUserAsConnected() {
         database.child("connectedUsers").child(currentUserId).setValue(currentUser);
+        Position position = new Position(0.0,0.0);
+        database.child("connectedUsers").child(currentUserId).child("lastKnownLocation").setValue(position);
     }
 
     /**
      * Methods to get the current connected user
+     *
      * @return
      */
     public FirebaseUser getCurrentUser() {
         return currentUser;
-    }
-
-    /**
-     * Method to update the current connecter user
-     * @param currentUser
-     */
-    public void setCurrentUser(FirebaseUser currentUser) {
-        this.currentUser = currentUser;
     }
 
     /**
@@ -194,33 +193,14 @@ public class UserController {
     }
 
 
-    @Override
-    protected void finalize() throws Throwable {
-        dbUser.removeEventListener(listenerUser);
-    }
-
     /**
      * Method that updates in database the last known location of the connected user
-     * @param location new last known location
+     *
+     * @param position new last known position
      */
-    public void updateLastKnownUserLocation(Location location){
-        databaseUsersConnectedReference.child("lastKnownLocation").setValue(location);
+    public void updateLastKnownUserLocation(Position position) {
+        databaseUsersConnectedReference.child("lastKnownLocation").setValue(position);
     }
-
-
-    /**
-     * Method that updates in database the last known location of the connected user
-     * @param id id of the last marker
-     */
-    /*public void updateIdLastMarker(String id){
-        databaseUsersConnectedReference.child("idLastMarker").setValue(id);
-    }
-
-    public String getIdLastMarker(){
-        return databaseUsersConnectedReference.child("idLastMarker").getKey();
-    }*/
-
-
 
 
 }

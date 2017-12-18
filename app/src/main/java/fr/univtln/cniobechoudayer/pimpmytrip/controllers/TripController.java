@@ -44,7 +44,7 @@ public class TripController {
     }
 
     /**
-     * Returns the singleton
+     * Returns the mSingleton
      * @return the unique instance
      */
     public static TripController getInstance(){

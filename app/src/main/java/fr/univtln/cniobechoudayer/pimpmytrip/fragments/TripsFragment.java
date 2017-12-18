@@ -23,6 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerViewAdapterReferenceTrip;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerAdapterTrip;
@@ -38,9 +39,8 @@ public class TripsFragment extends Fragment {
     private static TripsFragment singleton;
     private List<Trip> tripsList;
     private RecyclerView recyclerView;
-    private RecyclerAdapterTrip adapterTrip;
+    private RecyclerViewAdapterReferenceTrip adapterTrip;
     private FragmentManager fragmentManager;
-    private MapFragment mapFragment;
 
     private ValueEventListener listenerDbMyTrips;
 
@@ -72,15 +72,11 @@ public class TripsFragment extends Fragment {
         tripsList = new ArrayList<>();
         View rootView = inflater.inflate(R.layout.fragment_trips, container, false);
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerViewTrips);
-        adapterTrip = new RecyclerAdapterTrip(tripsList, getActivity(), fragmentManager);
+        adapterTrip = new RecyclerViewAdapterReferenceTrip(getActivity(),tripsList, "MY TRIPS", fragmentManager);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapterTrip);
-
-        //For drag and swipe with recyclerView
-        //Bitmap iconDelete = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.ic_delete_white_48dp);
-        //Bitmap iconDisplay = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.ic_;
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapterTrip, recyclerView);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
@@ -111,7 +107,6 @@ public class TripsFragment extends Fragment {
          * Setting up fragment title
          */
         Utils.setActionBarTitle((AppCompatActivity) getActivity(), getString(R.string.titleMyTrips));
-
 
         return rootView;
     }

@@ -24,6 +24,7 @@ import fr.univtln.cniobechoudayer.pimpmytrip.fragments.ManagerTripFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.MapFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.ProfileFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.RefTripsFragment;
+import fr.univtln.cniobechoudayer.pimpmytrip.fragments.ReferenceTripsFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.TripsFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.services.ConnectedUserLocationService;
@@ -140,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 displayFragment(MapFragment.getInstance());
                 break;
             case R.id.tabRefTrips:
-                displayFragment(RefTripsFragment.getInstance());
+                displayFragment(ReferenceTripsFragment.getInstance());
                 break;
             case R.id.tabMyTrips:
                 displayFragment(TripsFragment.getInstance());

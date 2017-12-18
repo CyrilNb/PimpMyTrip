@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
+import fr.univtln.cniobechoudayer.pimpmytrip.entities.Position;
 
 /**
  * Service that allows to get all current connected users
@@ -38,11 +39,8 @@ public class ConnectedUserLocationService extends Service
         @Override
         public void onLocationChanged(Location location)
         {
-            Toast.makeText(ConnectedUserLocationService.this, String.valueOf(location.getLatitude() + " / " + location.getLongitude()), Toast.LENGTH_SHORT).show();
-            //System.out.println("LOCATION CHANGED");
-            //System.out.println(location.getLatitude() + " / " + location.getLongitude());
-            mLastLocation.set(location);
-            userController.updateLastKnownUserLocation(mLastLocation);
+            Position position = new Position(location.getLatitude(),location.getLongitude());
+            userController.updateLastKnownUserLocation(position);
         }
 
         @Override

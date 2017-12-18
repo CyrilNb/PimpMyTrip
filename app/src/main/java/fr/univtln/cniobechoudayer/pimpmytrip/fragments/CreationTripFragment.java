@@ -119,7 +119,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         // Required empty public constructor
     }
 
-    //Managing the singleton
+    //Managing the mSingleton
     public static CreationTripFragment getInstance() {
 
         if (singleton == null) {
