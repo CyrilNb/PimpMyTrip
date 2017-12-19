@@ -101,7 +101,7 @@ public class TripController {
     }
 
     /**
-     * Delet the given trip from the mDatabase
+     * Delete the given trip from the mDatabase
      * @param tripToDelete trip to be deleted from db
      */
     public void deleteTrip(Trip tripToDelete){
