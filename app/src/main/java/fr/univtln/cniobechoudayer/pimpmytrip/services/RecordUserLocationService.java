@@ -26,10 +26,10 @@ import fr.univtln.cniobechoudayer.pimpmytrip.R;
 public class RecordUserLocationService extends IntentService implements LocationListener {
 
     private List<Position> positionList = new ArrayList<>();
+    private Position currentPosition;
     private LocationManager locationManager;
     private Messenger messenger;
     private Message msg;
-    private static Intent currentIntent;
     private Bundle retrievedBundle;
 
     private static final String TAG = "Debug GPS Service";
@@ -80,6 +80,7 @@ public class RecordUserLocationService extends IntentService implements Location
                 String latitude = "latitude: " + location.getLatitude();
                 String longitude = "longitude: " + location.getLongitude();
                 String toastString = "location is" + latitude + "," +longitude;
+                currentPosition = new Position(location.getLatitude(), location.getLongitude());
                 Log.d(TAG, toastString);
 
             }
@@ -124,26 +125,7 @@ public class RecordUserLocationService extends IntentService implements Location
      */
     @Override
     public void onDestroy() {
-        Bundle bundleToSend = new Bundle();
-        bundleToSend.putParcelableArrayList("listPositionsTrip", (ArrayList<? extends Parcelable>) positionList);
-        msg = Message.obtain();
-        msg.setData(bundleToSend); //put the data here
-        messenger = (Messenger) retrievedBundle.get("messenger");
-        if (msg != null) {
-            if (messenger != null) {
-                try {
-                    messenger.send(msg);
-                    Log.d("service", "message sent !");
-                } catch (RemoteException e) {
-                    Log.i("error", "error");
-                }
-            } else {
-                Log.d("messenger service", "null");
-            }
-
-        } else {
-            Log.d("message service", "null");
-        }
+        sendEndMessage();
         super.onDestroy();
         if(locationManager != null){
             locationManager.removeUpdates(mLocationListener);
@@ -170,14 +152,15 @@ public class RecordUserLocationService extends IntentService implements Location
             Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
             if(location != null){
                 while(true){
-                    positionList.add(new Position(location.getLatitude(), location.getLongitude()));
+                    //positionList.add(new Position(location.getLatitude(), location.getLongitude()));
+                    sendPositionToCaller();
                     try {
                         Thread.sleep(intervalInMs);
                     } catch (InterruptedException e) {
 
                     }
                     Log.d("positionsList size", String.valueOf(positionList.size()));
-                    Log.d("added element", String.valueOf(location.getLatitude() + location.getLongitude()));
+                    Log.d("added element", String.valueOf(currentPosition.toString()));
                 }
             }else{
                 Log.d("Location in service", "null");
@@ -188,6 +171,52 @@ public class RecordUserLocationService extends IntentService implements Location
         }
 
 
+    }
+
+    private void sendPositionToCaller(){
+        Bundle bundleToSend = new Bundle();
+        bundleToSend.putParcelable("current_position", currentPosition);
+        msg = Message.obtain();
+        msg.setData(bundleToSend); //put the data here
+        messenger = (Messenger) retrievedBundle.get("messenger");
+        if (msg != null) {
+            if (messenger != null) {
+                try {
+                    messenger.send(msg);
+                    Log.d("service", "message sent with position : " + currentPosition.toString());
+                } catch (RemoteException e) {
+                    Log.i("error", "error");
+                }
+            } else {
+                Log.d("messenger service", "null");
+            }
+
+        } else {
+            Log.d("message service", "null");
+        }
+    }
+
+    private void sendEndMessage(){
+        Bundle bundleToSend = new Bundle();
+        bundleToSend.putBoolean("service_finished", true);
+        msg = Message.obtain();
+        msg.setData(bundleToSend); //put the data here
+        messenger = (Messenger) retrievedBundle.get("messenger");
+        if (msg != null) {
+            if (messenger != null) {
+                try {
+                    messenger.send(msg);
+                    Log.d("service", "service finished message sent");
+                } catch (RemoteException e) {
+                    Log.i("error", "error");
+                }
+            } else {
+                Log.d("messenger service", "null");
+            }
+
+        } else {
+            Log.d("message service", "null");
+        }
     }
 
     /**

@@ -69,4 +69,12 @@ public class Position implements Parcelable{
         dest.writeDouble(coordX);
         dest.writeDouble(coordY);
     }
+
+    @Override
+    public String toString() {
+        return "Position{" +
+                "coordX=" + coordX +
+                ", coordY=" + coordY +
+                '}';
+    }
 }

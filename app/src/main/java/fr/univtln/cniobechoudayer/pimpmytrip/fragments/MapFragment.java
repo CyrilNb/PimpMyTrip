@@ -208,9 +208,10 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                 Bundle reply = msg.getData();
                 Log.d("listPositions service", String.valueOf(reply.get("listPositionsTrip")));
                 if (reply.get("listPositionsTrip") != null) {
-                    listPositions = reply.getParcelableArrayList("listPositionsTrip");
+                    listPositions.add((Position) reply.getParcelable("current_position"));
                     Log.d("listPos recorded size", String.valueOf(listPositions.size()));
-                    if (isUserSaving) {
+                    Boolean isServiceEnded = reply.getBoolean("recording_finished");
+                    if (isUserSaving && isServiceEnded) {
                         Trip addedTrip = tripController.insertTrip(false, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), userController.getConnectedUserId());
                         isUserSaving = false;
                     }
@@ -519,7 +520,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
      */
     private void displayDialogSaveMarker(final LatLng pointToSave) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
+            builder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
         } else {
             builder = new AlertDialog.Builder(getContext());
         }
@@ -589,7 +590,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
      */
     private void displayAlertDialogSaveTrip() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
+            builder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
         } else {
             builder = new AlertDialog.Builder(getContext());
         }
@@ -656,7 +657,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private void displayAlertDialogChoiceTransportationMode() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
+            builder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
         } else {
             builder = new AlertDialog.Builder(getContext());
         }
@@ -667,7 +668,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         alertLayout.setLayoutParams(params);
 
         final Spinner choiceTransportationMode = new Spinner(getContext());
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.spinnerChoicesTransportationMode));
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.spinnerChoicesTransportationMode));
         choiceTransportationMode.setAdapter(spinnerArrayAdapter);
 
         alertLayout.addView(choiceTransportationMode);

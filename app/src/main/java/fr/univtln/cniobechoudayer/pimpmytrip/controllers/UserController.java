@@ -204,8 +204,6 @@ public class UserController {
             databaseUsersConnectedReference.removeValue();
     }
 
-
-
     /**
      * Method that updates in database the last known location of the connected user
      *

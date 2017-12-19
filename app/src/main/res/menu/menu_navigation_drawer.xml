@@ -28,5 +28,15 @@
                 android:title="@string/titleTripsManagement"/>
         </menu>
     </item>
+    <item android:title="@string/titleSettingsCateg"
+        android:id="@+id/settingsCateg">
+        <menu>
+            <item
+                android:id="@+id/titleSettings"
+                android:icon="@drawable/ic_settings_black_48dp"
+                android:title="@string/titleSettings"/>
+        </menu>
+    </item>
+
 
 </menu>

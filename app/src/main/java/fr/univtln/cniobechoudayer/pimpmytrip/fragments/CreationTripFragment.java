@@ -577,7 +577,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
         choicesTypeWaypoint = new Spinner(getContext());
 
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String> (getContext(), android.R.layout.simple_list_item_1 , getResources().getStringArray(R.array.spinnerChoicesMarker));
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String> (getContext(), android.R.layout.simple_spinner_item , getResources().getStringArray(R.array.spinnerChoicesMarker));
         choicesTypeWaypoint.setAdapter(spinnerArrayAdapter);
 
         titleEditText = new EditText(getContext());
