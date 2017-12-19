@@ -8,7 +8,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Position;
@@ -19,12 +18,13 @@ import fr.univtln.cniobechoudayer.pimpmytrip.entities.Position;
 
 public class ConnectedUserLocationService extends Service
 {
-    private static final String TAG = "BOOMBOOMTESTGPS";
-    private LocationManager mLocationManager = null;
+    private static final String TAG = "Debug GPS ConnectedUserLocationService";
     private static final int LOCATION_INTERVAL = 3000; //milliseconds
     private static final float LOCATION_DISTANCE = 1; //meters
 
     private UserController userController;
+
+    private LocationManager mLocationManager = null;
 
     private class LocationListener implements android.location.LocationListener
     {
@@ -76,7 +76,7 @@ public class ConnectedUserLocationService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        userController = UserController.getInstance();
+        userController = UserController.getsInstance();
         super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }

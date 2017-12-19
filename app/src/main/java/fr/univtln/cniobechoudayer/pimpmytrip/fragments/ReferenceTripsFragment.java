@@ -53,15 +53,16 @@ import com.google.firebase.database.ValueEventListener;
 
 public class ReferenceTripsFragment extends Fragment {
 
-    private static ReferenceTripsFragment singleton;
+    private static ReferenceTripsFragment sInstance;
 
-    private RecyclerView recyclerView;
+    private List<Trip> mModelList;
+
+    private RecyclerView mRecyclerView;
     private RecyclerViewAdapterReferenceTrip mAdapter;
-    private ValueEventListener listenerDbReferenceTrips;
-    private FragmentManager fragmentManager;
-    private DatabaseReference dbTrips = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
+    private ValueEventListener mListenerDbReferenceTrips;
+    private FragmentManager mFragmentManager;
 
-    private List<Trip> modelList;
+    private final DatabaseReference fDbTrips = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
 
     public ReferenceTripsFragment() {
         // Required empty public constructor
@@ -74,17 +75,17 @@ public class ReferenceTripsFragment extends Fragment {
      * @return A new instance of fragment ReferenceTripsFragment.
      */
     public static ReferenceTripsFragment getInstance() {
-        if (singleton == null) {
-            singleton = new ReferenceTripsFragment();
+        if (sInstance == null) {
+            sInstance = new ReferenceTripsFragment();
         }
 
-        return singleton;
+        return sInstance;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fragmentManager = getActivity().getSupportFragmentManager();
+        mFragmentManager = getActivity().getSupportFragmentManager();
         setHasOptionsMenu(true);
 
     }
@@ -92,32 +93,32 @@ public class ReferenceTripsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        modelList = new ArrayList<>();
+        mModelList = new ArrayList<>();
         View rootView = inflater.inflate(R.layout.fragment_reference_trips, container, false);
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
-        mAdapter = new RecyclerViewAdapterReferenceTrip(getActivity(), modelList, "REFERENCE TRIPS",fragmentManager);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+        mAdapter = new RecyclerViewAdapterReferenceTrip(getActivity(), mModelList, "REFERENCE TRIPS", mFragmentManager);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        //recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        //mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setAdapter(mAdapter);
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter, recyclerView);
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter, mRecyclerView);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
-        touchHelper.attachToRecyclerView(recyclerView);
+        touchHelper.attachToRecyclerView(mRecyclerView);
 
-        listenerDbReferenceTrips = new ValueEventListener() {
+        mListenerDbReferenceTrips = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                modelList.clear();
+                mModelList.clear();
                 for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
                     for (DataSnapshot snapshot : tripSnapshot.getChildren()) {
                         Trip currentTrip = snapshot.getValue(Trip.class);
                         System.out.println(currentTrip.getName());
                         currentTrip.setId(snapshot.getKey());
                         if (!currentTrip.isReference())
-                            modelList.add(currentTrip);
+                            mModelList.add(currentTrip);
                     }
 
                 }
@@ -207,15 +208,15 @@ public class ReferenceTripsFragment extends Fragment {
             public boolean onQueryTextChange(String s) {
                 ArrayList<Trip> filterList = new ArrayList<>();
                 if (s.length() > 0) {
-                    for (int i = 0; i < modelList.size(); i++) {
-                        if (modelList.get(i).getName().toLowerCase().contains(s.toString().toLowerCase())) {
-                            filterList.add(modelList.get(i));
+                    for (int i = 0; i < mModelList.size(); i++) {
+                        if (mModelList.get(i).getName().toLowerCase().contains(s.toString().toLowerCase())) {
+                            filterList.add(mModelList.get(i));
                             mAdapter.updateList(filterList);
                         }
                     }
 
                 } else {
-                    mAdapter.updateList(modelList);
+                    mAdapter.updateList(mModelList);
                 }
                 return false;
             }
@@ -231,15 +232,15 @@ public class ReferenceTripsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        if (listenerDbReferenceTrips != null)
-            dbTrips.addValueEventListener(listenerDbReferenceTrips);
+        if (mListenerDbReferenceTrips != null)
+            fDbTrips.addValueEventListener(mListenerDbReferenceTrips);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (listenerDbReferenceTrips != null)
-            dbTrips.removeEventListener(listenerDbReferenceTrips);
+        if (mListenerDbReferenceTrips != null)
+            fDbTrips.removeEventListener(mListenerDbReferenceTrips);
     }
 }
 

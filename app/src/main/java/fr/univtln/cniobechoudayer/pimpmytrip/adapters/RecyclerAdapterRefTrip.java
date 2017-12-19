@@ -19,17 +19,17 @@ import fr.univtln.cniobechoudayer.pimpmytrip.R;
  */
 public class RecyclerAdapterRefTrip extends RecyclerView.Adapter<RecyclerAdapterRefTrip.MyHolder> {
 
-    List<Trip> listRefTrips;
-    Context context;
+    List<Trip> mListRefTrips;
+    Context mContext;
 
     /**
-     * Constructor using list and context
+     * Constructor using list and mContext
      * @param list
      * @param context
      */
     public RecyclerAdapterRefTrip(List<Trip> list, Context context) {
-        this.listRefTrips = list;
-        this.context = context;
+        this.mListRefTrips = list;
+        this.mContext = context;
     }
 
     /**
@@ -40,7 +40,7 @@ public class RecyclerAdapterRefTrip extends RecyclerView.Adapter<RecyclerAdapter
      */
     @Override
     public MyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.cardview_reftrip, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.cardview_reftrip, parent, false);
         return new MyHolder(view);
     }
 
@@ -51,7 +51,7 @@ public class RecyclerAdapterRefTrip extends RecyclerView.Adapter<RecyclerAdapter
      */
     @Override
     public void onBindViewHolder(MyHolder holder, int position) {
-        Trip trip = listRefTrips.get(position);
+        Trip trip = mListRefTrips.get(position);
         holder.nameRefTrip.setText(trip.getName());
         String distanceToDisplay = Double.toString(trip.getDistance()) + " kms";
         holder.distanceRefTrip.setText(distanceToDisplay);
@@ -64,10 +64,10 @@ public class RecyclerAdapterRefTrip extends RecyclerView.Adapter<RecyclerAdapter
      */
     @Override
     public int getItemCount() {
-        if(listRefTrips == null){
+        if(mListRefTrips == null){
             return 0;
         }else
-            return listRefTrips.size();
+            return mListRefTrips.size();
     }
 
     /**

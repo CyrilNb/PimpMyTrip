@@ -32,24 +32,27 @@ import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
  * create an instance of this fragment.
  */
 public class RefTripsFragment extends Fragment {
-    private static String TAG = "DATABASE";
 
-    private static RefTripsFragment singleton;
-    private DatabaseReference database;
-    private List<Trip> refTripsList;
-    private RecyclerView recyclerView;
-    private RecyclerAdapterRefTrip recyclerAdapterRefTrip;
+    private static final String TAG = "DATABASE";
+
+    private List<Trip> mRefTripsList;
+
+    private static RefTripsFragment sInstance;
+    private RecyclerView mRecyclerView;
+    private RecyclerAdapterRefTrip mRecyclerAdapterRefTrip;
+
+    private DatabaseReference mDatabase;
 
     public RefTripsFragment() {
         // Required empty public constructor
     }
 
     public static RefTripsFragment getInstance() {
-        if (singleton == null) {
-            singleton = new RefTripsFragment();
+        if (sInstance == null) {
+            sInstance = new RefTripsFragment();
         }
 
-        return singleton;
+        return sInstance;
     }
 
     @Override
@@ -60,14 +63,14 @@ public class RefTripsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        refTripsList = new ArrayList<>();
+        mRefTripsList = new ArrayList<>();
         View rootView = inflater.inflate(R.layout.fragment_ref_trips, container, false);
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerViewRefTrips);
-        recyclerAdapterRefTrip = new RecyclerAdapterRefTrip(refTripsList, getActivity());
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerViewRefTrips);
+        mRecyclerAdapterRefTrip = new RecyclerAdapterRefTrip(mRefTripsList, getActivity());
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(recyclerAdapterRefTrip);
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setAdapter(mRecyclerAdapterRefTrip);
 
         /**
          * Setting up fragment title
@@ -78,15 +81,15 @@ public class RefTripsFragment extends Fragment {
     }
 
     /**
-     * Setting up database listeners
+     * Setting up mDatabase listeners
      * when fragment starts
      */
     @Override
     public void onStart() {
         super.onStart();
 
-        database = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
-        database.addValueEventListener(new ValueEventListener() {
+        mDatabase = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
+        mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 //This method is called once with the initial value and again whenever data at this location is updated
@@ -94,11 +97,11 @@ public class RefTripsFragment extends Fragment {
                     Trip currentTrip = tripSnapshot.getValue(Trip.class);
                     Log.d("listreftrips", String.valueOf(currentTrip.getName()));
                     if (currentTrip.isReference()) {
-                        refTripsList.add(currentTrip);
+                        mRefTripsList.add(currentTrip);
                     }
                 }
-                Log.d("listreftrips", String.valueOf(refTripsList.size()));
-                recyclerAdapterRefTrip.notifyDataSetChanged();
+                Log.d("listreftrips", String.valueOf(mRefTripsList.size()));
+                mRecyclerAdapterRefTrip.notifyDataSetChanged();
 
             }
 

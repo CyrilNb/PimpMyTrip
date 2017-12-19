@@ -19,13 +19,13 @@ import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 
 public class StatisticsController {
 
-    private static FirebaseAuth firebaseAuth;
-    private static DatabaseReference database;
-    private static StatisticsController singleton;
-    private static ValueEventListener listenerDbStats;
-    private static Statistics userStats;
-    private static DatabaseReference dbStats = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("statistics");
-    private static DatabaseReference dbUserStats = dbStats.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+    private static FirebaseAuth sFirebaseAuth;
+    private static DatabaseReference sDatabase;
+    private static StatisticsController sInstance;
+    private static ValueEventListener sListenerDbStats;
+    private static Statistics sUserStats;
+    private static DatabaseReference sDbStats = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("statistics");
+    private static DatabaseReference sDbUserStats = sDbStats.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
 
     public StatisticsController() {
@@ -33,18 +33,18 @@ public class StatisticsController {
         /**
          * Getting useful singletons
          */
-        firebaseAuth = FirebaseAuth.getInstance();
-        database = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase");
+        sFirebaseAuth = FirebaseAuth.getInstance();
+        sDatabase = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase");
 
         /**
-         * Setting up database listeners
+         * Setting up sDatabase listeners
          */
-        listenerDbStats = new ValueEventListener() {
+        sListenerDbStats = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                    userStats = dataSnapshot.getValue(Statistics.class);
-                    if(userStats != null){
-                        Log.d("userStats", "retrieved : " + userStats.toString());
+                    sUserStats = dataSnapshot.getValue(Statistics.class);
+                    if(sUserStats != null){
+                        Log.d("sUserStats", "retrieved : " + sUserStats.toString());
                     }
             }
 
@@ -53,7 +53,7 @@ public class StatisticsController {
 
             }
         };
-        dbUserStats.addValueEventListener(listenerDbStats);
+        sDbUserStats.addValueEventListener(sListenerDbStats);
     }
 
     /**
@@ -61,10 +61,10 @@ public class StatisticsController {
      * @return
      */
     public static StatisticsController getInstance(){
-        if(singleton == null){
-            singleton = new StatisticsController();
+        if(sInstance == null){
+            sInstance = new StatisticsController();
         }
-        return singleton;
+        return sInstance;
     }
 
     /**
@@ -74,28 +74,28 @@ public class StatisticsController {
      */
     public static void updateStats(Trip savedTrip, boolean isUserWalking){
 
-        if(userStats != null){
-            Log.d("userStats", "exists");
-            userStats.setNbMyTripsTravelled(userStats.getNbMyTripsTravelled() + 1);
-            userStats.setNbTripsCreated(userStats.getNbTripsCreated() + 1);
+        if(sUserStats != null){
+            Log.d("sUserStats", "exists");
+            sUserStats.setNbMyTripsTravelled(sUserStats.getNbMyTripsTravelled() + 1);
+            sUserStats.setNbTripsCreated(sUserStats.getNbTripsCreated() + 1);
 
             if(isUserWalking){
-                userStats.setNbTripsSUVCreated(userStats.getNbTripsSUVCreated() + 1);
-                userStats.setTotalTimeDrove(userStats.getTotalTimeDrove() + 1);
-                userStats.setTotalDistanceBySUV(userStats.getTotalDistanceBySUV() + savedTrip.getDistance());
+                sUserStats.setNbTripsSUVCreated(sUserStats.getNbTripsSUVCreated() + 1);
+                sUserStats.setTotalTimeDrove(sUserStats.getTotalTimeDrove() + 1);
+                sUserStats.setTotalDistanceBySUV(sUserStats.getTotalDistanceBySUV() + savedTrip.getDistance());
             }else{
-                userStats.setNbTripsWalkingCreated(userStats.getNbTripsWalkingCreated() + 1);
-                userStats.setTotalTimeWalked(userStats.getTotalTimeWalked() + savedTrip.getDistance());
-                userStats.setTotalDistanceByWalk(userStats.getTotalDistanceByWalk() + savedTrip.getDistance());
+                sUserStats.setNbTripsWalkingCreated(sUserStats.getNbTripsWalkingCreated() + 1);
+                sUserStats.setTotalTimeWalked(sUserStats.getTotalTimeWalked() + savedTrip.getDistance());
+                sUserStats.setTotalDistanceByWalk(sUserStats.getTotalDistanceByWalk() + savedTrip.getDistance());
             }
 
-            userStats.setTotalDistance(userStats.getTotalDistance() + savedTrip.getDistance());
-            userStats.setTotalTimeTravelled(userStats.getTotalTimeTravelled() + savedTrip.getDistance());
+            sUserStats.setTotalDistance(sUserStats.getTotalDistance() + savedTrip.getDistance());
+            sUserStats.setTotalTimeTravelled(sUserStats.getTotalTimeTravelled() + savedTrip.getDistance());
 
-            dbUserStats.setValue(userStats);
+            sDbUserStats.setValue(sUserStats);
         }else{
-            Log.d("userStats", "null");
-            dbStats.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(new Statistics());
+            Log.d("sUserStats", "null");
+            sDbStats.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(new Statistics());
         }
 
     }
@@ -105,7 +105,7 @@ public class StatisticsController {
      * @return
      */
     public Statistics getUserStats(){
-        return userStats;
+        return sUserStats;
     }
 
 

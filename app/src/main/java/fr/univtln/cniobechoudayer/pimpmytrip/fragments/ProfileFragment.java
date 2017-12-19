@@ -24,12 +24,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -43,13 +39,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
-import fr.univtln.cniobechoudayer.pimpmytrip.entities.Position;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Statistics;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.StatisticsController;
-import fr.univtln.cniobechoudayer.pimpmytrip.entities.TypeWaypoint;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.User;
-import fr.univtln.cniobechoudayer.pimpmytrip.entities.Waypoint;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 
 /**
@@ -58,26 +51,30 @@ import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 
 public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener{
 
-    private ImageView mProfileImage;
-    private int mMaxScrollSize;
     private static final int PERCENTAGE_TO_ANIMATE_AVATAR = 20;
-    private boolean mIsAvatarShown = true;
-    private ListView listViewStats;
-    private List<String> listStatsToDisplay = new ArrayList<String>();
-    private ArrayAdapter<String> adapter;
+    public static final int GET_FROM_GALLERY = 3;
+
+    private UserController mUserController;
+    private StatisticsController mStatsController;
+    private static ProfileFragment sInstance;
     private Statistics userStats;
+
+    private boolean mIsAvatarShown = true;
+
+    private int mMaxScrollSize;
+
+    private List<String> mListStatsToDisplay = new ArrayList<>();
+
+    private ImageView mProfileImage;
+    private ListView listViewStats;
+    private ArrayAdapter<String> adapter;
     private AlertDialog.Builder builder;
     private EditText nameEditText;
-    private UserController userController;
-    private StatisticsController statsController;
-    private TextView textViewPseudoUser;
-    private TextView textViewEmailUser;
-    public static final int GET_FROM_GALLERY = 3;
-    private ValueEventListener listenerUser;
+    private TextView textViewPseudoUser, textViewEmailUser;
+
     private DatabaseReference dbUser = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+    private ValueEventListener listenerUser;
 
-
-    private static ProfileFragment singleton;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -85,11 +82,11 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
 
     public static ProfileFragment getInstance() {
-        if(singleton == null){
-            singleton = new ProfileFragment();
+        if(sInstance == null){
+            sInstance = new ProfileFragment();
 
         }
-        return singleton;
+        return sInstance;
     }
 
     @Override
@@ -106,9 +103,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         /**
          * Instanciating useful controllers
          */
-        userController = UserController.getInstance();
-        statsController = StatisticsController.getInstance();
-        userStats = statsController.getUserStats();
+        mUserController = UserController.getsInstance();
+        mStatsController = StatisticsController.getInstance();
+        userStats = mStatsController.getUserStats();
 
 
         /**
@@ -181,24 +178,24 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
          */
         if(userStats != null){
 
-            listStatsToDisplay.add(getString(R.string.nbMyTripsTravelledLabel) + String.valueOf(userStats.getNbMyTripsTravelled()));
-            listStatsToDisplay.add(getString(R.string.totalDistanceLabel) + String.valueOf(userStats.getTotalDistance()));
-            listStatsToDisplay.add(getString(R.string.totalDistanceBySUVLAbel) + String.valueOf(userStats.getTotalDistanceBySUV()));
-            listStatsToDisplay.add(getString(R.string.totalDistanceByWalkLabel) + String.valueOf(userStats.getTotalDistanceByWalk()));
-            listStatsToDisplay.add(getString(R.string.nbTripsCreatedLabel) + String.valueOf(userStats.getNbTripsCreated()));
-            listStatsToDisplay.add(getString(R.string.nbTripsSUVCreatedLabel) + String.valueOf(userStats.getNbTripsSUVCreated()));
-            listStatsToDisplay.add(getString(R.string.nbTripsWalkingCreatedLabel) + String.valueOf(userStats.getNbTripsWalkingCreated()));
-            listStatsToDisplay.add(getString(R.string.totalTimeTravelledLabel) + String.valueOf(userStats.getTotalTimeTravelled()));
-            listStatsToDisplay.add(getString(R.string.totalTimeDroveLabel) + String.valueOf(userStats.getTotalTimeDrove()));
-            listStatsToDisplay.add(getString(R.string.totalTimeWalkedLabel) + String.valueOf(userStats.getTotalTimeWalked()));
+            mListStatsToDisplay.add(getString(R.string.nbMyTripsTravelledLabel) + String.valueOf(userStats.getNbMyTripsTravelled()));
+            mListStatsToDisplay.add(getString(R.string.totalDistanceLabel) + String.valueOf(userStats.getTotalDistance()));
+            mListStatsToDisplay.add(getString(R.string.totalDistanceBySUVLAbel) + String.valueOf(userStats.getTotalDistanceBySUV()));
+            mListStatsToDisplay.add(getString(R.string.totalDistanceByWalkLabel) + String.valueOf(userStats.getTotalDistanceByWalk()));
+            mListStatsToDisplay.add(getString(R.string.nbTripsCreatedLabel) + String.valueOf(userStats.getNbTripsCreated()));
+            mListStatsToDisplay.add(getString(R.string.nbTripsSUVCreatedLabel) + String.valueOf(userStats.getNbTripsSUVCreated()));
+            mListStatsToDisplay.add(getString(R.string.nbTripsWalkingCreatedLabel) + String.valueOf(userStats.getNbTripsWalkingCreated()));
+            mListStatsToDisplay.add(getString(R.string.totalTimeTravelledLabel) + String.valueOf(userStats.getTotalTimeTravelled()));
+            mListStatsToDisplay.add(getString(R.string.totalTimeDroveLabel) + String.valueOf(userStats.getTotalTimeDrove()));
+            mListStatsToDisplay.add(getString(R.string.totalTimeWalkedLabel) + String.valueOf(userStats.getTotalTimeWalked()));
 
             adapter = new ArrayAdapter<String>(getContext(),
                     android.R.layout.simple_list_item_1,
-                    listStatsToDisplay);
+                    mListStatsToDisplay);
 
             // Create an ArrayAdapter from List
             adapter = new ArrayAdapter<String>
-                    (getContext(), android.R.layout.simple_list_item_1, listStatsToDisplay){
+                    (getContext(), android.R.layout.simple_list_item_1, mListStatsToDisplay){
                 @Override
                 public View getView(int position, View convertView, ViewGroup parent){
                     // Get the Item from ListView
@@ -224,9 +221,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         /**
          * Displaying user information
          */
-        textViewPseudoUser.setText(userController.getConnectedUser().getPseudo());
-        textViewEmailUser.setText(userController.getConnectedUser().getEmail());
-        mProfileImage.setImageBitmap(userController.getConnectedUser().getConvertedPhoto());
+        textViewPseudoUser.setText(mUserController.getmConnectedUser().getPseudo());
+        textViewEmailUser.setText(mUserController.getmConnectedUser().getEmail());
+        mProfileImage.setImageBitmap(mUserController.getmConnectedUser().getConvertedPhoto());
 
         /**
          * Setting up fragment title
@@ -253,7 +250,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             Bitmap bitmap = null;
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), selectedImage);
-                userController.updatePhotoUser(bitmap);
+                mUserController.updatePhotoUser(bitmap);
                 mProfileImage.setImageBitmap(bitmap);
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
@@ -311,14 +308,14 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         alertLayout.setLayoutParams(params);
 
         nameEditText = new EditText(getContext());
-        nameEditText.setText(userController.getConnectedUser().getPseudo());
+        nameEditText.setText(mUserController.getmConnectedUser().getPseudo());
 
         alertLayout.addView(nameEditText);
 
         builder.setTitle("Update your name")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        userController.updatePseudoUser(nameEditText.getText().toString());
+                        mUserController.updatePseudoUser(nameEditText.getText().toString());
                     }
 
                 })

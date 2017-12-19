@@ -21,54 +21,54 @@ import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
 /**
- * SignUp Activity using Firebase auth
+ * SignUp Activity using Firebase mAuth
  * Created by Cyril Niobé on 22/11/2017.
  */
 
 public class SignUpActivity extends AppCompatActivity {
 
-    private EditText inputEmail, inputPassword, confirmPassword, inputPseudo;
-    private Button btnSignIn, btnSignUp, btnResetPassword, btnSignUpWithGoogle;
-    private CoordinatorLayout rootView;
-    private ProgressBar progressBar;
-    private String email;
-    private String password;
-    private String pseudo;
+    private EditText mInputEmail, mInputPassword, mConfirmPassword, mInputPseudo;
+    private Button mBtnSignIn, mBtnSignUp, mBtnResetPassword, mBtnSignUpWithGoogle;
+    private CoordinatorLayout mRootView;
+    private ProgressBar mProgressBar;
+    private String mEmail;
+    private String mPassword;
+    private String mPseudo;
 
-    private FirebaseAuth auth;
+    private FirebaseAuth mAuth;
 
-    private UserController userController;
+    private UserController mUserController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
-        rootView = (CoordinatorLayout) findViewById(R.id.coordinatorLayoutSignup);
-        btnSignIn = (Button) findViewById(R.id.sign_in_buttonFromSignupActiv);
-        btnSignUp = (Button) findViewById(R.id.sign_up_button);
-        btnSignUpWithGoogle = (Button) findViewById(R.id.sign_up_with_google_button);
-        inputEmail = (EditText) findViewById(R.id.editTxtEmail);
-        inputPassword = (EditText) findViewById(R.id.editTxtPassword);
-        inputPseudo = (EditText) findViewById(R.id.editTxtPseudo);
-        confirmPassword = (EditText) findViewById(R.id.editTxtConfirmPassword);
-        progressBar = (ProgressBar) findViewById(R.id.progressBarSignUp);
-        btnResetPassword = (Button) findViewById(R.id.btn_reset_password);
+        mRootView = (CoordinatorLayout) findViewById(R.id.coordinatorLayoutSignup);
+        mBtnSignIn = (Button) findViewById(R.id.sign_in_buttonFromSignupActiv);
+        mBtnSignUp = (Button) findViewById(R.id.sign_up_button);
+        mBtnSignUpWithGoogle = (Button) findViewById(R.id.sign_up_with_google_button);
+        mInputEmail = (EditText) findViewById(R.id.editTxtEmail);
+        mInputPassword = (EditText) findViewById(R.id.editTxtPassword);
+        mInputPseudo = (EditText) findViewById(R.id.editTxtPseudo);
+        mConfirmPassword = (EditText) findViewById(R.id.editTxtConfirmPassword);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBarSignUp);
+        mBtnResetPassword = (Button) findViewById(R.id.btn_reset_password);
 
-        //Get Firebase auth instance
-        auth = FirebaseAuth.getInstance();
+        //Get Firebase mAuth instance
+        mAuth = FirebaseAuth.getInstance();
 
-        btnSignIn.setOnClickListener(new View.OnClickListener() {
+        mBtnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Finish the registration screen and return to the Login activity
-                Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(intent);
                 finish();
                 overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
             }
         });
 
-        btnSignUp.setOnClickListener(new View.OnClickListener() {
+        mBtnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 signUpWithEmail();
@@ -79,7 +79,7 @@ public class SignUpActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        progressBar.setVisibility(View.GONE);
+        mProgressBar.setVisibility(View.GONE);
     }
 
     /**
@@ -95,37 +95,37 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     /**
-     * Method to sign up with email
+     * Method to sign up with mEmail
      */
     private void signUpWithEmail(){
-        email = inputEmail.getText().toString().trim();
-        password = inputPassword.getText().toString().trim();
-        pseudo = inputPseudo.getText().toString().trim();
+        mEmail = mInputEmail.getText().toString().trim();
+        mPassword = mInputPassword.getText().toString().trim();
+        mPseudo = mInputPseudo.getText().toString().trim();
 
         if(validateInputs()){
-        progressBar.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.VISIBLE);
 
         //create user
-        auth.createUserWithEmailAndPassword(email, password).
+        mAuth.createUserWithEmailAndPassword(mEmail, mPassword).
                 addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         //Toast.makeText(SignUpActivity.this, "createUserWithEmail:onComplete:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
-                        progressBar.setVisibility(View.GONE);
+                        mProgressBar.setVisibility(View.GONE);
                         // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
+                        // the mAuth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            Utils.displayErrorMessage(getApplicationContext(),SignUpActivity.this,rootView,"Register failed");
+                            Utils.displayErrorMessage(getApplicationContext(),SignUpActivity.this, mRootView,"Register failed");
                         } else {
-                            userController.createUser(pseudo,email);
+                            mUserController.createUser(mPseudo, mEmail);
                             startActivity(new Intent(SignUpActivity.this, AccountSettingsActivity.class));
                             finish();
                         }
                     }
                 });
         }else{
-            Utils.displayErrorMessage(getApplicationContext(),SignUpActivity.this,rootView,"Register failed");
+            Utils.displayErrorMessage(getApplicationContext(),SignUpActivity.this, mRootView,"Register failed");
         }
     }
 
@@ -136,34 +136,34 @@ public class SignUpActivity extends AppCompatActivity {
     public boolean validateInputs() {
         boolean valid = true;
 
-        String reEnterPassword = confirmPassword.getText().toString();
+        String reEnterPassword = mConfirmPassword.getText().toString();
 
-        if (TextUtils.isEmpty(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            inputEmail.setError("Enter a valid email address");
+        if (TextUtils.isEmpty(mEmail) || !android.util.Patterns.EMAIL_ADDRESS.matcher(mEmail).matches()) {
+            mInputEmail.setError("Enter a valid mEmail address");
             valid = false;
         } else {
-            inputEmail.setError(null);
+            mInputEmail.setError(null);
         }
 
-        if (TextUtils.isEmpty(pseudo) || pseudo.length() < 2) {
-            inputPseudo.setError("Must be at least 2 characters long");
+        if (TextUtils.isEmpty(mPseudo) || mPseudo.length() < 2) {
+            mInputPseudo.setError("Must be at least 2 characters long");
             valid = false;
         } else {
-            inputPseudo.setError(null);
+            mInputPseudo.setError(null);
         }
 
-        if (TextUtils.isEmpty(password) || password.length() < 6) {
-            inputPassword.setError("Must be at least 6 characters long");
+        if (TextUtils.isEmpty(mPassword) || mPassword.length() < 6) {
+            mInputPassword.setError("Must be at least 6 characters long");
             valid = false;
         } else {
-            inputPassword.setError(null);
+            mInputPassword.setError(null);
         }
 
-        if (TextUtils.isEmpty(reEnterPassword) || reEnterPassword.length() < 6 || !(reEnterPassword.equals(password))) {
-            confirmPassword.setError("Password do not match");
+        if (TextUtils.isEmpty(reEnterPassword) || reEnterPassword.length() < 6 || !(reEnterPassword.equals(mPassword))) {
+            mConfirmPassword.setError("Password do not match");
             valid = false;
         } else {
-            confirmPassword.setError(null);
+            mConfirmPassword.setError(null);
         }
 
         return valid;

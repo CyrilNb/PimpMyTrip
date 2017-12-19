@@ -18,17 +18,17 @@ import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
  */
 public class ManagerTripFragment extends Fragment {
 
-    private static ManagerTripFragment singleton;
+    private static ManagerTripFragment sInstance;
 
     public ManagerTripFragment() {
         // Required empty public constructor
     }
 
     public static ManagerTripFragment getInstance(){
-        if(singleton == null){
-            singleton = new ManagerTripFragment();
+        if(sInstance == null){
+            sInstance = new ManagerTripFragment();
         }
-        return singleton;
+        return sInstance;
     }
 
 

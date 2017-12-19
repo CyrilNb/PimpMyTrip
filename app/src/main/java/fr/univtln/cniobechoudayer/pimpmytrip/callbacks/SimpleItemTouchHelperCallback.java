@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
-import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerAdapterTrip;
 import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerViewAdapterReferenceTrip;
 
 import static android.support.design.widget.Snackbar.LENGTH_LONG;
@@ -19,15 +18,15 @@ import static android.support.design.widget.Snackbar.make;
 public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
     public static final float ALPHA_FULL = 1.0f;
 
-    private final RecyclerViewAdapterReferenceTrip recyclerAdapterTrip;
-    private final RecyclerView recyclerView;
-    private View itemView;
+    private final RecyclerViewAdapterReferenceTrip fRecyclerAdapterTrip;
+    private final RecyclerView fRecyclerView;
+    private View mItemView;
     //private final Bitmap iconDelete, iconDisplay;
 
 
     public SimpleItemTouchHelperCallback(RecyclerViewAdapterReferenceTrip adapter, RecyclerView recyclerView) {
-        this.recyclerAdapterTrip = adapter;
-        this.recyclerView = recyclerView;
+        this.fRecyclerAdapterTrip = adapter;
+        this.fRecyclerView = recyclerView;
         //this.iconDelete = iconDelete;
         //this.iconDisplay = iconDelete;
 
@@ -52,7 +51,7 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     @Override
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-        recyclerAdapterTrip.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+        fRecyclerAdapterTrip.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
         return true;
     }
 
@@ -61,17 +60,17 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
         final int position = viewHolder.getAdapterPosition();
 
         if (direction == ItemTouchHelper.END) {
-            recyclerAdapterTrip.displaySelectedTripOnMap(position);
+            fRecyclerAdapterTrip.displaySelectedTripOnMap(position);
         }
         if (direction == ItemTouchHelper.START) {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                final Snackbar snackbar = make(recyclerView, "Trip removed from database", LENGTH_LONG);
+                final Snackbar snackbar = make(fRecyclerView, "Trip removed from database", LENGTH_LONG);
                 snackbar.setAction("UNDO", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         snackbar.dismiss();
-                        recyclerAdapterTrip.restoreItem(position);
+                        fRecyclerAdapterTrip.restoreItem(position);
 
                         Snackbar snackbarUndo = make(view, "Trip is restored!", Snackbar.LENGTH_SHORT);
                         snackbarUndo.show();
@@ -80,11 +79,11 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
                 // Changing action button text color
                 View sbView = snackbar.getView();
                 TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
-                textView.setTextColor(recyclerView.getContext().getResources().getColor(R.color.colorPrimary));
+                textView.setTextColor(fRecyclerView.getContext().getResources().getColor(R.color.colorPrimary));
                 snackbar.show();
 
             }
-            recyclerAdapterTrip.onItemDismiss(position);
+            fRecyclerAdapterTrip.onItemDismiss(position);
 
         }
 
@@ -94,19 +93,19 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
     public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
             // Get RecyclerView item from the ViewHolder
-            itemView = viewHolder.itemView;
+            mItemView = viewHolder.itemView;
 
             Paint p = new Paint();
             if (dX > 0) {
                 p.setARGB(100, 51, 153, 255);
                 // Draw Rect with varying right side, equal to displacement dX
-                c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX,
-                        (float) itemView.getBottom(), p);
+                c.drawRect((float) mItemView.getLeft(), (float) mItemView.getTop(), dX,
+                        (float) mItemView.getBottom(), p);
             } else {
                 p.setARGB(150, 204, 0, 0);
                 // Draw Rect with varying left side, equal to the item's right side plus negative displacement dX
-                c.drawRect((float) itemView.getRight() + dX, (float) itemView.getTop(),
-                        (float) itemView.getRight(), (float) itemView.getBottom(), p);
+                c.drawRect((float) mItemView.getRight() + dX, (float) mItemView.getTop(),
+                        (float) mItemView.getRight(), (float) mItemView.getBottom(), p);
             }
 
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
@@ -116,9 +115,9 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     /*
     @Override
-    public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+    public void onChildDraw(Canvas c, RecyclerView fRecyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
         final View foregroundView = ((RecyclerAdapterTrip.MyHolder) viewHolder).foreground;
-        getDefaultUIUtil().onDraw(c, recyclerView, foregroundView, dX, dY,
+        getDefaultUIUtil().onDraw(c, fRecyclerView, foregroundView, dX, dY,
                 actionState, isCurrentlyActive);
     }
 

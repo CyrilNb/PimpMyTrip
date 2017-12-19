@@ -25,18 +25,20 @@ import fr.univtln.cniobechoudayer.pimpmytrip.R;
 
 public class RecordUserLocationService extends IntentService implements LocationListener {
 
-    private List<Position> positionList = new ArrayList<>();
-    private Position currentPosition;
-    private LocationManager locationManager;
-    private Messenger messenger;
-    private Message msg;
-    private Bundle retrievedBundle;
-
-    private static final String TAG = "Debug GPS Service";
-    private LocationManager mLocationManager = null;
+    private static final String TAG = "Debug GPS RecordUserLocationService";
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
-    LocationListener mLocationListener;
+
+    private List<Position> mPositionList = new ArrayList<>();
+    private Position mCurrentPosition;
+    private LocationManager locationManager;
+    private Messenger mMessenger;
+    private Message mMessage;
+    private Bundle mRetrievedBundle;
+
+    private LocationManager mLocationManager = null;
+    private LocationListener mLocationListener;
+
 
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
@@ -56,7 +58,7 @@ public class RecordUserLocationService extends IntentService implements Location
 
         Log.d("onHandleIntent", "reached");
         Bundle bundle = intent.getExtras();
-        retrievedBundle = bundle;
+        mRetrievedBundle = bundle;
         Log.d("bundle content", String.valueOf(bundle));
         if (bundle != null) {
             Log.d("passed bundle", "not null");
@@ -80,7 +82,7 @@ public class RecordUserLocationService extends IntentService implements Location
                 String latitude = "latitude: " + location.getLatitude();
                 String longitude = "longitude: " + location.getLongitude();
                 String toastString = "location is" + latitude + "," +longitude;
-                currentPosition = new Position(location.getLatitude(), location.getLongitude());
+                mCurrentPosition = new Position(location.getLatitude(), location.getLongitude());
                 Log.d(TAG, toastString);
 
             }
@@ -125,7 +127,7 @@ public class RecordUserLocationService extends IntentService implements Location
      */
     @Override
     public void onDestroy() {
-        sendEndMessage();
+        sendPositionToCaller();
         super.onDestroy();
         if(locationManager != null){
             locationManager.removeUpdates(mLocationListener);
@@ -147,27 +149,27 @@ public class RecordUserLocationService extends IntentService implements Location
         }
 
         Criteria criteria = new Criteria();
+        while(true){
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
+                if(location != null){
+                    mCurrentPosition = new Position(location.getLatitude(), location.getLongitude());
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
-            if(location != null){
-                while(true){
-                    //positionList.add(new Position(location.getLatitude(), location.getLongitude()));
-                    sendPositionToCaller();
-                    try {
-                        Thread.sleep(intervalInMs);
-                    } catch (InterruptedException e) {
+                        mPositionList.add(mCurrentPosition);
+                        try {
+                            Thread.sleep(intervalInMs);
+                        } catch (InterruptedException e) {
 
+
+                        Log.d("positionsList size", String.valueOf(mPositionList.size()));
                     }
-                    Log.d("positionsList size", String.valueOf(positionList.size()));
-                    Log.d("added element", String.valueOf(currentPosition.toString()));
+                }else{
+                    Log.d("Location in service", "null");
                 }
-            }else{
-                Log.d("Location in service", "null");
-            }
 
-        }else{
-            Log.d("permission location", "denied");
+            }else{
+                Log.d("permission location", "denied");
+            }
         }
 
 
@@ -175,20 +177,20 @@ public class RecordUserLocationService extends IntentService implements Location
 
     private void sendPositionToCaller(){
         Bundle bundleToSend = new Bundle();
-        bundleToSend.putParcelable("current_position", currentPosition);
-        msg = Message.obtain();
-        msg.setData(bundleToSend); //put the data here
-        messenger = (Messenger) retrievedBundle.get("messenger");
-        if (msg != null) {
-            if (messenger != null) {
+        bundleToSend.putParcelableArrayList("listPositionsTrip", (ArrayList<? extends Parcelable>) mPositionList);
+        mMessage = Message.obtain();
+        mMessage.setData(bundleToSend); //put the data here
+        mMessenger = (Messenger) mRetrievedBundle.get("mMessenger");
+        if (mMessage != null) {
+            if (mMessenger != null) {
                 try {
-                    messenger.send(msg);
-                    Log.d("service", "message sent with position : " + currentPosition.toString());
+                    mMessenger.send(mMessage);
+                    Log.d("service", "message sent with position : " + mCurrentPosition.toString());
                 } catch (RemoteException e) {
                     Log.i("error", "error");
                 }
             } else {
-                Log.d("messenger service", "null");
+                Log.d("mMessenger service", "null");
             }
 
         } else {
@@ -196,28 +198,8 @@ public class RecordUserLocationService extends IntentService implements Location
         }
     }
 
-    private void sendEndMessage(){
-        Bundle bundleToSend = new Bundle();
-        bundleToSend.putBoolean("service_finished", true);
-        msg = Message.obtain();
-        msg.setData(bundleToSend); //put the data here
-        messenger = (Messenger) retrievedBundle.get("messenger");
-        if (msg != null) {
-            if (messenger != null) {
-                try {
-                    messenger.send(msg);
-                    Log.d("service", "service finished message sent");
-                } catch (RemoteException e) {
-                    Log.i("error", "error");
-                }
-            } else {
-                Log.d("messenger service", "null");
-            }
 
-        } else {
-            Log.d("message service", "null");
-        }
-    }
+
 
     /**
      * Implementing LocationListener interface

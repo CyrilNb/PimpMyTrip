@@ -24,10 +24,10 @@ import fr.univtln.cniobechoudayer.pimpmytrip.R;
 
 public class ResetPasswordActivity extends AppCompatActivity{
 
-    private EditText inputEmail;
-    private Button btnReset, btnBack;
-    private FirebaseAuth auth;
-    private ProgressBar progressBar;
+    private EditText mInputEmail;
+    private Button mBtnReset, mBtnBack;
+    private FirebaseAuth mAuth;
+    private ProgressBar mProgressBar;
 
 
     @Override
@@ -35,36 +35,36 @@ public class ResetPasswordActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reset_password);
 
-        inputEmail = (EditText) findViewById(R.id.email);
-        btnReset = (Button) findViewById(R.id.btn_reset_password);
-        btnBack = (Button) findViewById(R.id.btn_back);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        mInputEmail = (EditText) findViewById(R.id.email);
+        mBtnReset = (Button) findViewById(R.id.btn_reset_password);
+        mBtnBack = (Button) findViewById(R.id.btn_back);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
-        auth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
         /**
          * Setting up click listeners
          */
 
-        btnBack.setOnClickListener(new View.OnClickListener() {
+        mBtnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 returnToLoginActivity();
             }
         });
-        btnReset.setOnClickListener(new View.OnClickListener() {
+        mBtnReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                String email = inputEmail.getText().toString().trim();
+                String email = mInputEmail.getText().toString().trim();
 
                 if (TextUtils.isEmpty(email)) {
                     Toast.makeText(getApplication(), "Enter your registered email", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                progressBar.setVisibility(View.VISIBLE);
-                auth.sendPasswordResetEmail(email)
+                mProgressBar.setVisibility(View.VISIBLE);
+                mAuth.sendPasswordResetEmail(email)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
@@ -74,7 +74,7 @@ public class ResetPasswordActivity extends AppCompatActivity{
                                     Toast.makeText(ResetPasswordActivity.this, "Failed to send reset email!", Toast.LENGTH_SHORT).show();
                                 }
 
-                                progressBar.setVisibility(View.GONE);
+                                mProgressBar.setVisibility(View.GONE);
                             }
                         });
             }

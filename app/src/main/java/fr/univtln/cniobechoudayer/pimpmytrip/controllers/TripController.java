@@ -24,34 +24,34 @@ public class TripController {
      * MEMBERS *
      **********/
 
-    private FirebaseAuth firebaseAuth;
-    private DatabaseReference database;
-    private FirebaseUser currentUser;
-    private String currentUserId;
-    private static TripController instance;
+    private FirebaseAuth mFirebaseAuth;
+    private DatabaseReference mDatabase;
+    private FirebaseUser mCurrentUser;
+    private String mCurrentUserId;
+    private static TripController sInstance;
 
     /***************
      * CONSTRUCTOR *
      ***************/
 
     protected TripController() {
-        firebaseAuth = FirebaseAuth.getInstance();
-        database = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase");
-        currentUser = firebaseAuth.getCurrentUser();
-        if (currentUser != null) {
-            currentUserId = firebaseAuth.getCurrentUser().getUid();
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase");
+        mCurrentUser = mFirebaseAuth.getCurrentUser();
+        if (mCurrentUser != null) {
+            mCurrentUserId = mFirebaseAuth.getCurrentUser().getUid();
         }
     }
 
     /**
-     * Returns the mSingleton
-     * @return the unique instance
+     * Returns the sInstance
+     * @return the unique sInstance
      */
     public static TripController getInstance(){
-        if(instance == null){
-            instance = new TripController();
+        if(sInstance == null){
+            sInstance = new TripController();
         }
-        return instance;
+        return sInstance;
     }
 
     /***************
@@ -63,7 +63,7 @@ public class TripController {
      * @param tripToInsert the trip to insert
      */
     public void insertTrip(Trip tripToInsert){
-        database.child("trips").child(currentUserId).child(tripToInsert.getId()).setValue(tripToInsert);
+        mDatabase.child("trips").child(mCurrentUserId).child(tripToInsert.getId()).setValue(tripToInsert);
     }
 
     /**
@@ -77,18 +77,18 @@ public class TripController {
      * @param creatorId userID of the creator of the trip
      */
     public Trip insertTrip(boolean isReference, List<Position> listPositions, List<Waypoint> listWaypoints, String color, String name, int distance, String creatorId){
-        String keyTrip = database.child("trips").child(currentUserId).push().getKey();
+        String keyTrip = mDatabase.child("trips").child(mCurrentUserId).push().getKey();
         Trip newTrip = new Trip.TripBuilder(keyTrip,name).reference(isReference).listPositions(listPositions).listWaypoints(listWaypoints).creationDate(Calendar.getInstance().getTime())
                 .color(color).distance(distance).creator(creatorId).build();
-        database.child("trips").child(currentUserId).child(keyTrip).setValue(newTrip);
+        mDatabase.child("trips").child(mCurrentUserId).child(keyTrip).setValue(newTrip);
         return newTrip;
     }
 
     /**
-     * Delet the given trip from the database
+     * Delet the given trip from the mDatabase
      * @param tripToDelete trip to be deleted from db
      */
     public void deleteTrip(Trip tripToDelete){
-        database.child("trips").child(currentUserId).child(tripToDelete.getId()).removeValue();
+        mDatabase.child("trips").child(mCurrentUserId).child(tripToDelete.getId()).removeValue();
     }
 }

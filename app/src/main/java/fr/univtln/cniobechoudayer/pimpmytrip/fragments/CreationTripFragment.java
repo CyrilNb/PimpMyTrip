@@ -33,7 +33,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.github.clans.fab.FloatingActionMenu;
+import com.github.clans.fab.*;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -78,55 +78,61 @@ import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
 public class CreationTripFragment extends Fragment implements View.OnClickListener {
 
-    public static CreationTripFragment singleton;
-    private GoogleMap mGoogleMap;
-    private MapView mMapView;
-    private FloatingActionButton buttonRecordTrip;
+    private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+
     private boolean isUserRecording = false;
     private boolean isManagerDrawingPath = false;
     private boolean isUserSaving = false;
-    private ColorPicker mColorPicker;
-    private EditText titleEditText;
-    private Button colorButton;
-    private Spinner choicesTypeWaypoint;
-    private AlertDialog.Builder builder;
-    private PolylineOptions pathTrip;
-    private List<Position> listPositions;
-    private List<Waypoint> listWaypoints;
-    private String currentChosenColor;
-    private FloatingActionMenu menuActionsFAB;
-    private com.github.clans.fab.FloatingActionButton saveButtonFAB;
-    private com.github.clans.fab.FloatingActionButton deleteButtonFAB;
-    private TripController tripController;
     private boolean isUserWalkingForRecordingPath = true;
-    private StatisticsController statisticsController;
-    private UserController userController;
-    private Handler handler;
-    private Intent intentRecordUserLocationService;
 
-    private DatabaseReference dbTrips = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
+    public static CreationTripFragment sInstance;
+    private GoogleMap mGoogleMap;
+    private MapView mMapView;
+    private FloatingActionButton mButtonRecordTrip;
 
-    private List<Trip> listReferenceTrip;
-    private IconGenerator factory;
+    private List<Position> mListPositions;
+    private List<Waypoint> mListWaypoints;
+    private List<Trip> mListReferenceTrip;
+
+    private TripController mTripController;
+    private StatisticsController mStatisticsController;
+    private UserController mUserController;
+
+    private FloatingActionMenu menuActionsFAB;
+    private FloatingActionButton saveButtonFAB, deleteButtonFAB;
+
+    private ColorPicker mColorPicker;
+    private EditText mTitleEditText;
+    private Button mColorButton;
+    private Spinner mChoicesTypeWaypoint;
+    private AlertDialog.Builder mBuilder;
+    private PolylineOptions mPathTrip;
+    private String currentChosenColor;
+    private IconGenerator mFactory;
+
+    private Handler mHandler;
+    private Intent mIntentRecordUserLocationService;
+
+    private final DatabaseReference fDbTrips = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
+
 
     /**
      * Constructor
      */
 
-    private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
 
     public CreationTripFragment() {
         // Required empty public constructor
     }
 
-    //Managing the mSingleton
+    //Managing the sInstance
     public static CreationTripFragment getInstance() {
 
-        if (singleton == null) {
-            singleton = new CreationTripFragment();
+        if (sInstance == null) {
+            sInstance = new CreationTripFragment();
         }
 
-        return singleton;
+        return sInstance;
     }
 
     @Override
@@ -141,40 +147,40 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_creation_trip, container, false);
 
-        tripController = TripController.getInstance();
-        statisticsController = StatisticsController.getInstance();
-        userController = UserController.getInstance();
+        mTripController = TripController.getInstance();
+        mStatisticsController = StatisticsController.getInstance();
+        mUserController = UserController.getsInstance();
 
         //Setting lists to manage trips to display
-        listReferenceTrip = new ArrayList<>();
+        mListReferenceTrip = new ArrayList<>();
 
-        //Setting up maps factory for labels
-        factory = new IconGenerator(getActivity());
+        //Setting up maps mFactory for labels
+        mFactory = new IconGenerator(getActivity());
 
         //Setting up positions array
-        listPositions = new ArrayList<>();
-        listWaypoints = new ArrayList<>();
+        mListPositions = new ArrayList<>();
+        mListWaypoints = new ArrayList<>();
 
         //Setting up the view
         menuActionsFAB = (FloatingActionMenu) rootView.findViewById(R.id.menuFAB);
         menuActionsFAB.setVisibility(View.GONE);
 
-        saveButtonFAB = (com.github.clans.fab.FloatingActionButton) rootView.findViewById(R.id.saveTripFAB);
-        deleteButtonFAB = (com.github.clans.fab.FloatingActionButton) rootView.findViewById(R.id.deleteTripFAB);
+        saveButtonFAB = (FloatingActionButton) rootView.findViewById(R.id.saveTripFAB);
+        deleteButtonFAB = (FloatingActionButton) rootView.findViewById(R.id.deleteTripFAB);
         saveButtonFAB.setOnClickListener(this);
         deleteButtonFAB.setOnClickListener(this);
 
         //Get floating action button
-        buttonRecordTrip = (FloatingActionButton) rootView.findViewById(R.id.buttonRecordTrip);
-        buttonRecordTrip.setOnClickListener(this);
+        mButtonRecordTrip = (FloatingActionButton) rootView.findViewById(R.id.buttonRecordTrip);
+        mButtonRecordTrip.setOnClickListener(this);
 
         //Setting view for save alert dialog
-        titleEditText = new EditText(getContext());
-        colorButton = new Button(getContext());
-        choicesTypeWaypoint = new Spinner(getContext());
+        mTitleEditText = new EditText(getContext());
+        mColorButton = new Button(getContext());
+        mChoicesTypeWaypoint = new Spinner(getContext());
 
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String> (getContext(), android.R.layout.simple_list_item_1 , getResources().getStringArray(R.array.spinnerChoicesMarker));
-        choicesTypeWaypoint.setAdapter(spinnerArrayAdapter);
+        mChoicesTypeWaypoint.setAdapter(spinnerArrayAdapter);
 
         //Get the mapView
         mMapView = (MapView) rootView.findViewById(R.id.mapView);
@@ -199,8 +205,8 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                 Log.d("#Hex with alpha", String.format("#%08X", (0xFFFFFFFF & color)));
 
                 mColorPicker.dismiss();
-                if(colorButton != null){
-                    colorButton.setBackgroundColor(Color.parseColor(String.format("#%06X", (0xFFFFFF & color))));
+                if(mColorButton != null){
+                    mColorButton.setBackgroundColor(Color.parseColor(String.format("#%06X", (0xFFFFFF & color))));
                     currentChosenColor = String.format("#%06X", (0xFFFFFF & color));
                 }
             }
@@ -216,21 +222,21 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         /**
          * Listening result of recording service
          */
-        handler = new Handler() {
+        mHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
-                Log.d("listPositions service", String.valueOf(reply.get("listPositionsTrip")));
+                Log.d("mListPositions service", String.valueOf(reply.get("listPositionsTrip")));
                 if (reply.get("listPositionsTrip") != null) {
-                    listPositions = reply.getParcelableArrayList("listPositionsTrip");
-                    Log.d("listPos recorded size", String.valueOf(listPositions.size()));
+                    mListPositions = reply.getParcelableArrayList("listPositionsTrip");
+                    Log.d("listPos recorded size", String.valueOf(mListPositions.size()));
                     if (isUserSaving) {
-                        Trip addedTrip = tripController.insertTrip(false, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), userController.getConnectedUserId());
+                        Trip addedTrip = mTripController.insertTrip(false, mListPositions, mListWaypoints, currentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
                         isUserSaving = false;
                     }
                 } else {
-                    listPositions = new ArrayList<>();
-                    Log.d("listPositions", "null");
+                    mListPositions = new ArrayList<>();
+                    Log.d("mListPositions", "null");
                 }
             }
         };
@@ -273,7 +279,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                     CameraPosition cameraPosition = new CameraPosition.Builder()
                             .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
                             .zoom(13)                   // Sets the zoom
-                            .build();                   // Creates a CameraPosition from the builder
+                            .build();                   // Creates a CameraPosition from the mBuilder
                     mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                 }
 
@@ -281,7 +287,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
                     @Override
                     public void onMapClick(LatLng point) {
-                        if(isUserRecording || pathTrip == null)
+                        if(isUserRecording || mPathTrip == null)
                             mGoogleMap.clear();
                         mGoogleMap.addMarker(new MarkerOptions().position(point));
                         if(!isUserRecording)
@@ -308,7 +314,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     @Override
     public void onStart() {
         super.onStart();
-        dbTrips.addValueEventListener(new ValueEventListener() {
+        fDbTrips.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -316,10 +322,10 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                     Trip currentTrip = tripSnapshot.getValue(Trip.class);
                     Log.d("New trip retrieved", String.valueOf(currentTrip.getName()));
                     if (currentTrip.isReference()) {
-                        listReferenceTrip.add(currentTrip);
+                        mListReferenceTrip.add(currentTrip);
                     }
                 }
-                Log.d("listReferenceTrip size:", String.valueOf(listReferenceTrip.size()));
+                Log.d("mListReferenceTrip size:", String.valueOf(mListReferenceTrip.size()));
 
                 MapFragment myFragment = (MapFragment) getActivity().getSupportFragmentManager().findFragmentByTag("MapFragment");
                 if (myFragment != null && myFragment.isVisible()) {
@@ -340,7 +346,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
      * Method that loads and display the current referenced trip
      */
     private void loadReferenceTrip(){
-        for(Trip refTrip : listReferenceTrip){
+        for(Trip refTrip : mListReferenceTrip){
             displayTrip(refTrip);
             displayWaypoints(refTrip);
         }
@@ -354,7 +360,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     private void displayTrip(Trip tripToDisplay){
         List<Position> positionList = tripToDisplay.getListPositions();
         PolylineOptions pathTrip = new PolylineOptions();
-        factory = new IconGenerator(getActivity());
+        mFactory = new IconGenerator(getActivity());
 
         ListIterator<Position> iterator = positionList.listIterator();
         while(iterator.hasNext()){
@@ -362,9 +368,9 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
             Position pos = null;
 
             if(!iterator.hasPrevious()){
-                factory.setColor(Color.parseColor(tripToDisplay.getColor()));
+                mFactory.setColor(Color.parseColor(tripToDisplay.getColor()));
                 Bitmap icon = null;
-                icon = factory.makeIcon("Departure " + tripToDisplay.getName());
+                icon = mFactory.makeIcon("Departure " + tripToDisplay.getName());
                 pos = iterator.next();
                 mGoogleMap.addMarker(
                         new MarkerOptions()
@@ -483,7 +489,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                     //TODO start recording trip
                     displayAlertDialogChoiceTransportationMode();
                     isUserRecording = true;
-                    buttonRecordTrip.setImageResource(R.drawable.ic_stop_white_48dp);
+                    mButtonRecordTrip.setImageResource(R.drawable.ic_stop_white_48dp);
                 }
                 break;
             case R.id.saveTripFAB:
@@ -501,9 +507,9 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
     private void displayAlertDialogSaveTrip(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
+            mBuilder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
         } else {
-            builder = new AlertDialog.Builder(getContext());
+            mBuilder = new AlertDialog.Builder(getContext());
         }
         LinearLayout alertLayout = new LinearLayout(getContext());
         alertLayout.setOrientation(LinearLayout.VERTICAL);
@@ -512,35 +518,35 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         alertLayout.setLayoutParams(params);
 
         //Setting view for save alert dialog
-        titleEditText = new EditText(getContext());
-        colorButton = new Button(getContext());
+        mTitleEditText = new EditText(getContext());
+        mColorButton = new Button(getContext());
 
-        titleEditText.setHint("Choose a title");
-        titleEditText.setSingleLine(false);
-        titleEditText.setMaxLines(2);
-        titleEditText.setHorizontalScrollBarEnabled(false);
-        titleEditText.setHintTextColor(Color.WHITE);
-        titleEditText.setTextColor(Color.WHITE);
+        mTitleEditText.setHint("Choose a title");
+        mTitleEditText.setSingleLine(false);
+        mTitleEditText.setMaxLines(2);
+        mTitleEditText.setHorizontalScrollBarEnabled(false);
+        mTitleEditText.setHintTextColor(Color.WHITE);
+        mTitleEditText.setTextColor(Color.WHITE);
 
-        colorButton.setText("Choose a color");
-        colorButton.setOnClickListener(new View.OnClickListener() {
+        mColorButton.setText("Choose a color");
+        mColorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mColorPicker.show();
             }
         });
 
-        alertLayout.addView(titleEditText);
-        alertLayout.addView(colorButton);
+        alertLayout.addView(mTitleEditText);
+        alertLayout.addView(mColorButton);
 
 
-        builder.setTitle("Stop recording & save trip ?")
+        mBuilder.setTitle("Stop recording & save trip ?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        if(listPositions != null){
-                            Trip addedTrip = tripController.insertTrip(true, listPositions, listWaypoints, currentChosenColor, titleEditText.getText().toString(), computeTotalTripDistance(listPositions), userController.getConnectedUserId());
-                            statisticsController.updateStats(addedTrip, isUserWalkingForRecordingPath);
-                            buttonRecordTrip.setImageResource(R.drawable.ic_play_arrow_white_48dp);
+                        if(mListPositions != null){
+                            Trip addedTrip = mTripController.insertTrip(true, mListPositions, mListWaypoints, currentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
+                            mStatisticsController.updateStats(addedTrip, isUserWalkingForRecordingPath);
+                            mButtonRecordTrip.setImageResource(R.drawable.ic_play_arrow_white_48dp);
                             isUserRecording = false;
                         }else{
                             Log.d("can't save cause","listPos is null");
@@ -565,9 +571,9 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
      */
     private void displayDialogSaveMarker(final LatLng pointToSave){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
+            mBuilder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
         } else {
-            builder = new AlertDialog.Builder(getContext());
+            mBuilder = new AlertDialog.Builder(getContext());
         }
         LinearLayout alertLayout = new LinearLayout(getContext());
         alertLayout.setOrientation(LinearLayout.VERTICAL);
@@ -575,22 +581,22 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         params.setMargins(Utils.convertPixelsToDp(20, getContext()), Utils.convertPixelsToDp(40, getContext()), Utils.convertPixelsToDp(20, getContext()), Utils.convertPixelsToDp(40, getContext()));
         alertLayout.setLayoutParams(params);
 
-        choicesTypeWaypoint = new Spinner(getContext());
+        mChoicesTypeWaypoint = new Spinner(getContext());
 
         ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String> (getContext(), android.R.layout.simple_spinner_item , getResources().getStringArray(R.array.spinnerChoicesMarker));
-        choicesTypeWaypoint.setAdapter(spinnerArrayAdapter);
+        mChoicesTypeWaypoint.setAdapter(spinnerArrayAdapter);
 
-        titleEditText = new EditText(getContext());
+        mTitleEditText = new EditText(getContext());
 
-        alertLayout.addView(choicesTypeWaypoint);
-        alertLayout.addView(titleEditText);
+        alertLayout.addView(mChoicesTypeWaypoint);
+        alertLayout.addView(mTitleEditText);
 
-        builder.setTitle("Save waypoint ?")
+        mBuilder.setTitle("Save waypoint ?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         BitmapDescriptor iconForMarker;
                         TypeWaypoint typeWaypoint;
-                        switch (choicesTypeWaypoint.getSelectedItem().toString()) {
+                        switch (mChoicesTypeWaypoint.getSelectedItem().toString()) {
                             case "Info":
                                 iconForMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
                                 typeWaypoint = TypeWaypoint.INFO;
@@ -609,14 +615,14 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                                 break;
                         }
 
-                        Waypoint waypoint = new Waypoint(new Position(pointToSave.latitude, pointToSave.longitude), titleEditText.getText().toString(), typeWaypoint);
-                        listWaypoints.add(waypoint);
+                        Waypoint waypoint = new Waypoint(new Position(pointToSave.latitude, pointToSave.longitude), mTitleEditText.getText().toString(), typeWaypoint);
+                        mListWaypoints.add(waypoint);
                         mGoogleMap.addMarker(new MarkerOptions()
                                 .position(pointToSave)
                                 .title(waypoint.getLabel())
                                 .icon(iconForMarker));
 
-                        Log.d("listWaypoints size", String.valueOf(listWaypoints.size()));
+                        Log.d("mListWaypoints size", String.valueOf(mListWaypoints.size()));
                     }
 
                 })
@@ -636,20 +642,20 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
      */
     private void addLineBetweenMarkers(LatLng coords){
 
-        listPositions.add(new Position(coords.latitude, coords.longitude));
-        if(listPositions.size() > 1){
+        mListPositions.add(new Position(coords.latitude, coords.longitude));
+        if(mListPositions.size() > 1){
             menuActionsFAB.setVisibility(View.VISIBLE);
-            buttonRecordTrip.setVisibility(View.GONE);
+            mButtonRecordTrip.setVisibility(View.GONE);
         }
 
-        if(pathTrip == null){
-            pathTrip = new PolylineOptions().add(coords);
+        if(mPathTrip == null){
+            mPathTrip = new PolylineOptions().add(coords);
             isManagerDrawingPath = true;
             isUserRecording = false;
         }else{
-            pathTrip.add(coords);
+            mPathTrip.add(coords);
         }
-        mGoogleMap.addPolyline(pathTrip);
+        mGoogleMap.addPolyline(mPathTrip);
     }
 
     /**
@@ -657,11 +663,11 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
      */
     private void resetPath(){
         mGoogleMap.clear();
-        listPositions.clear();
-        listWaypoints.clear();
+        mListPositions.clear();
+        mListWaypoints.clear();
         menuActionsFAB.setVisibility(View.GONE);
-        buttonRecordTrip.setVisibility(View.VISIBLE);
-        pathTrip = null;
+        mButtonRecordTrip.setVisibility(View.VISIBLE);
+        mPathTrip = null;
         isManagerDrawingPath = false;
     }
 
@@ -702,9 +708,9 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     private void displayAlertDialogChoiceTransportationMode(){
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
+            mBuilder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
         } else {
-            builder = new AlertDialog.Builder(getContext());
+            mBuilder = new AlertDialog.Builder(getContext());
         }
         LinearLayout alertLayout = new LinearLayout(getContext());
         alertLayout.setOrientation(LinearLayout.VERTICAL);
@@ -718,27 +724,27 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
         alertLayout.addView(choiceTransportationMode);
 
-        builder.setTitle("Choose your transporation mode")
+        mBuilder.setTitle("Choose your transporation mode")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                        buttonRecordTrip.setImageResource(R.drawable.ic_stop_white_48dp);
+                        mButtonRecordTrip.setImageResource(R.drawable.ic_stop_white_48dp);
                         isUserRecording = true;
                         if(choiceTransportationMode.getSelectedItemPosition() == 0){
                             isUserWalkingForRecordingPath = true;
                         }else{
                             isUserWalkingForRecordingPath = false;
                         }
-                            intentRecordUserLocationService = new Intent(getContext(), RecordUserLocationService.class);
-                            intentRecordUserLocationService.putExtra("isUserWalking", isUserWalkingForRecordingPath);
-                            intentRecordUserLocationService.putExtra("messenger", new Messenger(handler));
-                            getActivity().startService(intentRecordUserLocationService);
+                            mIntentRecordUserLocationService = new Intent(getContext(), RecordUserLocationService.class);
+                            mIntentRecordUserLocationService.putExtra("isUserWalking", isUserWalkingForRecordingPath);
+                            mIntentRecordUserLocationService.putExtra("messenger", new Messenger(mHandler));
+                            getActivity().startService(mIntentRecordUserLocationService);
                     }
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         isUserRecording = false;
-                        buttonRecordTrip.setImageResource(R.drawable.ic_play_arrow_white_48dp);
+                        mButtonRecordTrip.setImageResource(R.drawable.ic_play_arrow_white_48dp);
                     }
                 })
                 .setIcon(android.R.drawable.ic_menu_save)

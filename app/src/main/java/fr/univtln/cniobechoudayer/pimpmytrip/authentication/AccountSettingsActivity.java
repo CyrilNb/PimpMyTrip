@@ -25,15 +25,15 @@ import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 public class AccountSettingsActivity extends AppCompatActivity implements View.OnClickListener{
     private static final int REQUEST_REVOKE_ACCESS_GOOGLE = 2;
 
-    private Button btnChangeEmail, btnChangePassword, btnSendResetEmail, btnRemoveUser,
-            changeEmail, changePassword, sendEmail, remove, signOut, btnRevokeAccessGoogle;
+    private Button mBtnChangeEmail, mBtnChangePassword, mBtnSendResetEmail, mBtnRemoveUser,
+            mChangeEmail, mChangePassword, mBtnSendEmail, mBtnRemove, mBtnSignOut, mBtnRevokeAccessGoogle;
 
-    private EditText oldEmail, newEmail, password, newPassword;
-    private ProgressBar progressBar;
-    private CoordinatorLayout coordinatorLayout;
+    private EditText mOldEmail, mNewEmail, mPassword, mNewPassword;
+    private ProgressBar mProgressBar;
+    private CoordinatorLayout mCoordinatorLayout;
 
-    private FirebaseAuth.AuthStateListener authListener;
-    private FirebaseAuth auth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,42 +43,42 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
         /**
          * Retrieving elements from view
          */
-        btnChangeEmail = (Button) findViewById(R.id.change_email_button);
-        btnChangePassword = (Button) findViewById(R.id.change_password_button);
-        btnSendResetEmail = (Button) findViewById(R.id.sending_pass_reset_button);
-        btnRemoveUser = (Button) findViewById(R.id.remove_user_button);
-        btnRevokeAccessGoogle = (Button) findViewById(R.id.revoke_access_google);
-        changeEmail = (Button) findViewById(R.id.changeEmail);
-        changePassword = (Button) findViewById(R.id.changePass);
-        sendEmail = (Button) findViewById(R.id.send);
-        remove = (Button) findViewById(R.id.remove);
-        signOut = (Button) findViewById(R.id.sign_out);
+        mBtnChangeEmail = (Button) findViewById(R.id.change_email_button);
+        mBtnChangePassword = (Button) findViewById(R.id.change_password_button);
+        mBtnSendResetEmail = (Button) findViewById(R.id.sending_pass_reset_button);
+        mBtnRemoveUser = (Button) findViewById(R.id.remove_user_button);
+        mBtnRevokeAccessGoogle = (Button) findViewById(R.id.revoke_access_google);
+        mChangeEmail = (Button) findViewById(R.id.changeEmail);
+        mChangePassword = (Button) findViewById(R.id.changePass);
+        mBtnSendEmail = (Button) findViewById(R.id.send);
+        mBtnRemove = (Button) findViewById(R.id.remove);
+        mBtnSignOut = (Button) findViewById(R.id.sign_out);
 
-        oldEmail = (EditText) findViewById(R.id.old_email);
-        newEmail = (EditText) findViewById(R.id.new_email);
-        password = (EditText) findViewById(R.id.password);
-        newPassword = (EditText) findViewById(R.id.newPassword);
+        mOldEmail = (EditText) findViewById(R.id.old_email);
+        mNewEmail = (EditText) findViewById(R.id.new_email);
+        mPassword = (EditText) findViewById(R.id.password);
+        mNewPassword = (EditText) findViewById(R.id.newPassword);
 
-        oldEmail.setVisibility(View.GONE);
-        newEmail.setVisibility(View.GONE);
-        password.setVisibility(View.GONE);
-        newPassword.setVisibility(View.GONE);
-        changeEmail.setVisibility(View.GONE);
-        changePassword.setVisibility(View.GONE);
-        sendEmail.setVisibility(View.GONE);
-        remove.setVisibility(View.GONE);
+        mOldEmail.setVisibility(View.GONE);
+        mNewEmail.setVisibility(View.GONE);
+        mPassword.setVisibility(View.GONE);
+        mNewPassword.setVisibility(View.GONE);
+        mChangeEmail.setVisibility(View.GONE);
+        mChangePassword.setVisibility(View.GONE);
+        mBtnSendEmail.setVisibility(View.GONE);
+        mBtnRemove.setVisibility(View.GONE);
 
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayoutSettings);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
+        mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayoutSettings);
 
-        if (progressBar != null) {
-            progressBar.setVisibility(View.GONE);
+        if (mProgressBar != null) {
+            mProgressBar.setVisibility(View.GONE);
         }
 
         /**
-         * get firebase auth instance
+         * get firebase mAuth instance
          */
-        auth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
         /**
          * get current user
@@ -88,12 +88,12 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
         /**
          * Setting up listeners
          */
-        authListener = new FirebaseAuth.AuthStateListener() {
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user == null) {
-                    // user auth state is changed - user is null
+                    // user mAuth state is changed - user is null
                     // launch login activity
                     startActivity(new Intent(AccountSettingsActivity.this, LoginActivity.class));
                     finish();
@@ -101,116 +101,116 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
             }
         };
 
-        btnChangePassword.setOnClickListener(this);
-        btnChangeEmail.setOnClickListener(this);
-        btnSendResetEmail.setOnClickListener(this);
+        mBtnChangePassword.setOnClickListener(this);
+        mBtnChangeEmail.setOnClickListener(this);
+        mBtnSendResetEmail.setOnClickListener(this);
 
-        btnChangeEmail.setOnClickListener(new View.OnClickListener() {
+        mBtnChangeEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
             }
         });
 
-        changeEmail.setOnClickListener(new View.OnClickListener() {
+        mChangeEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressBar.setVisibility(View.VISIBLE);
-                if (user != null && !newEmail.getText().toString().trim().equals("")) {
-                    user.updateEmail(newEmail.getText().toString().trim())
+                mProgressBar.setVisibility(View.VISIBLE);
+                if (user != null && !mNewEmail.getText().toString().trim().equals("")) {
+                    user.updateEmail(mNewEmail.getText().toString().trim())
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        Utils.displayErrorMessage(getApplicationContext(),AccountSettingsActivity.this,coordinatorLayout,"Email address is updated. Please sign in with new email!");
+                                        Utils.displayErrorMessage(getApplicationContext(), AccountSettingsActivity.this, mCoordinatorLayout, "Email address is updated. Please sign in with new email!");
                                         signOut();
-                                        progressBar.setVisibility(View.GONE);
+                                        mProgressBar.setVisibility(View.GONE);
                                     } else {
-                                        Utils.displayErrorMessage(getApplicationContext(),AccountSettingsActivity.this,coordinatorLayout,"Failed to update email!");
-                                        progressBar.setVisibility(View.GONE);
+                                        Utils.displayErrorMessage(getApplicationContext(), AccountSettingsActivity.this, mCoordinatorLayout, "Failed to update email!");
+                                        mProgressBar.setVisibility(View.GONE);
                                     }
                                 }
                             });
-                } else if (newEmail.getText().toString().trim().equals("")) {
-                    newEmail.setError("Enter email");
-                    progressBar.setVisibility(View.GONE);
+                } else if (mNewEmail.getText().toString().trim().equals("")) {
+                    mNewEmail.setError("Enter email");
+                    mProgressBar.setVisibility(View.GONE);
                 }
             }
         });
 
-        sendEmail.setOnClickListener(new View.OnClickListener() {
+        mBtnSendEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressBar.setVisibility(View.VISIBLE);
-                if (!oldEmail.getText().toString().trim().equals("")) {
-                    auth.sendPasswordResetEmail(oldEmail.getText().toString().trim())
+                mProgressBar.setVisibility(View.VISIBLE);
+                if (!mOldEmail.getText().toString().trim().equals("")) {
+                    mAuth.sendPasswordResetEmail(mOldEmail.getText().toString().trim())
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        Utils.displayErrorMessage(getApplicationContext(),AccountSettingsActivity.this,coordinatorLayout,"Reset password email is sent!");
-                                        progressBar.setVisibility(View.GONE);
+                                        Utils.displayErrorMessage(getApplicationContext(), AccountSettingsActivity.this, mCoordinatorLayout, "Reset mPassword email is sent!");
+                                        mProgressBar.setVisibility(View.GONE);
                                     } else {
-                                        Utils.displayErrorMessage(getApplicationContext(),AccountSettingsActivity.this,coordinatorLayout,"Failed to send reset email!");
-                                        progressBar.setVisibility(View.GONE);
+                                        Utils.displayErrorMessage(getApplicationContext(), AccountSettingsActivity.this, mCoordinatorLayout, "Failed to send reset email!");
+                                        mProgressBar.setVisibility(View.GONE);
                                     }
                                 }
                             });
                 } else {
-                    oldEmail.setError("Enter email");
-                    progressBar.setVisibility(View.GONE);
+                    mOldEmail.setError("Enter email");
+                    mProgressBar.setVisibility(View.GONE);
                 }
             }
         });
 
-        changePassword.setOnClickListener(new View.OnClickListener() {
+        mChangePassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressBar.setVisibility(View.VISIBLE);
-                if (user != null && !newPassword.getText().toString().trim().equals("")) {
-                    if (newPassword.getText().toString().trim().length() < 6) {
-                        newPassword.setError("Password too short, enter minimum 6 characters");
-                        progressBar.setVisibility(View.GONE);
+                mProgressBar.setVisibility(View.VISIBLE);
+                if (user != null && !mNewPassword.getText().toString().trim().equals("")) {
+                    if (mNewPassword.getText().toString().trim().length() < 6) {
+                        mNewPassword.setError("Password too short, enter minimum 6 characters");
+                        mProgressBar.setVisibility(View.GONE);
                     } else {
-                        user.updatePassword(newPassword.getText().toString().trim())
+                        user.updatePassword(mNewPassword.getText().toString().trim())
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
-                                            Utils.displayErrorMessage(getApplicationContext(),AccountSettingsActivity.this,coordinatorLayout,"Password is updated, sign in with new password!");
+                                            Utils.displayErrorMessage(getApplicationContext(), AccountSettingsActivity.this, mCoordinatorLayout, "Password is updated, sign in with new mPassword!");
                                             signOut();
-                                            progressBar.setVisibility(View.GONE);
+                                            mProgressBar.setVisibility(View.GONE);
                                         } else {
-                                            Utils.displayErrorMessage(getApplicationContext(),AccountSettingsActivity.this,coordinatorLayout,"Failed to update password!");
-                                            progressBar.setVisibility(View.GONE);
+                                            Utils.displayErrorMessage(getApplicationContext(), AccountSettingsActivity.this, mCoordinatorLayout, "Failed to update mPassword!");
+                                            mProgressBar.setVisibility(View.GONE);
                                         }
                                     }
                                 });
                     }
-                } else if (newPassword.getText().toString().trim().equals("")) {
-                    newPassword.setError("Enter password");
-                    progressBar.setVisibility(View.GONE);
+                } else if (mNewPassword.getText().toString().trim().equals("")) {
+                    mNewPassword.setError("Enter mPassword");
+                    mProgressBar.setVisibility(View.GONE);
                 }
             }
         });
 
-        btnRemoveUser.setOnClickListener(new View.OnClickListener() {
+        mBtnRemoveUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressBar.setVisibility(View.VISIBLE);
+                mProgressBar.setVisibility(View.VISIBLE);
                 if (user != null) {
                     user.delete()
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        Utils.displayErrorMessage(getApplicationContext(),AccountSettingsActivity.this,coordinatorLayout,"Your profile is deleted :(");
+                                        Utils.displayErrorMessage(getApplicationContext(), AccountSettingsActivity.this, mCoordinatorLayout, "Your profile is deleted :(");
                                         startActivity(new Intent(AccountSettingsActivity.this, SignUpActivity.class));
                                         finish();
-                                        progressBar.setVisibility(View.GONE);
+                                        mProgressBar.setVisibility(View.GONE);
                                     } else {
-                                        Utils.displayErrorMessage(getApplicationContext(),AccountSettingsActivity.this,coordinatorLayout,"Failed to remove account");
-                                        progressBar.setVisibility(View.GONE);
+                                        Utils.displayErrorMessage(getApplicationContext(), AccountSettingsActivity.this, mCoordinatorLayout, "Failed to mBtnRemove account");
+                                        mProgressBar.setVisibility(View.GONE);
                                     }
                                 }
                             });
@@ -218,14 +218,14 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
             }
         });
 
-        signOut.setOnClickListener(new View.OnClickListener() {
+        mBtnSignOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 signOut();
             }
         });
 
-        btnRevokeAccessGoogle.setOnClickListener(new View.OnClickListener() {
+        mBtnRevokeAccessGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 revokeAccess();
@@ -250,7 +250,7 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
                         }
                     });
             } else {
-            auth.signOut();
+            mAuth.signOut();
         }
     }
 
@@ -272,20 +272,20 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
     @Override
     protected void onResume() {
         super.onResume();
-        progressBar.setVisibility(View.GONE);
+        mProgressBar.setVisibility(View.GONE);
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        auth.addAuthStateListener(authListener);
+        mAuth.addAuthStateListener(mAuthListener);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (authListener != null) {
-            auth.removeAuthStateListener(authListener);
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
         }
     }
 
@@ -297,34 +297,34 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.change_password_button:
-                oldEmail.setVisibility(View.GONE);
-                newEmail.setVisibility(View.GONE);
-                password.setVisibility(View.VISIBLE);
-                newPassword.setVisibility(View.VISIBLE);
-                changeEmail.setVisibility(View.GONE);
-                changePassword.setVisibility(View.VISIBLE);
-                sendEmail.setVisibility(View.GONE);
-                remove.setVisibility(View.GONE);
+                mOldEmail.setVisibility(View.GONE);
+                mNewEmail.setVisibility(View.GONE);
+                mPassword.setVisibility(View.VISIBLE);
+                mNewPassword.setVisibility(View.VISIBLE);
+                mChangeEmail.setVisibility(View.GONE);
+                mChangePassword.setVisibility(View.VISIBLE);
+                mBtnSendEmail.setVisibility(View.GONE);
+                mBtnRemove.setVisibility(View.GONE);
                 break;
             case R.id.sending_pass_reset_button:
-                oldEmail.setVisibility(View.VISIBLE);
-                newEmail.setVisibility(View.GONE);
-                password.setVisibility(View.GONE);
-                newPassword.setVisibility(View.GONE);
-                changeEmail.setVisibility(View.GONE);
-                changePassword.setVisibility(View.GONE);
-                sendEmail.setVisibility(View.VISIBLE);
-                remove.setVisibility(View.GONE);
+                mOldEmail.setVisibility(View.VISIBLE);
+                mNewEmail.setVisibility(View.GONE);
+                mPassword.setVisibility(View.GONE);
+                mNewPassword.setVisibility(View.GONE);
+                mChangeEmail.setVisibility(View.GONE);
+                mChangePassword.setVisibility(View.GONE);
+                mBtnSendEmail.setVisibility(View.VISIBLE);
+                mBtnRemove.setVisibility(View.GONE);
                 break;
             case R.id.change_email_button:
-                oldEmail.setVisibility(View.GONE);
-                newEmail.setVisibility(View.VISIBLE);
-                password.setVisibility(View.GONE);
-                newPassword.setVisibility(View.GONE);
-                changeEmail.setVisibility(View.VISIBLE);
-                changePassword.setVisibility(View.GONE);
-                sendEmail.setVisibility(View.GONE);
-                remove.setVisibility(View.GONE);
+                mOldEmail.setVisibility(View.GONE);
+                mNewEmail.setVisibility(View.VISIBLE);
+                mPassword.setVisibility(View.GONE);
+                mNewPassword.setVisibility(View.GONE);
+                mChangeEmail.setVisibility(View.VISIBLE);
+                mChangePassword.setVisibility(View.GONE);
+                mBtnSendEmail.setVisibility(View.GONE);
+                mBtnRemove.setVisibility(View.GONE);
                 break;
         }
     }

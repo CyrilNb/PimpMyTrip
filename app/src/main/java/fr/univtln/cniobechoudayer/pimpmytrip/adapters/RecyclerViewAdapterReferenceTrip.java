@@ -20,42 +20,41 @@ import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.TripController;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.MapFragment;
-import fr.univtln.cniobechoudayer.pimpmytrip.interfaces.ItemTouchHelperAdapter;
+import fr.univtln.cniobechoudayer.pimpmytrip.interfaces.ItemTouchHelperAdaptable;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 
 
 /**
  * A custom adapter to use with the RecyclerView widget.
  */
-public class RecyclerViewAdapterReferenceTrip extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ItemTouchHelperAdapter {
+public class RecyclerViewAdapterReferenceTrip extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ItemTouchHelperAdaptable {
 
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
     private String mHeaderTitle;
-    private Trip swipedTrip;
+    private Trip mSwipedTrip;
     private OnHeaderClickListener mHeaderClickListener;
 
     private Context mContext;
-    private List<Trip> modelList;
-    private TripController tripController;
-    private MapFragment mapFragment;
-    private android.support.v4.app.FragmentManager fragmentManager;
-
+    private List<Trip> mModelList;
+    private TripController mTripController;
+    private MapFragment mMapFragment;
+    private android.support.v4.app.FragmentManager mFragmentManager;
 
     private OnItemClickListener mItemClickListener;
 
 
     public RecyclerViewAdapterReferenceTrip(Context context, List<Trip> modelList, String headerTitle, FragmentManager fragmentManager) {
         this.mContext = context;
-        this.modelList = modelList;
+        this.mModelList = modelList;
         this.mHeaderTitle = headerTitle;
-        this.fragmentManager = fragmentManager;
-        tripController = TripController.getInstance();
-        mapFragment = MapFragment.getInstance();
+        this.mFragmentManager = fragmentManager;
+        mTripController = TripController.getInstance();
+        mMapFragment = MapFragment.getInstance();
     }
 
     public void updateList(List<Trip> modelList) {
-        this.modelList = modelList;
+        this.mModelList = modelList;
         notifyDataSetChanged();
 
     }
@@ -82,10 +81,10 @@ public class RecyclerViewAdapterReferenceTrip extends RecyclerView.Adapter<Recyc
         } else if (holder instanceof ViewHolder) {
             final Trip model = getItem(position - 1);
             ViewHolder genericViewHolder = (ViewHolder) holder;
-            genericViewHolder.itemTxtTitle.setText(model.getName());
-            genericViewHolder.itemTxtDistance.setText(Utils.formatTripDistance(model.getDistance()));
+            genericViewHolder.mItemTxtTitle.setText(model.getName());
+            genericViewHolder.mItemTxtDistance.setText(Utils.formatTripDistance(model.getDistance()));
             if(model.getColor() != null)
-                ((ViewHolder) holder).imgColorItem.setBackgroundColor(Color.parseColor(model.getColor()));
+                ((ViewHolder) holder).mImgColorItem.setBackgroundColor(Color.parseColor(model.getColor()));
             else{
                 Log.d("listreftrips","trip.color is null");
             }
@@ -109,7 +108,7 @@ public class RecyclerViewAdapterReferenceTrip extends RecyclerView.Adapter<Recyc
     @Override
     public int getItemCount() {
 
-        return modelList.size() + 1;
+        return mModelList.size() + 1;
     }
 
     public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
@@ -121,7 +120,7 @@ public class RecyclerViewAdapterReferenceTrip extends RecyclerView.Adapter<Recyc
     }
 
     private Trip getItem(int position) {
-        return modelList.get(position);
+        return mModelList.get(position);
     }
 
     public interface OnItemClickListener {
@@ -161,11 +160,11 @@ public class RecyclerViewAdapterReferenceTrip extends RecyclerView.Adapter<Recyc
     public boolean onItemMove(int fromPosition, int toPosition) {
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
-                Collections.swap(modelList, i, i + 1);
+                Collections.swap(mModelList, i, i + 1);
             }
         } else {
             for (int i = fromPosition; i > toPosition; i--) {
-                Collections.swap(modelList, i, i - 1);
+                Collections.swap(mModelList, i, i - 1);
             }
         }
         notifyItemMoved(fromPosition, toPosition);
@@ -179,10 +178,10 @@ public class RecyclerViewAdapterReferenceTrip extends RecyclerView.Adapter<Recyc
      */
     @Override
     public void onItemDismiss(final int position) {
-        swipedTrip = modelList.get(position);
-        modelList.remove(swipedTrip);
+        mSwipedTrip = mModelList.get(position);
+        mModelList.remove(mSwipedTrip);
         notifyItemRemoved(position);
-        tripController.deleteTrip(swipedTrip);
+        mTripController.deleteTrip(mSwipedTrip);
     }
 
     /**
@@ -190,9 +189,9 @@ public class RecyclerViewAdapterReferenceTrip extends RecyclerView.Adapter<Recyc
      * @param position
      */
     public void restoreItem(final int position){
-        modelList.add(position, swipedTrip);
+        mModelList.add(position, mSwipedTrip);
         notifyItemInserted(position);
-        tripController.insertTrip(swipedTrip);
+        mTripController.insertTrip(mSwipedTrip);
     }
 
     /**
@@ -200,14 +199,14 @@ public class RecyclerViewAdapterReferenceTrip extends RecyclerView.Adapter<Recyc
      */
     public void displaySelectedTripOnMap(final int position){
         try{
-            swipedTrip = modelList.get(position);
+            mSwipedTrip = mModelList.get(position);
             ArrayList<Trip> listTripToBePassed = new ArrayList<>(); //Declare as ArrayList because of putParcelableArrayList() method
-            listTripToBePassed.add(swipedTrip);
+            listTripToBePassed.add(mSwipedTrip);
             System.out.println("swipedlist from recycler: "+listTripToBePassed.get(0).getName() );
             Bundle bundle = new Bundle();
             bundle.putParcelableArrayList("listSwipedTrips",listTripToBePassed);
-            mapFragment.setArguments(bundle);
-            fragmentManager.beginTransaction().replace(R.id.mainContent, mapFragment, MapFragment.getInstance().getClass().getSimpleName()).commit();
+            mMapFragment.setArguments(bundle);
+            mFragmentManager.beginTransaction().replace(R.id.mainContent, mMapFragment, MapFragment.getInstance().getClass().getSimpleName()).commit();
 
         } catch (ClassCastException e) {
             Log.d("fragment", "Can't get the fragment manager with this");
@@ -217,21 +216,21 @@ public class RecyclerViewAdapterReferenceTrip extends RecyclerView.Adapter<Recyc
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView imgColorItem;
-        private TextView itemTxtTitle;
-        private TextView itemTxtDistance;
+        private ImageView mImgColorItem;
+        private TextView mItemTxtTitle;
+        private TextView mItemTxtDistance;
 
         public ViewHolder(final View itemView) {
             super(itemView);
-            this.imgColorItem = (ImageView) itemView.findViewById(R.id.img_user);
-            this.itemTxtTitle = (TextView) itemView.findViewById(R.id.item_txt_title);
-            this.itemTxtDistance = (TextView) itemView.findViewById(R.id.item_txt_distance);
+            this.mImgColorItem = (ImageView) itemView.findViewById(R.id.img_user);
+            this.mItemTxtTitle = (TextView) itemView.findViewById(R.id.item_txt_title);
+            this.mItemTxtDistance = (TextView) itemView.findViewById(R.id.item_txt_distance);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
-                    mItemClickListener.onItemClick(itemView, getAdapterPosition(), modelList.get(getAdapterPosition() - 1));
+                    mItemClickListener.onItemClick(itemView, getAdapterPosition(), mModelList.get(getAdapterPosition() - 1));
 
                 }
             });

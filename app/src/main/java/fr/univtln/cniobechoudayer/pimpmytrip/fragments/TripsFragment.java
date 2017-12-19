@@ -26,7 +26,6 @@ import java.util.List;
 import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerViewAdapterReferenceTrip;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
-import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerAdapterTrip;
 import fr.univtln.cniobechoudayer.pimpmytrip.callbacks.SimpleItemTouchHelperCallback;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 
@@ -34,67 +33,66 @@ import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
  * Fragment representing the Trip Fragment
  */
 public class TripsFragment extends Fragment {
-    private static String TAG = "DATABASE";
 
-    private static TripsFragment singleton;
-    private List<Trip> tripsList;
-    private RecyclerView recyclerView;
-    private RecyclerViewAdapterReferenceTrip adapterTrip;
-    private FragmentManager fragmentManager;
+    private static TripsFragment sInstance;
+    private List<Trip> mTripsList;
+    private RecyclerView mRecyclerView;
+    private RecyclerViewAdapterReferenceTrip mAdapterTrip;
+    private FragmentManager mFragmentManager;
 
-    private ValueEventListener listenerDbMyTrips;
+    private ValueEventListener mListenerDbMyTrips;
 
     //TODO refactor it in Tripcontroller
-    private DatabaseReference dbTrips = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
-    private DatabaseReference dbMyTrips = (DatabaseReference) dbTrips.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+    private final DatabaseReference fDbTrips = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
+    private final DatabaseReference fDbMyTrips = (DatabaseReference) fDbTrips.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
     public TripsFragment() {
         // Required empty public constructor
     }
 
     public static TripsFragment getInstance() {
-        if (singleton == null) {
-            singleton = new TripsFragment();
+        if (sInstance == null) {
+            sInstance = new TripsFragment();
         }
 
-        return singleton;
+        return sInstance;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fragmentManager = getActivity().getSupportFragmentManager();
+        mFragmentManager = getActivity().getSupportFragmentManager();
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        tripsList = new ArrayList<>();
+        mTripsList = new ArrayList<>();
         View rootView = inflater.inflate(R.layout.fragment_trips, container, false);
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerViewTrips);
-        adapterTrip = new RecyclerViewAdapterReferenceTrip(getActivity(),tripsList, "MY TRIPS", fragmentManager);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerViewTrips);
+        mAdapterTrip = new RecyclerViewAdapterReferenceTrip(getActivity(), mTripsList, "MY TRIPS", mFragmentManager);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(adapterTrip);
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setAdapter(mAdapterTrip);
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapterTrip, recyclerView);
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapterTrip, mRecyclerView);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
-        touchHelper.attachToRecyclerView(recyclerView);
+        touchHelper.attachToRecyclerView(mRecyclerView);
 
-        listenerDbMyTrips = new ValueEventListener() {
+        mListenerDbMyTrips = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                tripsList.clear();
+                mTripsList.clear();
                 for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
                     Trip currentTrip = tripSnapshot.getValue(Trip.class);
                     if (currentTrip != null) {
                         currentTrip.setId(tripSnapshot.getKey());
                         if (!currentTrip.isReference())
-                            tripsList.add(currentTrip);
+                            mTripsList.add(currentTrip);
                     }
                 }
-                adapterTrip.notifyDataSetChanged();
+                mAdapterTrip.notifyDataSetChanged();
             }
 
             @Override
@@ -118,12 +116,12 @@ public class TripsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        dbMyTrips.addValueEventListener(listenerDbMyTrips);
+        fDbMyTrips.addValueEventListener(mListenerDbMyTrips);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        dbMyTrips.removeEventListener(listenerDbMyTrips);
+        fDbMyTrips.removeEventListener(mListenerDbMyTrips);
     }
 }

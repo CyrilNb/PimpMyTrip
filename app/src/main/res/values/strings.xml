@@ -11,6 +11,8 @@
     <string name="titleManagementCateg">Trip management</string>
     <string name="titleTripsAdd">Create new trip</string>
     <string name="titleTripsManagement">Manage trips</string>
+    <string name="titleSettingsCateg">Settings</string>
+    <string name="titleSettings">My Account</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -35,6 +37,7 @@
     <string name="hint_password">Password</string>
     <string name="hint_name">Fullname</string>
     <string name="btn_login">LOGIN</string>
+    <string name="btn_change_language">Change language</string>
     <string name="btn_link_to_register">Not a member yet ? Get registered now!</string>
     <string name="btn_link_to_login">Already registered ? Sign in!</string>
     <string name="title_activity_reset_password">ResetPasswordActivity</string>
@@ -51,6 +54,9 @@
     <string name="hint_confirmPassword">Confirm password</string>
     <string name="prompt_password">Current password</string>
 
+
+    <!-- DIALOGS -->
+    <string name="titleDialogLanguage">Select a language</string>
     <!-- Google Map -->
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_scrolling">ScrollingActivity</string>
@@ -178,4 +184,6 @@
     <string name="title_activity_main2">Main2Activity</string>
 
     <string name="hello_world">Hello world!</string>
+    <!-- PREFERENCES -->
+    <string name="preferenceLanguage">en</string>
 </resources>

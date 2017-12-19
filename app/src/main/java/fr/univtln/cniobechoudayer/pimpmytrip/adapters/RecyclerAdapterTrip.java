@@ -22,15 +22,15 @@ import fr.univtln.cniobechoudayer.pimpmytrip.fragments.MapFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.TripController;
-import fr.univtln.cniobechoudayer.pimpmytrip.interfaces.ItemTouchHelperAdapter;
+import fr.univtln.cniobechoudayer.pimpmytrip.interfaces.ItemTouchHelperAdaptable;
 
-public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTrip.MyHolder> implements ItemTouchHelperAdapter {
-    private List<Trip> listTrips;
-    private Context context;
-    private Trip swipedTrip;
-    private android.support.v4.app.FragmentManager fragmentManager;
-    private TripController tripController;
-    private MapFragment mapFragment;
+public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTrip.MyHolder> implements ItemTouchHelperAdaptable {
+    private List<Trip> mListTrips;
+    private Context mContext;
+    private Trip mSwipedTrip;
+    private android.support.v4.app.FragmentManager mFragmentManager;
+    private TripController mTripController;
+    private MapFragment mMapFragment;
 
     /**
      * Constructor for recycler adapter
@@ -39,11 +39,11 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
      * @param fragmentManager
      */
     public RecyclerAdapterTrip(List<Trip> list, Context context, android.support.v4.app.FragmentManager fragmentManager) {
-        this.listTrips = list;
-        this.context = context;
-        this.fragmentManager = fragmentManager;
-        tripController = TripController.getInstance();
-        mapFragment = MapFragment.getInstance();
+        this.mListTrips = list;
+        this.mContext = context;
+        this.mFragmentManager = fragmentManager;
+        mTripController = TripController.getInstance();
+        mMapFragment = MapFragment.getInstance();
     }
 
     /**
@@ -54,7 +54,7 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
      */
     @Override
     public MyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.cardview_trip, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.cardview_trip, parent, false);
         return new MyHolder(view);
     }
 
@@ -65,7 +65,7 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
      */
     @Override
     public void onBindViewHolder(MyHolder holder, int position) {
-        Trip trip = listTrips.get(position);
+        Trip trip = mListTrips.get(position);
         holder.nameTrip.setText(trip.getName());
         holder.distanceTrip.setText(Utils.formatTripDistance(trip.getDistance()));
         if(trip.getColor() != null)
@@ -81,14 +81,14 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
      */
     @Override
     public int getItemCount() {
-        if (listTrips == null) {
+        if (mListTrips == null) {
             return 0;
         } else
-            return listTrips.size();
+            return mListTrips.size();
     }
 
     public void addTrip(List<Trip> list) {
-        listTrips.addAll(0, list);
+        mListTrips.addAll(0, list);
         notifyDataSetChanged();
     }
 
@@ -103,11 +103,11 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
     public boolean onItemMove(int fromPosition, int toPosition) {
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
-                Collections.swap(listTrips, i, i + 1);
+                Collections.swap(mListTrips, i, i + 1);
             }
         } else {
             for (int i = fromPosition; i > toPosition; i--) {
-                Collections.swap(listTrips, i, i - 1);
+                Collections.swap(mListTrips, i, i - 1);
             }
         }
         notifyItemMoved(fromPosition, toPosition);
@@ -121,10 +121,10 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
      */
     @Override
     public void onItemDismiss(final int position) {
-        swipedTrip = listTrips.get(position);
-        listTrips.remove(swipedTrip);
+        mSwipedTrip = mListTrips.get(position);
+        mListTrips.remove(mSwipedTrip);
         notifyItemRemoved(position);
-        tripController.deleteTrip(swipedTrip);
+        mTripController.deleteTrip(mSwipedTrip);
     }
 
     /**
@@ -132,9 +132,9 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
      * @param position
      */
     public void restoreItem(final int position){
-        listTrips.add(position, swipedTrip);
+        mListTrips.add(position, mSwipedTrip);
         notifyItemInserted(position);
-        tripController.insertTrip(swipedTrip);
+        mTripController.insertTrip(mSwipedTrip);
     }
 
     /**
@@ -142,14 +142,14 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
      */
     public void displaySelectedTripOnMap(final int position){
         try{
-            swipedTrip = listTrips.get(position);
+            mSwipedTrip = mListTrips.get(position);
             ArrayList<Trip> listTripToBePassed = new ArrayList<>(); //Declare as ArrayList because of putParcelableArrayList() method
-            listTripToBePassed.add(swipedTrip);
+            listTripToBePassed.add(mSwipedTrip);
             System.out.println("swipedlist from recycler: "+listTripToBePassed.get(0).getName() );
             Bundle bundle = new Bundle();
             bundle.putParcelableArrayList("listSwipedTrips",listTripToBePassed);
-            mapFragment.setArguments(bundle);
-            fragmentManager.beginTransaction().replace(R.id.mainContent, mapFragment, MapFragment.getInstance().getClass().getSimpleName()).commit();
+            mMapFragment.setArguments(bundle);
+            mFragmentManager.beginTransaction().replace(R.id.mainContent, mMapFragment, MapFragment.getInstance().getClass().getSimpleName()).commit();
 
         } catch (ClassCastException e) {
             Log.d("fragment", "Can't get the fragment manager with this");
