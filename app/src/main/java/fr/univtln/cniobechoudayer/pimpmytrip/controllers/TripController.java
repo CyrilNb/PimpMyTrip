@@ -78,10 +78,26 @@ public class TripController {
      */
     public Trip insertTrip(boolean isReference, List<Position> listPositions, List<Waypoint> listWaypoints, String color, String name, int distance, String creatorId){
         String keyTrip = mDatabase.child("trips").child(mCurrentUserId).push().getKey();
-        Trip newTrip = new Trip.TripBuilder(keyTrip,name).reference(isReference).listPositions(listPositions).listWaypoints(listWaypoints).creationDate(Calendar.getInstance().getTime())
-                .color(color).distance(distance).creator(creatorId).build();
+        Trip newTrip = createTrip(keyTrip,isReference,listPositions,listWaypoints,color,name,distance,creatorId);
         mDatabase.child("trips").child(mCurrentUserId).child(keyTrip).setValue(newTrip);
         return newTrip;
+    }
+
+    /**
+     * Create a trip instance
+     * @param isReference boolean if the trip is a reference one
+     * @param listPositions list of all positions of the trip
+     * @param listWaypoints list of all waypoints of the trip
+     * @param color color of the trip
+     * @param name name of the trip
+     * @param distance distance of the trip
+     * @param creatorId userID of the creator of the trip
+     * @return trip created
+     */
+    private Trip createTrip(String id, boolean isReference, List<Position> listPositions, List<Waypoint> listWaypoints, String color, String name, int distance, String creatorId){
+       return new Trip.TripBuilder(id,name).reference(isReference).listPositions(listPositions).listWaypoints(listWaypoints)
+                .creationDate(Calendar.getInstance().getTime())
+                .color(color).distance(distance).creator(creatorId).build();
     }
 
     /**
