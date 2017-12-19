@@ -94,7 +94,7 @@ public class TripController {
      * @param creatorId userID of the creator of the trip
      * @return trip created
      */
-    private Trip createTrip(String id, boolean isReference, List<Position> listPositions, List<Waypoint> listWaypoints, String color, String name, int distance, String creatorId){
+    public Trip createTrip(String id, boolean isReference, List<Position> listPositions, List<Waypoint> listWaypoints, String color, String name, int distance, String creatorId){
        return new Trip.TripBuilder(id,name).reference(isReference).listPositions(listPositions).listWaypoints(listWaypoints)
                 .creationDate(Calendar.getInstance().getTime())
                 .color(color).distance(distance).creator(creatorId).build();

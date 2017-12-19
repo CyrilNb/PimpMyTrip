@@ -98,8 +98,8 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     private StatisticsController mStatisticsController;
     private UserController mUserController;
 
-    private FloatingActionMenu menuActionsFAB;
-    private com.github.clans.fab.FloatingActionButton saveButtonFAB, deleteButtonFAB;
+    private FloatingActionMenu mMenuActionsFAB;
+    private com.github.clans.fab.FloatingActionButton mSaveButtonFAB, mDeleteButtonFAB;
 
     private ColorPicker mColorPicker;
     private EditText mTitleEditText;
@@ -119,13 +119,16 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     /**
      * Constructor
      */
-
-
     public CreationTripFragment() {
         // Required empty public constructor
     }
 
-    //Managing the sInstance
+    /**
+     * Gets the unique instance of the singleton
+     * Create it if not initialized yet
+     *
+     * @return
+     */
     public static CreationTripFragment getInstance() {
 
         if (sInstance == null) {
@@ -137,10 +140,10 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -162,13 +165,13 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         mListWaypoints = new ArrayList<>();
 
         //Setting up the view
-        menuActionsFAB = (FloatingActionMenu) rootView.findViewById(R.id.menuFAB);
-        menuActionsFAB.setVisibility(View.GONE);
+        mMenuActionsFAB = (FloatingActionMenu) rootView.findViewById(R.id.menuFAB);
+        mMenuActionsFAB.setVisibility(View.GONE);
 
-        saveButtonFAB = (com.github.clans.fab.FloatingActionButton) rootView.findViewById(R.id.saveTripFAB);
-        deleteButtonFAB = (com.github.clans.fab.FloatingActionButton) rootView.findViewById(R.id.deleteTripFAB);
-        saveButtonFAB.setOnClickListener(this);
-        deleteButtonFAB.setOnClickListener(this);
+        mSaveButtonFAB = (com.github.clans.fab.FloatingActionButton) rootView.findViewById(R.id.saveTripFAB);
+        mDeleteButtonFAB = (com.github.clans.fab.FloatingActionButton) rootView.findViewById(R.id.deleteTripFAB);
+        mSaveButtonFAB.setOnClickListener(this);
+        mDeleteButtonFAB.setOnClickListener(this);
 
         //Get floating action button
         mButtonRecordTrip = (FloatingActionButton) rootView.findViewById(R.id.buttonRecordTrip);
@@ -179,7 +182,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         mColorButton = new Button(getContext());
         mChoicesTypeWaypoint = new Spinner(getContext());
 
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String> (getContext(), android.R.layout.simple_list_item_1 , getResources().getStringArray(R.array.spinnerChoicesMarker));
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.spinnerChoicesMarker));
         mChoicesTypeWaypoint.setAdapter(spinnerArrayAdapter);
 
         //Get the mapView
@@ -205,7 +208,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                 Log.d("#Hex with alpha", String.format("#%08X", (0xFFFFFFFF & color)));
 
                 mColorPicker.dismiss();
-                if(mColorButton != null){
+                if (mColorButton != null) {
                     mColorButton.setBackgroundColor(Color.parseColor(String.format("#%06X", (0xFFFFFF & color))));
                     currentChosenColor = String.format("#%06X", (0xFFFFFF & color));
                 }
@@ -287,10 +290,10 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
                     @Override
                     public void onMapClick(LatLng point) {
-                        if(isUserRecording || mPathTrip == null)
+                        if (isUserRecording || mPathTrip == null)
                             mGoogleMap.clear();
                         mGoogleMap.addMarker(new MarkerOptions().position(point));
-                        if(!isUserRecording)
+                        if (!isUserRecording)
                             addLineBetweenMarkers(point);
                     }
                 });
@@ -298,7 +301,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                 mGoogleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
                     @Override
                     public void onMapLongClick(LatLng point) {
-                        if(isUserRecording || isManagerDrawingPath)
+                        if (isUserRecording || isManagerDrawingPath)
                             displayDialogSaveMarker(point);
                     }
                 });
@@ -325,7 +328,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                         mListReferenceTrip.add(currentTrip);
                     }
                 }
-                Log.d("mListReferenceTrip size:", String.valueOf(mListReferenceTrip.size()));
+                Log.d("mListRefTrip size: ", String.valueOf(mListReferenceTrip.size()));
 
                 MapFragment myFragment = (MapFragment) getActivity().getSupportFragmentManager().findFragmentByTag("MapFragment");
                 if (myFragment != null && myFragment.isVisible()) {
@@ -345,8 +348,8 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     /**
      * Method that loads and display the current referenced trip
      */
-    private void loadReferenceTrip(){
-        for(Trip refTrip : mListReferenceTrip){
+    private void loadReferenceTrip() {
+        for (Trip refTrip : mListReferenceTrip) {
             displayTrip(refTrip);
             displayWaypoints(refTrip);
         }
@@ -355,19 +358,20 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
     /**
      * Method that display the passed trip in google maps
-     * @param tripToDisplay
+     *
+     * @param tripToDisplay the trip to display on the map
      */
-    private void displayTrip(Trip tripToDisplay){
+    private void displayTrip(Trip tripToDisplay) {
         List<Position> positionList = tripToDisplay.getListPositions();
         PolylineOptions pathTrip = new PolylineOptions();
         mFactory = new IconGenerator(getActivity());
 
         ListIterator<Position> iterator = positionList.listIterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
 
             Position pos = null;
 
-            if(!iterator.hasPrevious()){
+            if (!iterator.hasPrevious()) {
                 mFactory.setColor(Color.parseColor(tripToDisplay.getColor()));
                 Bitmap icon = null;
                 icon = mFactory.makeIcon("Departure " + tripToDisplay.getName());
@@ -377,11 +381,11 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                                 .position(new LatLng(pos.getCoordX(), pos.getCoordY()))
                                 .icon(BitmapDescriptorFactory.fromBitmap(icon))
                 );
-            }else{
+            } else {
                 pos = iterator.next();
             }
 
-            if(!iterator.hasNext()){
+            if (!iterator.hasNext()) {
                 IconGenerator factory = new IconGenerator(getActivity());
                 factory.setColor(Color.parseColor(tripToDisplay.getColor()));
                 Bitmap icon = null;
@@ -402,16 +406,17 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
     /**
      * Method that display the waypoints related to a specific displayed trip
-     * @param tripToLoadWaypoints
+     *
+     * @param tripToLoadWaypoints trip to load its waypoints
      */
-    private void displayWaypoints(Trip tripToLoadWaypoints){
+    private void displayWaypoints(Trip tripToLoadWaypoints) {
 
-        if(tripToLoadWaypoints.getListWaypoints() != null){
+        if (tripToLoadWaypoints.getListWaypoints() != null) {
             ListIterator<Waypoint> listIterator = tripToLoadWaypoints.getListWaypoints().listIterator();
-            while (listIterator.hasNext()){
+            while (listIterator.hasNext()) {
                 Waypoint waypoint = listIterator.next();
                 BitmapDescriptor iconForMarker = null;
-                switch (waypoint.getType()){
+                switch (waypoint.getType()) {
                     case DANGER:
                         iconForMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE);
                         break;
@@ -434,19 +439,20 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
     /**
      * Method to react once user gives an requested permission
+     *
      * @param requestCode
      * @param permissions
      * @param grantResults
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch(requestCode){
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION:
-
                 break;
         }
-    };
+    }
+
+    ;
 
     /**
      * Method to update the action bar title
@@ -481,11 +487,11 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-        switch(v.getId()){
+        switch (v.getId()) {
             case R.id.buttonRecordTrip:
-                if(isUserRecording){
+                if (isUserRecording) {
                     displayAlertDialogSaveTrip();
-                }else if(!isUserRecording){
+                } else if (!isUserRecording) {
                     //TODO start recording trip
                     displayAlertDialogChoiceTransportationMode();
                     isUserRecording = true;
@@ -505,7 +511,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
      * Method that shows alert dialog to save trip
      */
 
-    private void displayAlertDialogSaveTrip(){
+    private void displayAlertDialogSaveTrip() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mBuilder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
         } else {
@@ -543,13 +549,13 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         mBuilder.setTitle("Stop recording & save trip ?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        if(mListPositions != null){
+                        if (mListPositions != null) {
                             Trip addedTrip = mTripController.insertTrip(true, mListPositions, mListWaypoints, currentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
                             mStatisticsController.updateStats(addedTrip, isUserWalkingForRecordingPath);
                             mButtonRecordTrip.setImageResource(R.drawable.ic_play_arrow_white_48dp);
                             isUserRecording = false;
-                        }else{
-                            Log.d("can't save cause","listPos is null");
+                        } else {
+                            Log.d("can't save cause", "listPos is null");
                         }
                         Toast.makeText(getContext(), "Your trip has been saved successfully !", Toast.LENGTH_LONG).show();
                         resetPath();
@@ -569,7 +575,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     /**
      * Method to display an alert dialog to save a specific marker
      */
-    private void displayDialogSaveMarker(final LatLng pointToSave){
+    private void displayDialogSaveMarker(final LatLng pointToSave) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mBuilder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
         } else {
@@ -583,7 +589,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
         mChoicesTypeWaypoint = new Spinner(getContext());
 
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String> (getContext(), android.R.layout.simple_spinner_item , getResources().getStringArray(R.array.spinnerChoicesMarker));
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.spinnerChoicesMarker));
         mChoicesTypeWaypoint.setAdapter(spinnerArrayAdapter);
 
         mTitleEditText = new EditText(getContext());
@@ -638,21 +644,22 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
     /**
      * Method that stores clicked position and draw line between marker
-     * @param coords
+     *
+     * @param coords coordonates of the clicked position
      */
-    private void addLineBetweenMarkers(LatLng coords){
+    private void addLineBetweenMarkers(LatLng coords) {
 
         mListPositions.add(new Position(coords.latitude, coords.longitude));
-        if(mListPositions.size() > 1){
-            menuActionsFAB.setVisibility(View.VISIBLE);
+        if (mListPositions.size() > 1) {
+            mMenuActionsFAB.setVisibility(View.VISIBLE);
             mButtonRecordTrip.setVisibility(View.GONE);
         }
 
-        if(mPathTrip == null){
+        if (mPathTrip == null) {
             mPathTrip = new PolylineOptions().add(coords);
             isManagerDrawingPath = true;
             isUserRecording = false;
-        }else{
+        } else {
             mPathTrip.add(coords);
         }
         mGoogleMap.addPolyline(mPathTrip);
@@ -661,11 +668,11 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     /**
      * Method to reset the current draw path
      */
-    private void resetPath(){
+    private void resetPath() {
         mGoogleMap.clear();
         mListPositions.clear();
         mListWaypoints.clear();
-        menuActionsFAB.setVisibility(View.GONE);
+        mMenuActionsFAB.setVisibility(View.GONE);
         mButtonRecordTrip.setVisibility(View.VISIBLE);
         mPathTrip = null;
         isManagerDrawingPath = false;
@@ -673,10 +680,11 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
     /**
      * Method to compute the total distance of a trip
+     *
      * @param listPositions
      * @return
      */
-    private int computeTotalTripDistance(List<Position> listPositions){
+    private int computeTotalTripDistance(List<Position> listPositions) {
 
         Marker prevMarker = null;
         Marker currentMarker = null;
@@ -684,10 +692,10 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
         ListIterator<Position> listIterator = listPositions.listIterator();
         while (listIterator.hasNext()) {
-            if(!listIterator.hasPrevious()){
+            if (!listIterator.hasPrevious()) {
                 Position pos = listIterator.next();
                 prevMarker = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(pos.getCoordX(), pos.getCoordY())).visible(false));
-            }else{
+            } else {
                 Position pos = listIterator.next();
                 currentMarker = mGoogleMap.addMarker(new MarkerOptions().position(new LatLng(pos.getCoordX(), pos.getCoordY())).visible(false));
                 distance += SphericalUtil.computeDistanceBetween(prevMarker.getPosition(), currentMarker.getPosition());
@@ -698,14 +706,14 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
         Log.d("distance computed : ", String.valueOf(distance));
 
-        return (int)distance;
+        return (int) distance;
 
     }
 
     /**
      * Method that create and displays alert dialog to choose the transportation mode
      */
-    private void displayAlertDialogChoiceTransportationMode(){
+    private void displayAlertDialogChoiceTransportationMode() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mBuilder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
@@ -719,25 +727,25 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         alertLayout.setLayoutParams(params);
 
         final Spinner choiceTransportationMode = new Spinner(getContext());
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String> (getContext(), android.R.layout.simple_list_item_1 , getResources().getStringArray(R.array.spinnerChoicesTransportationMode));
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.spinnerChoicesTransportationMode));
         choiceTransportationMode.setAdapter(spinnerArrayAdapter);
 
         alertLayout.addView(choiceTransportationMode);
 
         mBuilder.setTitle("Choose your transporation mode")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(DialogInterface dialog, int which) {
                         mButtonRecordTrip.setImageResource(R.drawable.ic_stop_white_48dp);
                         isUserRecording = true;
-                        if(choiceTransportationMode.getSelectedItemPosition() == 0){
+                        if (choiceTransportationMode.getSelectedItemPosition() == 0) {
                             isUserWalkingForRecordingPath = true;
-                        }else{
+                        } else {
                             isUserWalkingForRecordingPath = false;
                         }
-                            mIntentRecordUserLocationService = new Intent(getContext(), RecordUserLocationService.class);
-                            mIntentRecordUserLocationService.putExtra("isUserWalking", isUserWalkingForRecordingPath);
-                            mIntentRecordUserLocationService.putExtra("messenger", new Messenger(mHandler));
-                            getActivity().startService(mIntentRecordUserLocationService);
+                        mIntentRecordUserLocationService = new Intent(getContext(), RecordUserLocationService.class);
+                        mIntentRecordUserLocationService.putExtra("isUserWalking", isUserWalkingForRecordingPath);
+                        mIntentRecordUserLocationService.putExtra("messenger", new Messenger(mHandler));
+                        getActivity().startService(mIntentRecordUserLocationService);
                     }
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {

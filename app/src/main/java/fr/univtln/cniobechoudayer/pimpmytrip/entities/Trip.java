@@ -28,9 +28,6 @@ public class Trip implements Parcelable{
     private List<Waypoint> listWaypoints;
     private String creator;
 
-    @Exclude
-    boolean isSelected; //only use to handle multiple and single selection in RecyclerVieW
-
     public Trip() {
     }
 
@@ -138,25 +135,14 @@ public class Trip implements Parcelable{
         return listPositions;
     }
 
-    public void setListPositions(List<Position> listPositions) {
-        this.listPositions = listPositions;
-    }
-
     public List<Waypoint> getListWaypoints() {
         return listWaypoints;
-    }
-
-    public void setListWaypoints(List<Waypoint> listWaypoints) {
-        this.listWaypoints = listWaypoints;
     }
 
     public String getCreator() {
         return creator;
     }
 
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
 
     @Exclude
     public String getId() {
@@ -166,16 +152,6 @@ public class Trip implements Parcelable{
     @Exclude
     public void setId(String id) {
         this.id = id;
-    }
-
-    @Exclude
-    public boolean isSelected() {
-        return isSelected;
-    }
-
-    @Exclude
-    public void setSelected(boolean selected) {
-        isSelected = selected;
     }
 
     @Override
