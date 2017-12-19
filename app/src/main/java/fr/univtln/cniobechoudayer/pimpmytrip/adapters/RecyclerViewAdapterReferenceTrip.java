@@ -31,18 +31,19 @@ public class RecyclerViewAdapterReferenceTrip extends RecyclerView.Adapter<Recyc
 
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
+
+    private Context mContext;
+    private TripController mTripController;
+    private MapFragment mMapFragment;
+
+    private List<Trip> mModelList;
+
     private String mHeaderTitle;
     private Trip mSwipedTrip;
     private OnHeaderClickListener mHeaderClickListener;
-
-    private Context mContext;
-    private List<Trip> mModelList;
-    private TripController mTripController;
-    private MapFragment mMapFragment;
-    private android.support.v4.app.FragmentManager mFragmentManager;
+    private FragmentManager mFragmentManager;
 
     private OnItemClickListener mItemClickListener;
-
 
     public RecyclerViewAdapterReferenceTrip(Context context, List<Trip> modelList, String headerTitle, FragmentManager fragmentManager) {
         this.mContext = context;

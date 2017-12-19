@@ -23,7 +23,6 @@ import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
  * Activity to allow user managing his account settings
  */
 public class AccountSettingsActivity extends AppCompatActivity implements View.OnClickListener{
-    private static final int REQUEST_REVOKE_ACCESS_GOOGLE = 2;
 
     private Button mBtnChangeEmail, mBtnChangePassword, mBtnSendResetEmail, mBtnRemoveUser,
             mChangeEmail, mChangePassword, mBtnSendEmail, mBtnRemove, mBtnSignOut, mBtnRevokeAccessGoogle;

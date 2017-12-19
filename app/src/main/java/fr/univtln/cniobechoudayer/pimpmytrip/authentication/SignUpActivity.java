@@ -31,9 +31,7 @@ public class SignUpActivity extends AppCompatActivity {
     private Button mBtnSignIn, mBtnSignUp, mBtnResetPassword, mBtnSignUpWithGoogle;
     private CoordinatorLayout mRootView;
     private ProgressBar mProgressBar;
-    private String mEmail;
-    private String mPassword;
-    private String mPseudo;
+    private String mEmail, mPassword, mPseudo;
 
     private FirebaseAuth mAuth;
 

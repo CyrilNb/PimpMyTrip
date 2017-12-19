@@ -18,7 +18,7 @@ import fr.univtln.cniobechoudayer.pimpmytrip.entities.Position;
 
 public class ConnectedUserLocationService extends Service
 {
-    private static final String TAG = "Debug GPS ConnectedUserLocationService";
+    private static final String TAG = "Debug GPS UserLocation";
     private static final int LOCATION_INTERVAL = 3000; //milliseconds
     private static final float LOCATION_DISTANCE = 1; //meters
 

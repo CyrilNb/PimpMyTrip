@@ -50,11 +50,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private static final int REQUEST_SIGNUP = 0;
     private static final int RC_SIGN_IN = 007;
 
+    private StatisticsController statisticsController;
+    private UserController userController;
+
     private EditText emailEditText, passwordEditText;
-    private Button btnLogin, btnSignup, btnForgotPassword;
-    private Button btnSignInWithGoogle;
-    private String email;
-    private String password;
+    private Button btnLogin, btnSignup, btnForgotPassword, btnSignInWithGoogle;
+    private String email, password;
     private ProgressBar progressBar;
     private CoordinatorLayout rootView;
 
@@ -62,8 +63,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     public static GoogleSignInClient googleSignInClient;
     public static GoogleApiClient googleApiClient;
 
-    private UserController userController;
-    private StatisticsController statisticsController;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

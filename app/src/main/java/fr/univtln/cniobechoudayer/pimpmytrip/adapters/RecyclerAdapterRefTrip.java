@@ -19,8 +19,8 @@ import fr.univtln.cniobechoudayer.pimpmytrip.R;
  */
 public class RecyclerAdapterRefTrip extends RecyclerView.Adapter<RecyclerAdapterRefTrip.MyHolder> {
 
-    List<Trip> mListRefTrips;
-    Context mContext;
+    private List<Trip> mListRefTrips;
+    private Context mContext;
 
     /**
      * Constructor using list and mContext

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,11 +26,14 @@ import fr.univtln.cniobechoudayer.pimpmytrip.controllers.TripController;
 import fr.univtln.cniobechoudayer.pimpmytrip.interfaces.ItemTouchHelperAdaptable;
 
 public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTrip.MyHolder> implements ItemTouchHelperAdaptable {
-    private List<Trip> mListTrips;
+
     private Context mContext;
-    private Trip mSwipedTrip;
-    private android.support.v4.app.FragmentManager mFragmentManager;
     private TripController mTripController;
+
+    private List<Trip> mListTrips;
+
+    private Trip mSwipedTrip;
+    private FragmentManager mFragmentManager;
     private MapFragment mMapFragment;
 
     /**

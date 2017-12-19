@@ -32,15 +32,16 @@ public class UserController {
      * MEMBERS *
      **********/
 
-    private final FirebaseAuth fFirebaseAuth;
-    private final DatabaseReference fDatabase;
-    private DatabaseReference mDatabaseUsersConnectedReference;
-    private final FirebaseUser fCurrentUser;
-    private String mCurrentUserId;
     private static UserController sInstance;
     private User mConnectedUser;
+
+    private final FirebaseAuth fFirebaseAuth;
+    private final FirebaseUser fCurrentUser;
     private final ValueEventListener fListenerUser;
-    private DatabaseReference mDbUser;
+
+    private String mCurrentUserId;
+
+    private DatabaseReference mDatabase, mDbUser, mDatabaseUsersConnectedReference;
 
 
 
@@ -50,13 +51,13 @@ public class UserController {
 
     private UserController() {
         fFirebaseAuth = FirebaseAuth.getInstance();
-        fDatabase = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase");
+        mDatabase = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase");
         fCurrentUser = fFirebaseAuth.getCurrentUser();
         if (fCurrentUser != null) {
             mCurrentUserId = fFirebaseAuth.getCurrentUser().getUid();
-            mDbUser = fDatabase.child("users").child(mCurrentUserId);
+            mDbUser = mDatabase.child("users").child(mCurrentUserId);
             Log.d("mDbUser", mDbUser.getKey());
-            mDatabaseUsersConnectedReference = fDatabase.child("connectedUsers").child(mCurrentUserId);
+            mDatabaseUsersConnectedReference = mDatabase.child("connectedUsers").child(mCurrentUserId);
         }else{
             Log.d("user connected", "null");
         }
@@ -118,7 +119,7 @@ public class UserController {
             User user = new User(pseudo, email);
             //create CONSTANT or config file to store
             // .child(Constants.FIREBASE_CHILD_USERS);
-            fDatabase.child("users").child(mCurrentUserId).setValue(user);
+            mDatabase.child("users").child(mCurrentUserId).setValue(user);
             return true;
         } else {
             return false;
@@ -132,7 +133,7 @@ public class UserController {
      * @param pseudo new pseudo
      */
     public void updatePseudoUser(String pseudo) {
-        fDatabase.child("users").child(mCurrentUserId).child("pseudo").setValue(pseudo);
+        mDatabase.child("users").child(mCurrentUserId).child("pseudo").setValue(pseudo);
     }
 
     /**
@@ -141,7 +142,7 @@ public class UserController {
      * @param email new email
      */
     public void updateEmailUser(String email) {
-        fDatabase.child("users").child(mCurrentUserId).child("email").setValue(email);
+        mDatabase.child("users").child(mCurrentUserId).child("email").setValue(email);
     }
 
     /**
@@ -155,14 +156,14 @@ public class UserController {
         photo.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-        fDatabase.child("users").child(mCurrentUserId).child("photo").setValue(encoded);
+        mDatabase.child("users").child(mCurrentUserId).child("photo").setValue(encoded);
     }
 
     /**
      * Method that delete the connected user
      */
     public void deleteUser() {
-        fDatabase.child("users").child(mCurrentUserId).removeValue();
+        mDatabase.child("users").child(mCurrentUserId).removeValue();
     }
 
     /**
@@ -175,12 +176,12 @@ public class UserController {
     }
 
     /**
-     * Method that updates in fDatabase the fact that a user is connected
+     * Method that updates in mDatabase the fact that a user is connected
      */
     public void setUserAsConnected() {
-        fDatabase.child("connectedUsers").child(mCurrentUserId).setValue(fCurrentUser);
+        mDatabase.child("connectedUsers").child(mCurrentUserId).setValue(fCurrentUser);
         Position position = new Position(0.0,0.0);
-        fDatabase.child("connectedUsers").child(mCurrentUserId).child("lastKnownLocation").setValue(position);
+        mDatabase.child("connectedUsers").child(mCurrentUserId).child("lastKnownLocation").setValue(position);
     }
 
     /**
@@ -193,7 +194,7 @@ public class UserController {
     }
 
     /**
-     * Method that updates in fDatabase the fact that a user is disconnected
+     * Method that updates in mDatabase the fact that a user is disconnected
      */
     public void setUserAsDisconnected() {
         if(mDatabaseUsersConnectedReference != null)
@@ -201,7 +202,7 @@ public class UserController {
     }
 
     /**
-     * Method that updates in fDatabase the last known location of the connected user
+     * Method that updates in mDatabase the last known location of the connected user
      *
      * @param position new last known position
      */

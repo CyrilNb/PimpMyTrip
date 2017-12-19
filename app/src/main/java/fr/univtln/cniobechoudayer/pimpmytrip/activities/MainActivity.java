@@ -31,15 +31,14 @@ import fr.univtln.cniobechoudayer.pimpmytrip.controllers.StatisticsController;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
+    private StatisticsController mStatsController;
+    private UserController mUserController;
+
+    private ImageView mImageViewProfile;
+    private TextView mTextViewPseudoUser, mTextViewStats;
     private NavigationView mNavigationView;
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
-
-    private ImageView mImageViewProfile;
-    private TextView mTextViewPseudoUser;
-    private TextView mTextViewStats;
-    private StatisticsController mStatsController;
-    private UserController mUserController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
