@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -269,6 +270,11 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
             }
         });
 
+        /**
+         * Setting up fragment title
+         */
+        Utils.setActionBarTitle((AppCompatActivity) getActivity(), getString(R.string.titleSettings));
+
         return rootView;
     }
 
@@ -376,9 +382,9 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
      * sign out method
      */
     public void signOut() {
-        if (LoginActivity.googleApiClient != null && LoginActivity.googleApiClient.isConnected()) //has to be only one instance of googleApiClient in the app
+        if (LoginActivity.mGoogleApiClient != null && LoginActivity.mGoogleApiClient.isConnected()) //has to be only one instance of mGoogleApiClient in the app
         {
-            LoginActivity.googleSignInClient.signOut()
+            LoginActivity.mGoogleSignInClient.signOut()
                     .addOnCompleteListener((Executor) this, new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
@@ -392,7 +398,7 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
     }
 
     private void revokeAccess() {
-        LoginActivity.googleSignInClient.revokeAccess()
+        LoginActivity.mGoogleSignInClient.revokeAccess()
                 .addOnCompleteListener((Executor) this, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {

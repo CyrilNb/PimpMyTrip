@@ -237,9 +237,9 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
      * sign out method
      */
     public void signOut() {
-        if (LoginActivity.googleApiClient != null && LoginActivity.googleApiClient.isConnected()) //has to be only one instance of googleApiClient in the app
+        if (LoginActivity.mGoogleApiClient != null && LoginActivity.mGoogleApiClient.isConnected()) //has to be only one instance of mGoogleApiClient in the app
             {
-            LoginActivity.googleSignInClient.signOut()
+            LoginActivity.mGoogleSignInClient.signOut()
                     .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
@@ -254,7 +254,7 @@ public class AccountSettingsActivity extends AppCompatActivity implements View.O
     }
 
     private void revokeAccess() {
-        LoginActivity.googleSignInClient.revokeAccess()
+        LoginActivity.mGoogleSignInClient.revokeAccess()
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {

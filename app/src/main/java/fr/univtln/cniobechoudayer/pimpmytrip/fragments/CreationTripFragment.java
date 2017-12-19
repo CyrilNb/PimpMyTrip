@@ -99,7 +99,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     private UserController mUserController;
 
     private FloatingActionMenu menuActionsFAB;
-    private FloatingActionButton saveButtonFAB, deleteButtonFAB;
+    private com.github.clans.fab.FloatingActionButton saveButtonFAB, deleteButtonFAB;
 
     private ColorPicker mColorPicker;
     private EditText mTitleEditText;
@@ -165,8 +165,8 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         menuActionsFAB = (FloatingActionMenu) rootView.findViewById(R.id.menuFAB);
         menuActionsFAB.setVisibility(View.GONE);
 
-        saveButtonFAB = (FloatingActionButton) rootView.findViewById(R.id.saveTripFAB);
-        deleteButtonFAB = (FloatingActionButton) rootView.findViewById(R.id.deleteTripFAB);
+        saveButtonFAB = (com.github.clans.fab.FloatingActionButton) rootView.findViewById(R.id.saveTripFAB);
+        deleteButtonFAB = (com.github.clans.fab.FloatingActionButton) rootView.findViewById(R.id.deleteTripFAB);
         saveButtonFAB.setOnClickListener(this);
         deleteButtonFAB.setOnClickListener(this);
 
