@@ -1,5 +1,6 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.utils;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
@@ -13,6 +14,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.activities.MainActivity;
+import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
 import static android.support.design.widget.Snackbar.*;
 
