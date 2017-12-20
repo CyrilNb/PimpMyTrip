@@ -69,7 +69,7 @@ public class UserController {
         fListenerUser = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("setting","connected user");
+                //TODO JOINTURE
                 mConnectedUser = dataSnapshot.getValue(User.class);
             }
 
@@ -83,7 +83,6 @@ public class UserController {
             mDbUser.addValueEventListener(fListenerUser);
             //mDbUser.keepSynced(true);
         }
-
 
     }
 
@@ -100,6 +99,8 @@ public class UserController {
     }
 
     public User getmConnectedUser() {
+        System.out.println("TEST CONNECTED USER");
+        System.out.println("connected user: "+mConnectedUser);
         return mConnectedUser;
     }
 
@@ -117,8 +118,6 @@ public class UserController {
     public boolean createUser(String pseudo, String email) {
         if (!TextUtils.isEmpty(pseudo)) {
             User user = new User(pseudo, email);
-            //create CONSTANT or config file to store
-            // .child(Constants.FIREBASE_CHILD_USERS);
             mDatabase.child("users").child(mCurrentUserId).setValue(user);
             return true;
         } else {
@@ -156,6 +155,7 @@ public class UserController {
         photo.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+        System.out.println("encoded: "+encoded);
         mDatabase.child("users").child(mCurrentUserId).child("photo").setValue(encoded);
     }
 

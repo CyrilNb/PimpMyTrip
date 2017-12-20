@@ -17,6 +17,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.activities.MainActivity;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
@@ -52,8 +53,10 @@ public class SignUpActivity extends AppCompatActivity {
         mProgressBar = (ProgressBar) findViewById(R.id.progressBarSignUp);
         mBtnResetPassword = (Button) findViewById(R.id.btn_reset_password);
 
-        //Get Firebase mAuth instance
+
+        //Get Singleton instances
         mAuth = FirebaseAuth.getInstance();
+        mUserController = UserController.getsInstance();
 
         mBtnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,8 +120,7 @@ public class SignUpActivity extends AppCompatActivity {
                             Utils.displayErrorMessage(getApplicationContext(),SignUpActivity.this, mRootView,"Register failed");
                         } else {
                             mUserController.createUser(mPseudo, mEmail);
-                            startActivity(new Intent(SignUpActivity.this, AccountSettingsActivity.class));
-                            finish();
+                            onRegisterSuccess();
                         }
                     }
                 });
@@ -165,5 +167,18 @@ public class SignUpActivity extends AppCompatActivity {
         }
 
         return valid;
+    }
+
+
+    /**
+     * Method that sets the user as connected
+     * and calls the main view
+     */
+    private void onRegisterSuccess() {
+        mUserController = UserController.getsInstance();
+        mUserController.setUserAsConnected();
+        Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

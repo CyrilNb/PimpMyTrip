@@ -30,7 +30,7 @@ import fr.univtln.cniobechoudayer.pimpmytrip.services.ConnectedUserLocationServi
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.CircleTransform;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.StatisticsController;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private StatisticsController mStatsController;
     private UserController mUserController;
@@ -57,15 +57,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
          * Handling the navigation mDrawer slide to display user data in real time
          */
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
+                this, mDrawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
-                if(mUserController != null){  if(mImageViewProfile != null)
-                    if(mUserController.getmConnectedUser().getConvertedPhoto() != null)
-                    mImageViewProfile.setImageBitmap(new CircleTransform().transform(mUserController.getmConnectedUser().getConvertedPhoto()));
-                    if(mUserController.getmConnectedUser() != null)
+                if (mUserController != null) {
+                    if (mImageViewProfile != null)
+                        if (mUserController.getmConnectedUser().getConvertedPhoto() != null)
+                            mImageViewProfile.setImageBitmap(new CircleTransform().transform(mUserController.getmConnectedUser().getConvertedPhoto()));
+                    if (mUserController.getmConnectedUser() != null)
                         mTextViewPseudoUser.setText(mUserController.getmConnectedUser().getPseudo());
-                    if(mStatsController.getUserStats() != null)
+                    if (mStatsController.getUserStats() != null)
                         mTextViewStats.setText(String.valueOf(mStatsController.getUserStats().getNbTripsCreated()) + " " + getString(R.string.tripsLabel));
                 }
             }
@@ -90,19 +91,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mTextViewPseudoUser = (TextView) header.findViewById(R.id.textViewPseudoUser);
         mTextViewStats = (TextView) header.findViewById(R.id.textViewStats);
 
-        if(mUserController.getmConnectedUser() != null){
-            if(mImageViewProfile != null)
-                if(mUserController.getmConnectedUser().getConvertedPhoto() != null)
+        if (mUserController.getmConnectedUser() != null) {
+            if (mImageViewProfile != null)
+                if (mUserController.getmConnectedUser().getConvertedPhoto() != null)
                     mImageViewProfile.setImageBitmap(new CircleTransform().transform(mUserController.getmConnectedUser().getConvertedPhoto()));
-            if(mUserController.getmConnectedUser() != null)
+            if (mUserController.getmConnectedUser() != null)
                 mTextViewPseudoUser.setText(mUserController.getmConnectedUser().getPseudo());
-            if(mStatsController.getUserStats() != null)
+            if (mStatsController.getUserStats() != null)
                 mTextViewStats.setText(String.valueOf(mStatsController.getUserStats().getNbTripsCreated()) + " " + getString(R.string.tripsLabel));
 
             /**
              * Checking if user is a trip manager
              */
-            if(!checkIfUserIsManager()){
+            if (!checkIfUserIsManager()) {
                 Menu navMenu = mNavigationView.getMenu();
                 navMenu.findItem(R.id.managementTripsCateg).setVisible(false);
             }
@@ -126,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     /**
      * Method to get selected item in nav mDrawer
+     *
      * @param item selected
      * @return
      */
@@ -134,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         int idSelectedItem = item.getItemId();
 
-        switch(idSelectedItem){
+        switch (idSelectedItem) {
             case R.id.tabMap:
                 displayFragment(MapFragment.getInstance());
                 break;
@@ -186,6 +188,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     /**
      * When item of mToolbar is selected
+     *
      * @param item
      * @return
      */
@@ -201,25 +204,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     /**
      * Method to display a fragment in the mainContent
+     *
      * @param fragToDisplay
      */
-    private void displayFragment(Fragment fragToDisplay){
+    private void displayFragment(Fragment fragToDisplay) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.mainContent, fragToDisplay, fragToDisplay.getClass().getSimpleName()).commit();
     }
 
     /**
      * Methods that returns if the user is a manager or not
+     *
      * @return
      */
-    private boolean checkIfUserIsManager(){
-        if(mUserController.getmConnectedUser() != null){
-            Log.d("getmConnectedUser","isNotNull");
-            if(mUserController.getmConnectedUser().isManager())
+    private boolean checkIfUserIsManager() {
+        if (mUserController.getmConnectedUser() != null) {
+            Log.d("getmConnectedUser", "isNotNull");
+            if (mUserController.getmConnectedUser().isManager())
                 return true;
             else
                 return false;
-        }else{
+        } else {
             return false;
         }
     }
