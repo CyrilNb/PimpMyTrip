@@ -62,16 +62,16 @@ public class Utils {
      * @return
      */
     public static String formatTripDistance(double distance) {
-        String unit = "m";
+        String unit = " m";
         if (distance < 1) {
             distance *= 1000;
-            unit = "m";
+            unit = " m";
         } else if (distance >= 1000) {
             distance /= 1000;
             if(distance == 1.000)
-                unit = "km";
+                unit = " km";
             else
-                unit = "kms";
+                unit = " kms";
         }
 
         return String.format("%4.3f%s", distance, unit);
