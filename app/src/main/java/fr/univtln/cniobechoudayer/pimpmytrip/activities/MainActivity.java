@@ -62,8 +62,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 if (mUserController != null) {
                     if (mImageViewProfile != null)
-                        if (mUserController.getmConnectedUser().getConvertedPhoto() != null)
-                            mImageViewProfile.setImageBitmap(new CircleTransform().transform(mUserController.getmConnectedUser().getConvertedPhoto()));
+                        if (mUserController.getmConnectedUser().convertedPhoto() != null)
+                            mImageViewProfile.setImageBitmap(new CircleTransform().transform(mUserController.getmConnectedUser().convertedPhoto()));
                     if (mUserController.getmConnectedUser() != null)
                         mTextViewPseudoUser.setText(mUserController.getmConnectedUser().getPseudo());
                     if (mStatsController.getUserStats() != null)
@@ -93,8 +93,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (mUserController.getmConnectedUser() != null) {
             if (mImageViewProfile != null)
-                if (mUserController.getmConnectedUser().getConvertedPhoto() != null)
-                    mImageViewProfile.setImageBitmap(new CircleTransform().transform(mUserController.getmConnectedUser().getConvertedPhoto()));
+                if (mUserController.getmConnectedUser().convertedPhoto() != null)
+                    mImageViewProfile.setImageBitmap(new CircleTransform().transform(mUserController.getmConnectedUser().convertedPhoto()));
             if (mUserController.getmConnectedUser() != null)
                 mTextViewPseudoUser.setText(mUserController.getmConnectedUser().getPseudo());
             if (mStatsController.getUserStats() != null)

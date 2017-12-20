@@ -125,7 +125,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 User connectedUser = dataSnapshot.getValue(User.class);
                 if(connectedUser != null){
                     mTextViewPseudoUser.setText(connectedUser.getPseudo());
-                    mProfileImage.setImageBitmap(connectedUser.getConvertedPhoto());
+                    mProfileImage.setImageBitmap(connectedUser.convertedPhoto());
                     mTextViewEmailUser.setText(connectedUser.getEmail());
                 }
 
@@ -222,7 +222,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
          */
         mTextViewPseudoUser.setText(mUserController.getmConnectedUser().getPseudo());
         mTextViewEmailUser.setText(mUserController.getmConnectedUser().getEmail());
-        mProfileImage.setImageBitmap(mUserController.getmConnectedUser().getConvertedPhoto());
+        mProfileImage.setImageBitmap(mUserController.getmConnectedUser().convertedPhoto());
 
         /**
          * Setting up fragment title

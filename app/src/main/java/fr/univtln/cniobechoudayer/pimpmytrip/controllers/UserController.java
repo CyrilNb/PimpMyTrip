@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -14,6 +15,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Position;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.User;
@@ -37,11 +40,12 @@ public class UserController {
 
     private final FirebaseAuth fFirebaseAuth;
     private final FirebaseUser fCurrentUser;
-    private final ValueEventListener fListenerUser;
+    private final ValueEventListener fListenerUser, fListenerUsers;
 
     private String mCurrentUserId;
+    private Map<String, User> mMapUsers;
 
-    private DatabaseReference mDatabase, mDbUser, mDatabaseUsersConnectedReference;
+    private DatabaseReference mDatabase, mDbUser, mDatabaseUsersConnectedReference, mDbAllUsers;
 
 
 
@@ -53,14 +57,32 @@ public class UserController {
         fFirebaseAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase");
         fCurrentUser = fFirebaseAuth.getCurrentUser();
+        mMapUsers = new HashMap<>();
         if (fCurrentUser != null) {
             mCurrentUserId = fFirebaseAuth.getCurrentUser().getUid();
             mDbUser = mDatabase.child("users").child(mCurrentUserId);
             Log.d("mDbUser", mDbUser.getKey());
             mDatabaseUsersConnectedReference = mDatabase.child("connectedUsers").child(mCurrentUserId);
+            mDbAllUsers = mDatabase.child("users");
         }else{
             Log.d("user connected", "null");
         }
+
+        fListenerUsers = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot userSnapshot : dataSnapshot.getChildren()){
+                    User user = userSnapshot.getValue(User.class);
+                    mMapUsers.put(userSnapshot.getKey(), user);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
 
 
         /**
@@ -83,6 +105,8 @@ public class UserController {
             mDbUser.addValueEventListener(fListenerUser);
             //mDbUser.keepSynced(true);
         }
+        if(mDbAllUsers != null)
+            mDbAllUsers.addValueEventListener(fListenerUsers);
 
     }
 
@@ -106,6 +130,20 @@ public class UserController {
 
     public void setmConnectedUser(User mConnectedUser) {
         this.mConnectedUser = mConnectedUser;
+    }
+
+    /***************
+     *   GETTERS   *
+     *     AND     *
+     *   SETTERS   *
+     ***************/
+
+    public Map<String, User> getmMapUsers() {
+        return mMapUsers;
+    }
+
+    public void setmMapUsers(Map<String, User> mMapUsers) {
+        this.mMapUsers = mMapUsers;
     }
 
     /***************
@@ -209,6 +247,7 @@ public class UserController {
     public void updateLastKnownUserLocation(Position position) {
         mDatabaseUsersConnectedReference.child("lastKnownLocation").setValue(position);
     }
+
 
 
 }
