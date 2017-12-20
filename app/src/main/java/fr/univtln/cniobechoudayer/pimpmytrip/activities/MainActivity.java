@@ -25,6 +25,7 @@ import fr.univtln.cniobechoudayer.pimpmytrip.fragments.ProfileFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.ReferenceTripsFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.TripsFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.opengl.OpenGLActivity;
 import fr.univtln.cniobechoudayer.pimpmytrip.services.ConnectedUserLocationService;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.CircleTransform;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.StatisticsController;
@@ -144,7 +145,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 displayFragment(TripsFragment.getInstance());
                 break;
             case R.id.tabAR:
-                //TODO display activity for ar
+                Intent ARintent = new Intent(this, OpenGLActivity.class);
+                startActivity(ARintent);
                 break;
             case R.id.titleTripsManagement:
                 displayFragment(ManagerTripFragment.getInstance());

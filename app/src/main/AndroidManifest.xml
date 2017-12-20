@@ -25,6 +25,7 @@
 
         <activity
             android:name=".activities.MainActivity"
+            android:screenOrientation="portrait"
             android:hardwareAccelerated="true"/>
         <activity android:name=".opengl.OpenGLActivity">
             <!--<intent-filter>
@@ -33,8 +34,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>-->
         </activity>
-        <activity android:name=".authentication.AccountSettingsActivity"></activity>
-        <activity android:name=".authentication.SignUpActivity" />
+        <activity
+            android:name=".authentication.AccountSettingsActivity"
+            android:screenOrientation="portrait"
+            ></activity>
+        <activity
+            android:name=".authentication.SignUpActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".authentication.LoginActivity"
             android:screenOrientation="portrait">
@@ -44,7 +50,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".authentication.ResetPasswordActivity" />
+        <activity
+            android:name=".authentication.ResetPasswordActivity"
+            android:screenOrientation="portrait"/>
 
         <service
             android:enabled="true"

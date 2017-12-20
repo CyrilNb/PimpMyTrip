@@ -46,7 +46,7 @@ public class OpenGLRenderer implements GLSurfaceView.Renderer{
         /**
          * Set the background fram color
          */
-        GLES20.glClearColor(0.0f,0.0f,0.0f,1.0f);
+        GLES20.glClearColor(0.0f,188.0f,212.0f,1.0f);
 
         triangleShape = new Triangle();
     }
