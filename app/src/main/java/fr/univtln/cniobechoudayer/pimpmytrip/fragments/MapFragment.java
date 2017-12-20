@@ -423,10 +423,12 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                     String idUser = dataSnapshot.getKey();
                     //if (!idUser.equals(mUserController.getConnectedUserId())) {
                     Position position = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
-                    //LatLng latLng = getLastPositionFromDB(dataSnapshot, idUser);
-                    LatLng latLng = new LatLng(position.getCoordX(), position.getCoordY());
-                    Marker marker = mConnectedUsersMarkersHashMap.get(idUser);
-                    marker.setPosition(latLng);
+                    if(position != null){
+                        //LatLng latLng = getLastPositionFromDB(dataSnapshot, idUser);
+                        LatLng latLng = new LatLng(position.getCoordX(), position.getCoordY());
+                        Marker marker = mConnectedUsersMarkersHashMap.get(idUser);
+                        marker.setPosition(latLng);
+                    }
                 }
 
                 @Override

@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
  * Test class
  * to check the formated distance of a trip
  */
-public class FormatedTripDistanceTest {
+public class FormatTripDistanceTest {
     @Test
     public void formatTripDistance_isCorrect(){
         String exactDistance = "1.500kms";

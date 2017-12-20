@@ -66,9 +66,12 @@ public class Utils {
         if (distance < 1) {
             distance *= 1000;
             unit = "m";
-        } else if (distance > 1000) {
+        } else if (distance >= 1000) {
             distance /= 1000;
-            unit = "kms";
+            if(distance == 1.000)
+                unit = "km";
+            else
+                unit = "kms";
         }
 
         return String.format("%4.3f%s", distance, unit);
