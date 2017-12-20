@@ -156,6 +156,7 @@ public class UserController {
         photo.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+        Log.d("encoded photo", encoded);
         mDatabase.child("users").child(mCurrentUserId).child("photo").setValue(encoded);
     }
 

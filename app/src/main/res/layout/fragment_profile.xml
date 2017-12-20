@@ -96,7 +96,6 @@
             android:layout_height="match_parent"
             android:layout_below="@+id/labelStats"
             android:id="@+id/listViewStats"
-            android:paddingTop="20dp"
             android:paddingBottom="20dp"
             android:layout_weight="1"
             android:scrollbarSize="3dp"
