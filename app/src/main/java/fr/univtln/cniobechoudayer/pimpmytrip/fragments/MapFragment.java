@@ -273,6 +273,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                     public void onMapReady(GoogleMap mMap) {
                         mGoogleMap = mMap;
                         displaySwipedTrip(mListSwipedTrips.get(0));
+                        mGoogleMap.setMapType(mGoogleMap.MAP_TYPE_SATELLITE);
                     }
                 });
 
@@ -316,8 +317,11 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                                 displayDialogSaveMarker(point);
                         }
                     });
+                    mGoogleMap.setMapType(mGoogleMap.MAP_TYPE_HYBRID);
                 }
             });
+
+
             mListenerDbTrips = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
