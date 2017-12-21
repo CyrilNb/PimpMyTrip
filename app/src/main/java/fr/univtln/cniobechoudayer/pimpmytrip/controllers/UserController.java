@@ -75,7 +75,6 @@ public class UserController {
                     mMapUsers.put(userSnapshot.getKey(), user);
                     Log.d("LISTENING","all users");
                 }
-
             }
 
             @Override
