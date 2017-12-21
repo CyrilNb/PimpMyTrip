@@ -303,7 +303,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
      */
     private void displayAlertDialogUpdateName() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mBuilder = new AlertDialog.Builder(getContext(), R.drawable.custom_alert_dialog);
+            mBuilder = new AlertDialog.Builder(getContext(), R.style.CustomDialogTheme);
         } else {
             mBuilder = new AlertDialog.Builder(getContext());
         }
