@@ -1,6 +1,5 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.authentication;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -330,7 +329,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
      * and calls the main view
      */
     private void onConnectionSuccess() {
-        mUserController = UserController.getsInstance();
+        mUserController = UserController.getInstance();
         mUserController.setUserAsConnected();
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);

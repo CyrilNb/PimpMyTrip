@@ -56,7 +56,7 @@ public class SignUpActivity extends AppCompatActivity {
 
         //Get Singleton instances
         mAuth = FirebaseAuth.getInstance();
-        mUserController = UserController.getsInstance();
+        mUserController = UserController.getInstance();
 
         mBtnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,7 +175,7 @@ public class SignUpActivity extends AppCompatActivity {
      * and calls the main view
      */
     private void onRegisterSuccess() {
-        mUserController = UserController.getsInstance();
+        mUserController = UserController.getInstance();
         mUserController.setUserAsConnected();
         Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
         startActivity(intent);

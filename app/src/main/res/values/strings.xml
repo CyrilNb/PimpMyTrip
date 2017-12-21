@@ -68,6 +68,7 @@
     <!-- Floating Action Menu -->
     <string name="nameFABsaveTrip">Save</string>
     <string name="nameFABdeleteTrip">Reset</string>
+    <string name="nameFABundoTrip">Undo</string>
 
     <!-- PROFILE -->
     <string name="titleStats">Statistics</string>

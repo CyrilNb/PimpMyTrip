@@ -45,7 +45,9 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -87,19 +89,22 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
     public static CreationTripFragment sInstance;
     private GoogleMap mGoogleMap;
+    private PolylineOptions mCurrentDrawingPathOptions;
+    private Polyline mCurrentPath;
     private MapView mMapView;
     private FloatingActionButton mButtonRecordTrip;
 
-    private List<Position> mListPositions;
+    private List<Position> mListPositions, mListPositionsCurrentRecordedTrip;
     private List<Waypoint> mListWaypoints;
     private List<Trip> mListReferenceTrip;
+    private List<LatLng> mListCoordsCurrentPath;
 
     private TripController mTripController;
     private StatisticsController mStatisticsController;
     private UserController mUserController;
 
     private FloatingActionMenu mMenuActionsFAB;
-    private com.github.clans.fab.FloatingActionButton mSaveButtonFAB, mDeleteButtonFAB;
+    private com.github.clans.fab.FloatingActionButton mSaveButtonFAB, mDeleteButtonFAB, mUndoButtonFAB;
 
     private ColorPicker mColorPicker;
     private EditText mTitleEditText;
@@ -107,13 +112,16 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     private Spinner mChoicesTypeWaypoint;
     private AlertDialog.Builder mBuilder;
     private PolylineOptions mPathTrip;
-    private String currentChosenColor;
     private IconGenerator mFactory;
+    private String mCurrentChosenColor;
 
     private Handler mHandler;
     private Intent mIntentRecordUserLocationService;
 
+    private final DatabaseReference fDbUsersConnected = (DatabaseReference) FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("connectedUsers");
+    private final DatabaseReference dDatabaseUsersConnectedReference = fDbUsersConnected.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
     private final DatabaseReference fDbTrips = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
+    private ValueEventListener mListenerConnectedUsers;
 
 
     /**
@@ -152,10 +160,11 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
         mTripController = TripController.getInstance();
         mStatisticsController = StatisticsController.getInstance();
-        mUserController = UserController.getsInstance();
+        mUserController = UserController.getInstance();
 
         //Setting lists to manage trips to display
         mListReferenceTrip = new ArrayList<>();
+        mListCoordsCurrentPath = new ArrayList<>();
 
         //Setting up maps mFactory for labels
         mFactory = new IconGenerator(getActivity());
@@ -170,8 +179,10 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
         mSaveButtonFAB = (com.github.clans.fab.FloatingActionButton) rootView.findViewById(R.id.saveTripFAB);
         mDeleteButtonFAB = (com.github.clans.fab.FloatingActionButton) rootView.findViewById(R.id.deleteTripFAB);
+        mUndoButtonFAB = (com.github.clans.fab.FloatingActionButton) rootView.findViewById(R.id.undoTripFAB);
         mSaveButtonFAB.setOnClickListener(this);
         mDeleteButtonFAB.setOnClickListener(this);
+        mUndoButtonFAB.setOnClickListener(this);
 
         //Get floating action button
         mButtonRecordTrip = (FloatingActionButton) rootView.findViewById(R.id.buttonRecordTrip);
@@ -191,26 +202,21 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         mMapView.onResume(); // needed to get the map to display immediately
 
         //Default color
-        currentChosenColor = "#F2F2F2";
+        mCurrentChosenColor = "#F2F2F2";
 
         /**
          * Callback for color picker
          * when creating a new trip
          */
 
-        mColorPicker = new ColorPicker(getActivity(), 127, 127, 127);
+        mColorPicker = new ColorPicker(getActivity(), 249, 191, 59);
         mColorPicker.setCallback(new ColorPickerCallback() {
             @Override
             public void onColorChosen(@ColorInt int color) {
-
-                Log.d("Pure Hex", Integer.toHexString(color));
-                Log.d("#Hex no alpha", String.format("#%06X", (0xFFFFFF & color)));
-                Log.d("#Hex with alpha", String.format("#%08X", (0xFFFFFFFF & color)));
-
                 mColorPicker.dismiss();
                 if (mColorButton != null) {
                     mColorButton.setBackgroundColor(Color.parseColor(String.format("#%06X", (0xFFFFFF & color))));
-                    currentChosenColor = String.format("#%06X", (0xFFFFFF & color));
+                    mCurrentChosenColor = String.format("#%06X", (0xFFFFFF & color));
                 }
             }
         });
@@ -234,7 +240,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                     mListPositions = reply.getParcelableArrayList("listPositionsTrip");
                     Log.d("listPos recorded size", String.valueOf(mListPositions.size()));
                     if (isUserSaving) {
-                        Trip addedTrip = mTripController.insertTrip(false, mListPositions, mListWaypoints, currentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
+                        Trip addedTrip = mTripController.insertTrip(true, mListPositions, mListWaypoints, mCurrentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
                         isUserSaving = false;
                     }
                 } else {
@@ -247,8 +253,33 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         /**
          * Setting up fragment title
          */
-        Utils.setActionBarTitle((AppCompatActivity) getActivity(), getString(R.string.titleTripsManagement));
+        Utils.setActionBarTitle((AppCompatActivity) getActivity(), getString(R.string.titleTripsAdd));
 
+        /**
+         * Setting up default chosen color
+         */
+        mCurrentChosenColor = "#F2F2F2";
+
+        /**
+         * Set up listener if order to get user location and display the trip
+         */
+        mListenerConnectedUsers = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Position newPosition = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
+                Log.d("pos retrieved", newPosition.toString());
+                if(isUserRecording){
+                    displayRecordingTrip(newPosition);
+                    Log.d("new pos","added to path");
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
 
         /**
          * Loading the map asynchronously and adding a OnMapReadyCallback for displaying locations
@@ -343,6 +374,9 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
             }
         });
+
+        if(mListenerConnectedUsers != null)
+            dDatabaseUsersConnectedReference.addValueEventListener(mListenerConnectedUsers);
     }
 
     /**
@@ -438,6 +472,29 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     }
 
     /**
+     * Method that display the current recorded trip in live
+     * @param pos
+     */
+    private void displayRecordingTrip(Position pos){
+        Toast.makeText(getContext(), "mListPositionsCurrentRecordedTrip" + mListPositionsCurrentRecordedTrip.size(), Toast.LENGTH_SHORT).show();
+        if(mCurrentDrawingPathOptions == null){
+            mCurrentDrawingPathOptions = new PolylineOptions();
+            mCurrentDrawingPathOptions.color(getActivity().getResources().getColor(R.color.colorPrimaryDark));
+        }
+        if(mListPositionsCurrentRecordedTrip.size() == 0){
+            Toast.makeText(getContext(), "mCurrentDrawingPathOptions linked to map " + pos.toString(), Toast.LENGTH_SHORT).show();
+            mCurrentPath = mGoogleMap.addPolyline(mCurrentDrawingPathOptions);
+        }else{
+            mCurrentPath.remove();
+        }
+        mListPositionsCurrentRecordedTrip.add(pos);
+        mCurrentDrawingPathOptions.add(new LatLng(pos.getCoordX(), pos.getCoordY()));
+        mCurrentPath = mGoogleMap.addPolyline(mCurrentDrawingPathOptions);
+        Toast.makeText(getContext(), "mCurrentDrawingPathOptions" + mCurrentDrawingPathOptions.getPoints().size(), Toast.LENGTH_SHORT).show();
+
+    }
+
+    /**
      * Method to react once user gives an requested permission
      *
      * @param requestCode
@@ -468,6 +525,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     /**
      * Handle different fragment states and adapt the map
      */
+
     @Override
     public void onPause() {
         super.onPause();
@@ -492,9 +550,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                 if (isUserRecording) {
                     displayAlertDialogSaveTrip();
                 } else if (!isUserRecording) {
-                    //TODO start recording trip
                     displayAlertDialogChoiceTransportationMode();
-                    isUserRecording = true;
                     mButtonRecordTrip.setImageResource(R.drawable.ic_stop_white_48dp);
                 }
                 break;
@@ -503,6 +559,14 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                 break;
             case R.id.deleteTripFAB:
                 resetPath();
+                break;
+            case R.id.undoTripFAB:
+                mListCoordsCurrentPath.remove(mListCoordsCurrentPath.size()-1);
+                mCurrentPath.remove();
+                for(LatLng pos : mListCoordsCurrentPath){
+                    mPathTrip.add(pos);
+                }
+                mCurrentPath = mGoogleMap.addPolyline(mPathTrip);
                 break;
         }
     }
@@ -549,12 +613,13 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         mBuilder.setTitle("Stop recording & save trip ?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        if (mListPositions != null) {
-                            Trip addedTrip = mTripController.insertTrip(true, mListPositions, mListWaypoints, currentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
+                        if (mListPositions != null && !isUserRecording) {
+                            Trip addedTrip = mTripController.insertTrip(true, mListPositions, mListWaypoints, mCurrentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
                             mStatisticsController.updateStats(addedTrip, isUserWalkingForRecordingPath);
                             mButtonRecordTrip.setImageResource(R.drawable.ic_play_arrow_white_48dp);
-                            isUserRecording = false;
+                            resetPath();
                         } else {
+                            isUserSaving = true;
                             Log.d("can't save cause", "listPos is null");
                         }
                         Toast.makeText(getContext(), "Your trip has been saved successfully !", Toast.LENGTH_LONG).show();
@@ -648,7 +713,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
      * @param coords coordonates of the clicked position
      */
     private void addLineBetweenMarkers(LatLng coords) {
-
+        mListCoordsCurrentPath.add(coords);
         mListPositions.add(new Position(coords.latitude, coords.longitude));
         if (mListPositions.size() > 1) {
             mMenuActionsFAB.setVisibility(View.VISIBLE);
@@ -662,7 +727,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         } else {
             mPathTrip.add(coords);
         }
-        mGoogleMap.addPolyline(mPathTrip);
+        mCurrentPath = mGoogleMap.addPolyline(mPathTrip);
     }
 
     /**
@@ -672,10 +737,13 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         mGoogleMap.clear();
         mListPositions.clear();
         mListWaypoints.clear();
+        mListCoordsCurrentPath.clear();
         mMenuActionsFAB.setVisibility(View.GONE);
         mButtonRecordTrip.setVisibility(View.VISIBLE);
         mPathTrip = null;
         isManagerDrawingPath = false;
+        if(mCurrentPath != null)
+            mCurrentPath.remove();
     }
 
     /**

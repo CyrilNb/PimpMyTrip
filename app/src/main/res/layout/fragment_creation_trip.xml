@@ -57,6 +57,14 @@
         fab:menu_fab_hide_animation="@anim/jump_to_down">
 
         <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/undoTripFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_history_white_18dp"
+            fab:fab_size="mini"
+            fab:fab_label="@string/nameFABundoTrip" />
+
+        <com.github.clans.fab.FloatingActionButton
             android:id="@+id/saveTripFAB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

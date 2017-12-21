@@ -46,6 +46,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -97,7 +98,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private List<Position> mListPositions, mListPositionsCurrentRecordedTrip;
     private List<Waypoint> mListWaypoints;
     private List<Trip> mListReferenceTrip, mListMyTrips, mListSwipedTrips;
-    private List<User> connectedUserlist;
     private Map<String, Marker> mConnectedUsersMarkersHashMap;
 
     private LocationManager mLocationManager;
@@ -105,6 +105,8 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private LocationListener mLocationListener;
 
     public static MapFragment sInstance;
+    private PolylineOptions mCurrentDrawingPathOptions;
+    private Polyline mCurrentPath;
     private GoogleMap mGoogleMap;
     private MapView mMapView;
     private FloatingActionButton mButtonRecordTrip;
@@ -114,7 +116,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private AlertDialog.Builder mBuilder;
     private Handler mHandler;
     private Intent mIntentRecordUserLocationService;
-    private String CurrentChosenColor;
+    private String mCurrentChosenColor;
     private Spinner mChoicesTypeWaypoint;
     private UserController mUserController;
 
@@ -150,7 +152,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         this.mContext = getContext();
         mFactory = new IconGenerator(getActivity());
         mConnectedUsersMarkersHashMap = new HashMap<>();
-        connectedUserlist = new ArrayList<>();
         getActivity().startService(new Intent(getActivity(), ConnectedUserLocationService.class));
         requestLocationPermissions();
 
@@ -196,7 +197,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         mListWaypoints = new ArrayList<>();
         mListPositionsCurrentRecordedTrip = new ArrayList<>();
 
-        mUserController = UserController.getsInstance();
+        mUserController = UserController.getInstance();
 
         /**
          * Handler to get a message that returns position from
@@ -213,7 +214,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                     Log.d("listPos recorded size", String.valueOf(mListPositions.size()));
                     if (isUserSaving) {
                         Toast.makeText(getContext(), "Your trip has been saved successfully ! " + mListPositions.size() + " positions !", Toast.LENGTH_LONG).show();
-                        Trip addedTrip = fTripController.insertTrip(false, mListPositions, mListWaypoints, CurrentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
+                        fTripController.insertTrip(false, mListPositions, mListWaypoints, mCurrentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
                         isUserSaving = false;
                     }
                 } else {
@@ -223,7 +224,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
             }
         };
 
-        CurrentChosenColor = "#F2F2F2";
+        mCurrentChosenColor = "#F2F2F2";
 
         //Get floating action button
         mButtonRecordTrip = (FloatingActionButton) rootView.findViewById(R.id.buttonRecordTrip);
@@ -244,12 +245,10 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         mColorPicker.setCallback(new ColorPickerCallback() {
             @Override
             public void onColorChosen(@ColorInt int color) {
-                Log.d("#Hex no alpha", String.format("#%06X", (0xFFFFFF & color)));
-
                 mColorPicker.dismiss();
                 if (mColorButton != null) {
                     mColorButton.setBackgroundColor(Color.parseColor(String.format("#%06X", (0xFFFFFF & color))));
-                    CurrentChosenColor = String.format("#%06X", (0xFFFFFF & color));
+                    mCurrentChosenColor = String.format("#%06X", (0xFFFFFF & color));
                 }
             }
         });
@@ -388,10 +387,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                 }
             };
 
-
-
-
-            //TODO
             fDbRefTrips.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -515,7 +510,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     @Override
     public void onPause() {
         super.onPause();
-        //mLocationManager.removeUpdates(mLocationListener);
     }
 
     @Override
@@ -669,8 +663,10 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                         } else {
                             Log.d("can't save cause", "listPos is null");
                         }
-                        fTripController.insertTrip(false, mListPositionsCurrentRecordedTrip, mListWaypoints, CurrentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
+                        fTripController.insertTrip(false, mListPositionsCurrentRecordedTrip, mListWaypoints, mCurrentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
                         mListPositionsCurrentRecordedTrip.clear();
+                        mCurrentDrawingPathOptions = null;
+                        mCurrentPath.remove();
                     }
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -788,19 +784,27 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         }
     }
 
+    /**
+     * Method that display the current recorded trip in live
+     * @param pos
+     */
     private void displayRecordingTrip(Position pos){
-        PolylineOptions currentDrawingPath = null;
-        if(currentDrawingPath == null){
-            Toast.makeText(getContext(), "create polyline" + pos.toString(), Toast.LENGTH_SHORT).show();
-            currentDrawingPath = new PolylineOptions();
+        Toast.makeText(getContext(), "mListPositionsCurrentRecordedTrip" + mListPositionsCurrentRecordedTrip.size(), Toast.LENGTH_SHORT).show();
+        if(mCurrentDrawingPathOptions == null){
+            mCurrentDrawingPathOptions = new PolylineOptions();
+            mCurrentDrawingPathOptions.color(getActivity().getResources().getColor(R.color.colorPrimaryDark));
         }
-        if(mListPositionsCurrentRecordedTrip == null){
-            Toast.makeText(getContext(), "currentDrawingPath linked to map " + pos.toString(), Toast.LENGTH_SHORT).show();
-            mGoogleMap.addPolyline(currentDrawingPath);
+        if(mListPositionsCurrentRecordedTrip.size() == 0){
+            Toast.makeText(getContext(), "mCurrentDrawingPathOptions linked to map " + pos.toString(), Toast.LENGTH_SHORT).show();
+            mCurrentPath = mGoogleMap.addPolyline(mCurrentDrawingPathOptions);
+        }else{
+            mCurrentPath.remove();
         }
         mListPositionsCurrentRecordedTrip.add(pos);
-        currentDrawingPath.add(new LatLng(pos.getCoordX(), pos.getCoordY()));
-        Toast.makeText(getContext(), "point added " + pos.toString(), Toast.LENGTH_SHORT).show();
+        mCurrentDrawingPathOptions.add(new LatLng(pos.getCoordX(), pos.getCoordY()));
+        mCurrentPath = mGoogleMap.addPolyline(mCurrentDrawingPathOptions);
+        Toast.makeText(getContext(), "mCurrentDrawingPathOptions" + mCurrentDrawingPathOptions.getPoints().size(), Toast.LENGTH_SHORT).show();
+
     }
 
     /**
@@ -964,28 +968,33 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         Log.d("user found", userRetrieved.toString());
         mFactory = new IconGenerator(this.mContext);
         mFactory.setColor(getResources().getColor(R.color.colorPrimaryDark));
-            //icon = Bitmap.createScaledBitmap(new CircleTransform().transform(userRetrieved.convertedPhoto()), 200, 200, false);
+            icon = Bitmap.createScaledBitmap(new CircleTransform().transform(userRetrieved.convertedPhoto()), 100, 100, false);
             //icon = Bitmap.createScaledBitmap(new CircleTransform().transform(Utils.convertPicture(userRetrieved.getPhoto())), 200, 200, false);
 
             mGoogleMap.addMarker(
                     new MarkerOptions()
                             .position(location)
                             .title(userRetrieved.getPseudo())//TODO get user
-                            //.icon(BitmapDescriptorFactory.fromBitmap(icon)) //TODO get picture user
+                            .icon(BitmapDescriptorFactory.fromBitmap(icon)) //TODO get picture user
             );
     }
 
     private User findUserInList(String userID){
         Iterator it = mUserController.getmMapUsers().entrySet().iterator();
         User user = new User();
-        Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
-        while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
-            Log.d("key", String.valueOf(pair.getKey()));
-            Log.d("searched for", userID);
-            Log.d("is it equal ?", String.valueOf(userID.equals(pair.getKey())));
-            user = (User) pair.getValue();
+        //Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), String.valueOf(mUserController.getmMapUsers().size()), Toast.LENGTH_SHORT).show();
+        if(mUserController.getmMapUsers().size() > 0){
+            for(Map.Entry<String, User> userFound : mUserController.getmMapUsers().entrySet()) {
+                String key = userFound.getKey();
+                user = userFound.getValue();
+                if(userID.equals(userFound.getKey()))
+                    Toast.makeText(getContext(), String.valueOf(user.getPseudo()), Toast.LENGTH_SHORT).show();
+            }
+        }else{
+            user = new User("DEFAULT","default@gmail.com");
         }
+
         return user;
     }
 
@@ -1017,6 +1026,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private void getCurrentLocation() {
 
         /*mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
         Criteria criteria = new Criteria();
 
         // For showing a move to my location button

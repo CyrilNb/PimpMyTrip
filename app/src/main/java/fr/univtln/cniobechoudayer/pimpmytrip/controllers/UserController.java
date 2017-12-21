@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -58,12 +57,12 @@ public class UserController {
         mDatabase = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase");
         fCurrentUser = fFirebaseAuth.getCurrentUser();
         mMapUsers = new HashMap<>();
+        mDbAllUsers = mDatabase.child("users");
         if (fCurrentUser != null) {
             mCurrentUserId = fFirebaseAuth.getCurrentUser().getUid();
             mDbUser = mDatabase.child("users").child(mCurrentUserId);
             Log.d("mDbUser", mDbUser.getKey());
             mDatabaseUsersConnectedReference = mDatabase.child("connectedUsers").child(mCurrentUserId);
-            mDbAllUsers = mDatabase.child("users");
         }else{
             Log.d("user connected", "null");
         }
@@ -74,6 +73,7 @@ public class UserController {
                 for(DataSnapshot userSnapshot : dataSnapshot.getChildren()){
                     User user = userSnapshot.getValue(User.class);
                     mMapUsers.put(userSnapshot.getKey(), user);
+                    Log.d("LISTENING","all users");
                 }
 
             }
@@ -115,7 +115,7 @@ public class UserController {
      *
      * @return the unique sInstance
      */
-    public static UserController getsInstance() {
+    public static UserController getInstance() {
         if (sInstance == null) {
             sInstance = new UserController();
         }

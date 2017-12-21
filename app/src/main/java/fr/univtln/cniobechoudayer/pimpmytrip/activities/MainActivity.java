@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.AccountFragment;
-import fr.univtln.cniobechoudayer.pimpmytrip.fragments.ManagerTripFragment;
+import fr.univtln.cniobechoudayer.pimpmytrip.fragments.CreationTripFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.MapFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.ProfileFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.ReferenceTripsFragment;
@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
-        mUserController = UserController.getsInstance();
+        mUserController = UserController.getInstance();
         mStatsController = StatisticsController.getInstance();
 
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(ARintent);
                 break;
             case R.id.titleTripsManagement:
-                displayFragment(ManagerTripFragment.getInstance());
+                displayFragment(CreationTripFragment.getInstance());
                 break;
             case R.id.titleSettings:
                 displayFragment(AccountFragment.getInstance());
@@ -175,13 +175,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onStop() {
-        UserController.getsInstance().setUserAsDisconnected();
+        UserController.getInstance().setUserAsDisconnected();
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        UserController.getsInstance().setUserAsDisconnected();
+        UserController.getInstance().setUserAsDisconnected();
         stopService(new Intent(this, ConnectedUserLocationService.class));
         super.onDestroy();
     }

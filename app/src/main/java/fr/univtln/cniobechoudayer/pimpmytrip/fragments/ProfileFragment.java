@@ -102,7 +102,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         /**
          * Instanciating useful controllers
          */
-        mUserController = UserController.getsInstance();
+        mUserController = UserController.getInstance();
         mStatsController = StatisticsController.getInstance();
         userStats = mStatsController.getUserStats();
 
@@ -115,6 +115,13 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         AppBarLayout appbarLayout = (AppBarLayout) rootView.findViewById(R.id.materialup_appbar);
         mProfileImage = (ImageView) rootView.findViewById(R.id.materialup_profile_image);
         mListViewStats = (ListView) rootView.findViewById(R.id.listViewStats);
+
+        /**
+         * Making list view scrolling
+         */
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mListViewStats.setNestedScrollingEnabled(true);
+        }
 
         /**
          * Setting up listener to retrieve user from firebase db
