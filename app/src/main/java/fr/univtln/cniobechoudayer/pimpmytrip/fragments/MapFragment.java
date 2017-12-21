@@ -939,13 +939,11 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
     private User findUserInList(String userID) {
         User user = new User();
-        Toast.makeText(getContext(), String.valueOf(mUserController.getmMapUsers().size()), Toast.LENGTH_SHORT).show();
         if (mUserController.getmMapUsers().size() > 0) {
             for (Map.Entry<String, User> userFound : mUserController.getmMapUsers().entrySet()) {
                 String key = userFound.getKey();
                 if (userID.equals(key)) {
                     user = userFound.getValue();
-                    Toast.makeText(getContext(), String.valueOf(user.getPseudo()), Toast.LENGTH_SHORT).show();
                 }
             }
         } else {
