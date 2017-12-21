@@ -97,7 +97,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private List<Trip> mListReferenceTrip, mListMyTrips, mListSwipedTrips;
     private Map<String, Marker> mConnectedUsersMarkersHashMap;
 
-    private LocationManager mLocationManager;
     private LocationManager locationManager;
     private LocationListener mLocationListener;
 
@@ -322,7 +321,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
-                        Trip currentTrip = (Trip) tripSnapshot.getValue(Trip.class);
+                        Trip currentTrip = tripSnapshot.getValue(Trip.class);
                         if (currentTrip.isReference()) {
                             mListReferenceTrip.add(currentTrip);
                         }
@@ -349,7 +348,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                         Trip currentTrip = tripSnapshot.getValue(Trip.class);
                         mListMyTrips.add(currentTrip);
                     }
-                    Log.d("mListMyTrips", "updated");
                     loadMyTrips();
                 }
 
@@ -417,7 +415,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                     String idUser = dataSnapshot.getKey();
                     if (!idUser.equals(mUserController.getConnectedUserId())) {
                         Position position = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
-                        if(position !=null){
+                        if (position != null) {
                             LatLng latLng = new LatLng(position.getCoordX(), position.getCoordY());
                             MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(idUser).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).visible(true);
                             Marker marker = mGoogleMap.addMarker(markerOptions);
@@ -444,7 +442,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
                     String idUser = dataSnapshot.getKey();
                     //mConnectedUsersMarkersHashMap.get(idUser).remove();
-                    if(mConnectedUsersMarkersHashMap.get(idUser) != null){
+                    if (mConnectedUsersMarkersHashMap.get(idUser) != null) {
                         mConnectedUsersMarkersHashMap.get(idUser).remove();
                     }
 
@@ -738,6 +736,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
             }
 
         }
+
         return (int) distance;
 
     }
@@ -915,7 +914,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
 
     /**
-     * Method to display user on map
+     * Method to display photo and pseudo of the user on map
      *
      * @param location
      * @param idUser
@@ -923,7 +922,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private void displayUserOnMap(LatLng location, String idUser) {
         Bitmap icon = null;
         User userRetrieved = findUserInList(idUser);
-        //Toast.makeText(getContext(), userRetrieved.toString(), Toast.LENGTH_SHORT).show();
+
         mFactory = new IconGenerator(this.mContext);
         mFactory.setColor(getResources().getColor(R.color.colorPrimaryDark));
         icon = Bitmap.createScaledBitmap(new CircleTransform().transform(userRetrieved.convertedPhoto()), 100, 100, false);

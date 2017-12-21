@@ -11,25 +11,20 @@ import android.widget.TextView;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerAdapterTrip;
-import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerViewAdapterReferenceTrip;
 
 import static android.support.design.widget.Snackbar.LENGTH_LONG;
 import static android.support.design.widget.Snackbar.make;
 
 public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
-    public static final float ALPHA_FULL = 1.0f;
 
     private final RecyclerAdapterTrip fRecyclerAdapterTrip;
     private final RecyclerView fRecyclerView;
     private View mItemView;
-    //private final Bitmap iconDelete, iconDisplay;
 
 
     public SimpleItemTouchHelperCallback(RecyclerAdapterTrip adapter, RecyclerView recyclerView) {
         this.fRecyclerAdapterTrip = adapter;
         this.fRecyclerView = recyclerView;
-        //this.iconDelete = iconDelete;
-        //this.iconDisplay = iconDelete;
 
     }
 
@@ -113,23 +108,6 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
         }
     }
-
-    /*
-    @Override
-    public void onChildDraw(Canvas c, RecyclerView fRecyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-        final View foregroundView = ((RecyclerAdapterTrip.MyHolder) viewHolder).foreground;
-        getDefaultUIUtil().onDraw(c, fRecyclerView, foregroundView, dX, dY,
-                actionState, isCurrentlyActive);
-    }
-
-    @Override
-    public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
-        if(viewHolder != null){
-            final View foregroundView = ((RecyclerAdapterTrip.MyHolder) viewHolder).background;
-            getDefaultUIUtil().onSelected(foregroundView);
-        }
-    }*/
-
 
 
 }

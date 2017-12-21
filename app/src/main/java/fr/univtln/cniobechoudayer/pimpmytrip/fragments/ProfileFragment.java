@@ -49,7 +49,7 @@ import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
  * Fragment that manages user profile
  */
 
-public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener{
+public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetChangedListener {
 
     private static final int PERCENTAGE_TO_ANIMATE_AVATAR = 20;
     public static final int GET_FROM_GALLERY = 3;
@@ -82,7 +82,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
 
     public static ProfileFragment getInstance() {
-        if(sInstance == null){
+        if (sInstance == null) {
             sInstance = new ProfileFragment();
         }
         return sInstance;
@@ -130,7 +130,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User connectedUser = dataSnapshot.getValue(User.class);
-                if(connectedUser != null){
+                if (connectedUser != null) {
                     mTextViewPseudoUser.setText(connectedUser.getPseudo());
                     mProfileImage.setImageBitmap(connectedUser.convertedPhoto());
                     mTextViewEmailUser.setText(connectedUser.getEmail());
@@ -164,15 +164,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             }
         });
 
-        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.materialup_toolbar);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View v) {
-                    //TODO BACK
-                }
-            });
-        }
-
         appbarLayout.addOnOffsetChangedListener(this);
         mMaxScrollSize = appbarLayout.getTotalScrollRange();
 
@@ -182,7 +173,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         /**
          * Displaying user statistics
          */
-        if(userStats != null){
+        if (userStats != null) {
 
             mListStatsToDisplay.add(getString(R.string.nbMyTripsTravelledLabel) + String.valueOf(userStats.getNbMyTripsTravelled()));
             mListStatsToDisplay.add(getString(R.string.totalDistanceLabel) + String.valueOf(Utils.formatTripDistance(userStats.getTotalDistance())));
@@ -201,9 +192,9 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
             // Create an ArrayAdapter from List
             mAdapter = new ArrayAdapter<String>
-                    (getContext(), android.R.layout.simple_list_item_1, mListStatsToDisplay){
+                    (getContext(), android.R.layout.simple_list_item_1, mListStatsToDisplay) {
                 @Override
-                public View getView(int position, View convertView, ViewGroup parent){
+                public View getView(int position, View convertView, ViewGroup parent) {
                     // Get the Item from ListView
                     View view = super.getView(position, convertView, parent);
 
@@ -239,6 +230,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     /**
      * Methods that is used to get the picture that the user uploaded
+     *
      * @param requestCode
      * @param resultCode
      * @param data
@@ -248,7 +240,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         super.onActivityResult(requestCode, resultCode, data);
 
         //Detects request codes
-        if(requestCode==GET_FROM_GALLERY && resultCode == Activity.RESULT_OK) {
+        if (requestCode == GET_FROM_GALLERY && resultCode == Activity.RESULT_OK) {
             Uri selectedImage = data.getData();
             Bitmap bitmap = null;
             try {
@@ -256,10 +248,8 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
                 mUserController.updatePhotoUser(bitmap);
                 mProfileImage.setImageBitmap(bitmap);
             } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -267,6 +257,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
     /**
      * Method to animate profile picture
+     *
      * @param appBarLayout
      * @param i
      */
@@ -341,7 +332,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
         if (mListenerUser != null)
             mDbUser.removeEventListener(mListenerUser);
     }
-
 
 
 }

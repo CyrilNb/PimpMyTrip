@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerAdapterTrip;
-import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerViewAdapterReferenceTrip;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.callbacks.SimpleItemTouchHelperCallback;
@@ -55,6 +54,7 @@ public class TripsFragment extends Fragment {
 
     /**
      * Get singleton instance
+     *
      * @return
      */
     public static TripsFragment getInstance() {
@@ -76,7 +76,7 @@ public class TripsFragment extends Fragment {
         mTripsList = new ArrayList<>();
         View rootView = inflater.inflate(R.layout.fragment_trips, container, false);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerViewTrips);
-        mAdapterTrip = new RecyclerAdapterTrip(mTripsList,getActivity(), mFragmentManager);
+        mAdapterTrip = new RecyclerAdapterTrip(mTripsList, getActivity(), mFragmentManager);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());

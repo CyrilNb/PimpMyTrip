@@ -242,7 +242,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                 if (reply.get("listPositionsTrip") != null) {
                     mListPositions = reply.getParcelableArrayList("listPositionsTrip");
                     if (isUserSaving) {
-                        Trip addedTrip = mTripController.insertTrip(true, mListPositions, mListWaypoints, mCurrentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
+                        mTripController.insertTrip(true, mListPositions, mListWaypoints, mCurrentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
                         isUserSaving = false;
                     }
                 } else {
@@ -289,7 +289,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                 mGoogleMap = mMap;
 
                 // For showing a move to my location button
-                //Checking if user's location is accessible
+                // Checking if user's location is accessible
                 if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     //Requesting location permission
                     ActivityCompat.requestPermissions(getActivity(),
@@ -358,6 +358,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                         mListReferenceTrip.add(currentTrip);
                     }
                 }
+
                 MapFragment myFragment = (MapFragment) getActivity().getSupportFragmentManager().findFragmentByTag("MapFragment");
                 if (myFragment != null && myFragment.isVisible()) {
                     loadReferenceTrip();
@@ -372,7 +373,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
             }
         });
 
-        if(mListenerConnectedUsers != null)
+        if (mListenerConnectedUsers != null)
             dDatabaseUsersConnectedReference.addValueEventListener(mListenerConnectedUsers);
     }
 
@@ -470,18 +471,19 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
     /**
      * Method that display the current recorded trip in live
+     *
      * @param pos
      */
-    private void displayRecordingTrip(Position pos){
+    private void displayRecordingTrip(Position pos) {
         Toast.makeText(getContext(), "mListPositionsCurrentRecordedTrip" + mListPositionsCurrentRecordedTrip.size(), Toast.LENGTH_SHORT).show();
-        if(mCurrentDrawingPathOptions == null){
+        if (mCurrentDrawingPathOptions == null) {
             mCurrentDrawingPathOptions = new PolylineOptions();
             mCurrentDrawingPathOptions.color(getActivity().getResources().getColor(R.color.colorPrimaryDark));
         }
-        if(mListPositionsCurrentRecordedTrip.size() == 0){
+        if (mListPositionsCurrentRecordedTrip.size() == 0) {
             Toast.makeText(getContext(), "mCurrentDrawingPathOptions linked to map " + pos.toString(), Toast.LENGTH_SHORT).show();
             mCurrentPath = mGoogleMap.addPolyline(mCurrentDrawingPathOptions);
-        }else{
+        } else {
             mCurrentPath.remove();
         }
         mListPositionsCurrentRecordedTrip.add(pos);
@@ -558,13 +560,13 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                 resetPath();
                 break;
             case R.id.undoTripFAB:
-                mListCoordsCurrentPath.remove(mListCoordsCurrentPath.size()-1);
-                mLastAddedMarker = mListMarkersTrip.get(mListMarkersTrip.size()-1);
+                mListCoordsCurrentPath.remove(mListCoordsCurrentPath.size() - 1);
+                mLastAddedMarker = mListMarkersTrip.get(mListMarkersTrip.size() - 1);
                 mCurrentPath.remove();
                 mLastAddedMarker.remove();
                 mListMarkersTrip.remove(mLastAddedMarker);
                 mPathTrip = new PolylineOptions();
-                for(LatLng pos : mListCoordsCurrentPath){
+                for (LatLng pos : mListCoordsCurrentPath) {
                     mPathTrip.add(pos);
                 }
                 mCurrentPath = mGoogleMap.addPolyline(mPathTrip);
@@ -742,7 +744,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         mButtonRecordTrip.setVisibility(View.VISIBLE);
         mPathTrip = null;
         isManagerDrawingPath = false;
-        if(mCurrentPath != null)
+        if (mCurrentPath != null)
             mCurrentPath.remove();
     }
 

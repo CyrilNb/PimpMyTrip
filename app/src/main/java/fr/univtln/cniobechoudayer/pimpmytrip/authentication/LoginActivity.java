@@ -270,17 +270,15 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
-                Log.w(TAG, "Google sign in failed", e);
-                Utils.displayErrorMessage(getApplicationContext(), LoginActivity.this, mRootView, "Google sign in failed");
+                Utils.displayErrorMessage(getApplicationContext(), LoginActivity.this, mRootView, getString(R.string.google_api_error));
             }
         }
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
-        // be available.
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not be available
+        Utils.displayErrorMessage(getApplicationContext(), LoginActivity.this, mRootView, getString(R.string.google_api_error));
     }
 
 
@@ -290,7 +288,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
      * @param acct
      */
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         mProgressBar.setVisibility(View.VISIBLE);
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
@@ -299,13 +296,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithCredential:success");
                             mProgressBar.setVisibility(View.GONE);
                             onConnectionSuccess();
                         } else {
                             mProgressBar.setVisibility(View.GONE);
                             // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
                             Utils.displayErrorMessage(getApplicationContext(), LoginActivity.this, mRootView, "Authentication failed");
                         }
                     }
