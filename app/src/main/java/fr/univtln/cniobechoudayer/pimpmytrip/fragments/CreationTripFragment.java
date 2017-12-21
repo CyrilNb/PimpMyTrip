@@ -92,12 +92,14 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
     private PolylineOptions mCurrentDrawingPathOptions;
     private Polyline mCurrentPath;
     private MapView mMapView;
+    private Marker mLastAddedMarker;
     private FloatingActionButton mButtonRecordTrip;
 
     private List<Position> mListPositions, mListPositionsCurrentRecordedTrip;
     private List<Waypoint> mListWaypoints;
     private List<Trip> mListReferenceTrip;
     private List<LatLng> mListCoordsCurrentPath;
+    private List<Marker> mListMarkersTrip;
 
     private TripController mTripController;
     private StatisticsController mStatisticsController;
@@ -165,6 +167,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         //Setting lists to manage trips to display
         mListReferenceTrip = new ArrayList<>();
         mListCoordsCurrentPath = new ArrayList<>();
+        mListMarkersTrip = new ArrayList<>();
 
         //Setting up maps mFactory for labels
         mFactory = new IconGenerator(getActivity());
@@ -323,7 +326,8 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                     public void onMapClick(LatLng point) {
                         if (isUserRecording || mPathTrip == null)
                             mGoogleMap.clear();
-                        mGoogleMap.addMarker(new MarkerOptions().position(point));
+                        mLastAddedMarker = mGoogleMap.addMarker(new MarkerOptions().position(point));
+                        mListMarkersTrip.add(mLastAddedMarker);
                         if (!isUserRecording)
                             addLineBetweenMarkers(point);
                     }
@@ -435,7 +439,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
         pathTrip.color(Color.parseColor(tripToDisplay.getColor()));
 
-        mGoogleMap.addPolyline(pathTrip);
+        mCurrentPath = mGoogleMap.addPolyline(pathTrip);
     }
 
     /**
@@ -562,7 +566,11 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                 break;
             case R.id.undoTripFAB:
                 mListCoordsCurrentPath.remove(mListCoordsCurrentPath.size()-1);
+                mLastAddedMarker = mListMarkersTrip.get(mListMarkersTrip.size()-1);
                 mCurrentPath.remove();
+                mLastAddedMarker.remove();
+                mListMarkersTrip.remove(mLastAddedMarker);
+                mPathTrip = new PolylineOptions();
                 for(LatLng pos : mListCoordsCurrentPath){
                     mPathTrip.add(pos);
                 }
@@ -738,6 +746,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         mListPositions.clear();
         mListWaypoints.clear();
         mListCoordsCurrentPath.clear();
+        mListMarkersTrip.clear();
         mMenuActionsFAB.setVisibility(View.GONE);
         mButtonRecordTrip.setVisibility(View.VISIBLE);
         mPathTrip = null;
