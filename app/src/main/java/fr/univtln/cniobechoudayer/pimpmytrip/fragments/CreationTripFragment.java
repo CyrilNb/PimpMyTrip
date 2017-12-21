@@ -168,6 +168,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         mListReferenceTrip = new ArrayList<>();
         mListCoordsCurrentPath = new ArrayList<>();
         mListMarkersTrip = new ArrayList<>();
+        mListPositionsCurrentRecordedTrip = new ArrayList<>();
 
         //Setting up maps mFactory for labels
         mFactory = new IconGenerator(getActivity());
@@ -238,17 +239,14 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
             @Override
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
-                Log.d("mListPositions service", String.valueOf(reply.get("listPositionsTrip")));
                 if (reply.get("listPositionsTrip") != null) {
                     mListPositions = reply.getParcelableArrayList("listPositionsTrip");
-                    Log.d("listPos recorded size", String.valueOf(mListPositions.size()));
                     if (isUserSaving) {
                         Trip addedTrip = mTripController.insertTrip(true, mListPositions, mListWaypoints, mCurrentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
                         isUserSaving = false;
                     }
                 } else {
                     mListPositions = new ArrayList<>();
-                    Log.d("mListPositions", "null");
                 }
             }
         };
@@ -270,10 +268,8 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Position newPosition = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
-                Log.d("pos retrieved", newPosition.toString());
                 if(isUserRecording){
                     displayRecordingTrip(newPosition);
-                    Log.d("new pos","added to path");
                 }
 
             }
@@ -358,13 +354,10 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
                 for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
                     Trip currentTrip = tripSnapshot.getValue(Trip.class);
-                    Log.d("New trip retrieved", String.valueOf(currentTrip.getName()));
                     if (currentTrip.isReference()) {
                         mListReferenceTrip.add(currentTrip);
                     }
                 }
-                Log.d("mListRefTrip size: ", String.valueOf(mListReferenceTrip.size()));
-
                 MapFragment myFragment = (MapFragment) getActivity().getSupportFragmentManager().findFragmentByTag("MapFragment");
                 if (myFragment != null && myFragment.isVisible()) {
                     loadReferenceTrip();
@@ -629,7 +622,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                         } else {
                             isUserSaving = true;
                         }
-                        Toast.makeText(getContext(), "Your trip has been saved successfully !", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.successMessageCreationTrip), Toast.LENGTH_LONG).show();
                         resetPath();
                     }
                 })
@@ -778,9 +771,6 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
             }
 
         }
-
-        Log.d("distance computed : ", String.valueOf(distance));
-
         return (int) distance;
 
     }

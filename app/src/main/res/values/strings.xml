@@ -58,12 +58,18 @@
     <string name="titleDialogTransportationMode">Choose transportation mode</string>
     <string name="hintChooseTitleTrip">Choose a title</string>
     <string name="hintChooseColorTrip">Choose a color</string>
+    <string name="titleDialogPseudo">Change your pseudo</string>
     <!-- Google Map -->
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_scrolling" translatable="false">ScrollingActivity</string>
     <string name="action_settings">Settings</string>
     <string name="revoke_google_access">Disconnect your Google account</string>
     <string name="google_maps_key" translatable="false">AIzaSyBPccZZOBlcIpH-Tvm8m5d4cU_CXMkllxc</string>
+    <string name="successMessageCreationTrip">Your trip has been saved successfully !</string>
+    <string name="titleReferenceTripDeparture">REFERENCE TRIP \n Departure</string>
+    <string name="titleReferenceTripArrival">REFERENCE TRIP \n Arrival</string>
+    <string name="titleTripDeparture">Departure</string>
+    <string name="titleTripArrival">Arrival</string>
 
     <!-- Trips Management -->
     <string name="nameTabTripCreation">Create</string>

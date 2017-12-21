@@ -219,9 +219,6 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
             };
 
             mListViewStats.setAdapter(mAdapter);
-            Log.d("userStats", "not null");
-        }else{
-            Log.d("userStats", "null");
         }
 
         /**
@@ -318,7 +315,7 @@ public class ProfileFragment extends Fragment implements AppBarLayout.OnOffsetCh
 
         alertLayout.addView(mNameEditText);
 
-        mBuilder.setTitle("Update your name")
+        mBuilder.setTitle(getString(R.string.titleDialogPseudo))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         mUserController.updatePseudoUser(mNameEditText.getText().toString());

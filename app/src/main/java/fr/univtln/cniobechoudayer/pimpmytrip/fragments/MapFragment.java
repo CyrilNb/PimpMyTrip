@@ -204,19 +204,15 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
             @Override
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
-                Log.d("mListPositions service", String.valueOf(reply.get("listPositionsTrip")));
                 if (reply.get("listPositionsTrip") != null) {
-                    //mListPositions.add((Position) reply.getParcelable("current_position"));
                     mListPositions = reply.getParcelableArrayList("listPositionsTrip");
-                    Log.d("listPos recorded size", String.valueOf(mListPositions.size()));
                     if (isUserSaving) {
-                        Toast.makeText(getContext(), "Your trip has been saved successfully ! " + mListPositions.size() + " positions !", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.successMessageCreationTrip) + mListPositions.size() + " positions !", Toast.LENGTH_LONG).show();
                         fTripController.insertTrip(false, mListPositions, mListWaypoints, mCurrentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
                         isUserSaving = false;
                     }
                 } else {
                     mListPositions = new ArrayList<>();
-                    Log.d("mListPositions", "null");
                 }
             }
         };
@@ -323,7 +319,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
                         Trip currentTrip = (Trip) tripSnapshot.getValue(Trip.class);
-                        Log.d("New trip retrieved", String.valueOf(currentTrip.getName()));
                         if (currentTrip.isReference()) {
                             mListReferenceTrip.add(currentTrip);
                         }
@@ -415,7 +410,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
             fDbUsersConnected.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    System.out.println("new connected User added: " + dataSnapshot.getKey());
                     String idUser = dataSnapshot.getKey();
                     if (!idUser.equals(mUserController.getConnectedUserId())) {
                         Position position = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
@@ -431,7 +425,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                    System.out.println("onchild changed of user: " + dataSnapshot.getKey());
                     String idUser = dataSnapshot.getKey();
                     if (!idUser.equals(mUserController.getConnectedUserId())) {
                         Position position = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
@@ -587,10 +580,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                                 .position(pointToSave)
                                 .title(waypoint.getLabel())
                                 .icon(iconForMarker));
-
-                        Log.d("mListWaypoints size", String.valueOf(mListWaypoints.size()));
                     }
-
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
@@ -623,14 +613,14 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         mTitleEditText = new EditText(getContext());
         mColorButton = new Button(getContext());
 
-        mTitleEditText.setHint("Choose a title");
+        mTitleEditText.setHint(getString(R.string.hintChooseTitleTrip));
         mTitleEditText.setSingleLine(false);
         mTitleEditText.setMaxLines(2);
         mTitleEditText.setHorizontalScrollBarEnabled(false);
         mTitleEditText.setHintTextColor(Color.WHITE);
         mTitleEditText.setTextColor(Color.WHITE);
 
-        mColorButton.setText("Choose a color");
+        mColorButton.setText(getString(R.string.hintChooseColorTrip));
         mColorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -649,10 +639,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                         mButtonRecordTrip.setImageResource(R.drawable.ic_play_arrow_white_48dp);
                         isUserRecording = false;
                         if (mListPositions != null) {
-                            Log.d("add trip ?", "reached");
                             isUserSaving = true;
-                        } else {
-                            Log.d("can't save cause", "listPos is null");
                         }
                         fTripController.insertTrip(false, mListPositionsCurrentRecordedTrip, mListWaypoints, mCurrentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
                         mListPositionsCurrentRecordedTrip.clear();
@@ -747,9 +734,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
             }
 
         }
-
-        Log.d("distance computed : ", String.valueOf(distance));
-
         return (int) distance;
 
     }
@@ -780,13 +764,11 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
      * @param pos
      */
     private void displayRecordingTrip(Position pos) {
-        Toast.makeText(getContext(), "mListPositionsCurrentRecordedTrip" + mListPositionsCurrentRecordedTrip.size(), Toast.LENGTH_SHORT).show();
         if (mCurrentDrawingPathOptions == null) {
             mCurrentDrawingPathOptions = new PolylineOptions();
             mCurrentDrawingPathOptions.color(getActivity().getResources().getColor(R.color.colorPrimaryDark));
         }
         if (mListPositionsCurrentRecordedTrip.size() == 0) {
-            Toast.makeText(getContext(), "mCurrentDrawingPathOptions linked to map " + pos.toString(), Toast.LENGTH_SHORT).show();
             mCurrentPath = mGoogleMap.addPolyline(mCurrentDrawingPathOptions);
         } else {
             mCurrentPath.remove();
@@ -794,8 +776,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         mListPositionsCurrentRecordedTrip.add(pos);
         mCurrentDrawingPathOptions.add(new LatLng(pos.getCoordX(), pos.getCoordY()));
         mCurrentPath = mGoogleMap.addPolyline(mCurrentDrawingPathOptions);
-        Toast.makeText(getContext(), "mCurrentDrawingPathOptions" + mCurrentDrawingPathOptions.getPoints().size(), Toast.LENGTH_SHORT).show();
-
     }
 
     /**
@@ -817,11 +797,11 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
                 if (!iterator.hasPrevious()) {
                     if (tripToDisplay.isReference()) {
-                        titleLabel = "REFERENCE TRIP \n Departure " + tripToDisplay.getName();
+                        titleLabel = getString(R.string.titleReferenceTripDeparture) + " " + tripToDisplay.getName();
                         mFactory.setColor(Color.YELLOW);
                     } else {
                         mFactory.setColor(Color.parseColor(tripToDisplay.getColor()));
-                        titleLabel = "Departure " + tripToDisplay.getName();
+                        titleLabel = getString(R.string.titleTripDeparture) + " " + tripToDisplay.getName();
                     }
                     icon = mFactory.makeIcon(titleLabel);
                     pos = iterator.next();
@@ -836,11 +816,11 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
                 if (!iterator.hasNext()) {
                     if (tripToDisplay.isReference()) {
-                        titleLabel = "REFERENCE TRIP \n Arrival " + tripToDisplay.getName();
+                        titleLabel = getString(R.string.titleReferenceTripArrival) + " " + tripToDisplay.getName();
                         mFactory.setColor(Color.YELLOW);
                     } else {
                         mFactory.setColor(Color.parseColor(tripToDisplay.getColor()));
-                        titleLabel = "Arrival " + tripToDisplay.getName();
+                        titleLabel = getString(R.string.titleTripArrival) + " " + tripToDisplay.getName();
                     }
                     mFactory.setColor(Color.parseColor(tripToDisplay.getColor()));
                     icon = mFactory.makeIcon(titleLabel);
@@ -940,7 +920,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         Bitmap icon = null;
         User userRetrieved = findUserInList(idUser);
         //Toast.makeText(getContext(), userRetrieved.toString(), Toast.LENGTH_SHORT).show();
-        Log.d("user found", userRetrieved.toString());
         mFactory = new IconGenerator(this.mContext);
         mFactory.setColor(getResources().getColor(R.color.colorPrimaryDark));
         icon = Bitmap.createScaledBitmap(new CircleTransform().transform(userRetrieved.convertedPhoto()), 100, 100, false);
@@ -949,24 +928,19 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         mGoogleMap.addMarker(
                 new MarkerOptions()
                         .position(location)
-                        .title(userRetrieved.getPseudo())//TODO get user
-                        .icon(BitmapDescriptorFactory.fromBitmap(icon)) //TODO get picture user
+                        .title(userRetrieved.getPseudo())
+                        .icon(BitmapDescriptorFactory.fromBitmap(icon))
         );
     }
 
     private User findUserInList(String userID) {
-        Iterator it = mUserController.getmMapUsers().entrySet().iterator();
         User user = new User();
-        //Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
         Toast.makeText(getContext(), String.valueOf(mUserController.getmMapUsers().size()), Toast.LENGTH_SHORT).show();
         if (mUserController.getmMapUsers().size() > 0) {
             for (Map.Entry<String, User> userFound : mUserController.getmMapUsers().entrySet()) {
                 String key = userFound.getKey();
-                System.out.println("userID passed in args: " + userID);
-                System.out.println("findUserInList: " + key);
                 if (userID.equals(key)) {
                     user = userFound.getValue();
-                    System.out.println("OK TEST");
                     Toast.makeText(getContext(), String.valueOf(user.getPseudo()), Toast.LENGTH_SHORT).show();
                 }
             }
