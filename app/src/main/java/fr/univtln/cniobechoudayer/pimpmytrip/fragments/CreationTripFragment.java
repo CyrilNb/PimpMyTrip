@@ -168,6 +168,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         mListReferenceTrip = new ArrayList<>();
         mListCoordsCurrentPath = new ArrayList<>();
         mListMarkersTrip = new ArrayList<>();
+        mListPositionsCurrentRecordedTrip = new ArrayList<>();
 
         //Setting up maps mFactory for labels
         mFactory = new IconGenerator(getActivity());
@@ -267,7 +268,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Position newPosition = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
-                if (isUserRecording) {
+                if(isUserRecording){
                     displayRecordingTrip(newPosition);
                 }
 
@@ -288,7 +289,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                 mGoogleMap = mMap;
 
                 // For showing a move to my location button
-                //Checking if user's location is accessible
+                // Checking if user's location is accessible
                 if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     //Requesting location permission
                     ActivityCompat.requestPermissions(getActivity(),
@@ -623,7 +624,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                         } else {
                             isUserSaving = true;
                         }
-                        Toast.makeText(getContext(), "Your trip has been saved successfully !", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.successMessageCreationTrip), Toast.LENGTH_LONG).show();
                         resetPath();
                     }
                 })
@@ -772,7 +773,6 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
             }
 
         }
-
         return (int) distance;
 
     }

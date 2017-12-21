@@ -61,14 +61,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 if (mUserController != null) {
-                    if (mImageViewProfile != null)
+                    if (mImageViewProfile != null){
                         if (mUserController.getmConnectedUser().convertedPhoto() != null)
                             mImageViewProfile.setImageBitmap(new CircleTransform().transform(mUserController.getmConnectedUser().convertedPhoto()));
-                    if (mUserController.getmConnectedUser() != null)
-                        mTextViewPseudoUser.setText(mUserController.getmConnectedUser().getPseudo());
-                    if (mStatsController.getUserStats() != null)
-                        mTextViewStats.setText(String.valueOf(mStatsController.getUserStats().getNbTripsCreated()) + " " + getString(R.string.tripsLabel));
-                }
+                        if (mUserController.getmConnectedUser() != null)
+                            mTextViewPseudoUser.setText(mUserController.getmConnectedUser().getPseudo());
+                        if (mStatsController.getUserStats() != null)
+                            mTextViewStats.setText(String.valueOf(mStatsController.getUserStats().getNbTripsCreated()) + " " + getString(R.string.tripsLabel));
+                        }
+                    }
             }
         };
         mDrawer.addDrawerListener(toggle);
