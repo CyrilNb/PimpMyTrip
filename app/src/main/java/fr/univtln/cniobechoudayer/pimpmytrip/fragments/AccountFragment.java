@@ -137,12 +137,6 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
         mBtnChangeEmail.setOnClickListener(this);
         mBtnSendResetEmail.setOnClickListener(this);
 
-        mBtnChangeEmail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
 
         mChangeEmail.setOnClickListener(new View.OnClickListener() {
             @Override

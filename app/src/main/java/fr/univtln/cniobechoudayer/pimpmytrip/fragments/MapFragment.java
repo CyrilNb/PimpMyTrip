@@ -447,7 +447,9 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
                     String idUser = dataSnapshot.getKey();
                     //mConnectedUsersMarkersHashMap.get(idUser).remove();
-                    System.out.println(" connected User removed: " + idUser);
+                    if(mConnectedUsersMarkersHashMap.get(idUser) != null){
+                        mConnectedUsersMarkersHashMap.get(idUser).remove();
+                    }
 
                 }
 
