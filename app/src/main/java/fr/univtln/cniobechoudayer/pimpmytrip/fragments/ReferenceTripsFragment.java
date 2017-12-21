@@ -87,7 +87,6 @@ public class ReferenceTripsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mFragmentManager = getActivity().getSupportFragmentManager();
         setHasOptionsMenu(true);
-
     }
 
 
@@ -100,12 +99,11 @@ public class ReferenceTripsFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        //mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mAdapter);
 
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter, mRecyclerView);
+        /*ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter, mRecyclerView);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
-        touchHelper.attachToRecyclerView(mRecyclerView);
+        touchHelper.attachToRecyclerView(mRecyclerView);*/
 
         mListenerDbReferenceTrips = new ValueEventListener() {
             @Override

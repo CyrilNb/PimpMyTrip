@@ -102,7 +102,6 @@ public class UserController {
         if(mDbUser != null){
             Log.d("mDbUser","not null");
             mDbUser.addValueEventListener(fListenerUser);
-            //mDbUser.keepSynced(true);
         }
         if(mDbAllUsers != null)
             mDbAllUsers.addValueEventListener(fListenerUsers);
@@ -122,7 +121,6 @@ public class UserController {
     }
 
     public User getmConnectedUser() {
-        System.out.println("TEST CONNECTED USER");
         System.out.println("connected user: "+mConnectedUser);
         return mConnectedUser;
     }
@@ -184,7 +182,7 @@ public class UserController {
     /**
      * Methd to update user profile picture of connected user
      *
-     * @param photo
+     * @param photo new photo
      */
     public void updatePhotoUser(Bitmap photo) {
         Log.d("updating photo user", "reached");

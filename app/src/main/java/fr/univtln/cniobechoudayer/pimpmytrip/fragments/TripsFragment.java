@@ -23,6 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerAdapterTrip;
 import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerViewAdapterReferenceTrip;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
@@ -37,19 +38,25 @@ public class TripsFragment extends Fragment {
     private static TripsFragment sInstance;
     private List<Trip> mTripsList;
     private RecyclerView mRecyclerView;
-    private RecyclerViewAdapterReferenceTrip mAdapterTrip;
+    private RecyclerAdapterTrip mAdapterTrip;
     private FragmentManager mFragmentManager;
 
     private ValueEventListener mListenerDbMyTrips;
 
-    //TODO refactor it in Tripcontroller
     private final DatabaseReference fDbTrips = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase").child("trips");
     private final DatabaseReference fDbMyTrips = (DatabaseReference) fDbTrips.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
+    /**
+     * Constructor
+     */
     public TripsFragment() {
         // Required empty public constructor
     }
 
+    /**
+     * Get singleton instance
+     * @return
+     */
     public static TripsFragment getInstance() {
         if (sInstance == null) {
             sInstance = new TripsFragment();
@@ -64,13 +71,12 @@ public class TripsFragment extends Fragment {
         mFragmentManager = getActivity().getSupportFragmentManager();
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mTripsList = new ArrayList<>();
         View rootView = inflater.inflate(R.layout.fragment_trips, container, false);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerViewTrips);
-        mAdapterTrip = new RecyclerViewAdapterReferenceTrip(getActivity(), mTripsList, "MY TRIPS", mFragmentManager);
+        mAdapterTrip = new RecyclerAdapterTrip(mTripsList,getActivity(), mFragmentManager);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
