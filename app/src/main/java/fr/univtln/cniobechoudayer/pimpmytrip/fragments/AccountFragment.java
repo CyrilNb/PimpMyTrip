@@ -313,10 +313,9 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
                         Configuration config = new Configuration();
                         config.locale = myLocale;
                         getContext().getResources().updateConfiguration(config, getContext().getResources().getDisplayMetrics());
-                        Log.d("SELECTED LANGUAGE", langFormatted);
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
                         SharedPreferences.Editor editor = prefs.edit();
-                        editor.putString(getString(R.string.preferenceLanguage), langFormatted);
+                        editor.putString("language", langFormatted);
                         editor.commit();
                         /**
                          * Restarting the app

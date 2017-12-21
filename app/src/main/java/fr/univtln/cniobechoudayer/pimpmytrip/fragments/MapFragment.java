@@ -557,7 +557,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         alertLayout.addView(mChoicesTypeWaypoint);
         alertLayout.addView(mTitleEditText);
 
-        mBuilder.setTitle("Save waypoint ?")
+        mBuilder.setTitle(getString(R.string.titleDialogWaypointTrip))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         BitmapDescriptor iconForMarker;
@@ -642,7 +642,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         alertLayout.addView(mColorButton);
 
 
-        mBuilder.setTitle("Stop recording & save trip ?")
+        mBuilder.setTitle(getString(R.string.titleDialogSaveTrip))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         getActivity().stopService(mIntentRecordUserLocationService);
@@ -693,7 +693,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
         alertLayout.addView(choiceTransportationMode);
 
-        mBuilder.setTitle("Choose your transporation mode")
+        mBuilder.setTitle(getString(R.string.titleDialogTransportationMode))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         mButtonRecordTrip.setImageResource(R.drawable.ic_stop_white_48dp);
