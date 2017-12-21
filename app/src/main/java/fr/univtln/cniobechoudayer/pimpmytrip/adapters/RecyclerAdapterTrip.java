@@ -18,9 +18,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.MapFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
+import fr.univtln.cniobechoudayer.pimpmytrip.fragments.RefTripsFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 import fr.univtln.cniobechoudayer.pimpmytrip.controllers.TripController;
 import fr.univtln.cniobechoudayer.pimpmytrip.interfaces.ItemTouchHelperAdaptable;
@@ -74,9 +76,6 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
         holder.distanceTrip.setText(Utils.formatTripDistance(trip.getDistance()));
         if(trip.getColor() != null)
             holder.imgView.setBackgroundColor(Color.parseColor(trip.getColor()));
-        else{
-            Log.d("listreftrips","trip.color is null");
-        }
     }
 
     /**
@@ -91,10 +90,6 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
             return mListTrips.size();
     }
 
-    public void addTrip(List<Trip> list) {
-        mListTrips.addAll(0, list);
-        notifyDataSetChanged();
-    }
 
     /**
      * Method that handles gesture of user
@@ -126,14 +121,22 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
     @Override
     public void onItemDismiss(final int position) {
         mSwipedTrip = mListTrips.get(position);
-        mListTrips.remove(mSwipedTrip);
-        notifyItemRemoved(position);
-        mTripController.deleteTrip(mSwipedTrip);
+        if(mSwipedTrip.isReference()){
+            if(UserController.getInstance().isUserManager()){
+                mListTrips.remove(mSwipedTrip);
+                mTripController.deleteTrip(mSwipedTrip);
+                notifyItemRemoved(position);
+            }
+        }else{
+            mListTrips.remove(mSwipedTrip);
+            mTripController.deleteTrip(mSwipedTrip);
+            notifyItemRemoved(position);
+        }
     }
 
     /**
      * To reinsert a previously deleted item
-     * @param position
+     * @param position where to be added in the list
      */
     public void restoreItem(final int position){
         mListTrips.add(position, mSwipedTrip);
@@ -155,7 +158,7 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
             mFragmentManager.beginTransaction().replace(R.id.mainContent, mMapFragment, MapFragment.getInstance().getClass().getSimpleName()).commit();
 
         } catch (ClassCastException e) {
-            Log.d("fragment", "Can't get the fragment manager with this");
+            Log.d("fragment", e.getMessage());
         }
 
     }

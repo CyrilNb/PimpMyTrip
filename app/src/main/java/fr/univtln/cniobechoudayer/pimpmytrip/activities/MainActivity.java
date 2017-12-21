@@ -10,7 +10,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +21,7 @@ import fr.univtln.cniobechoudayer.pimpmytrip.fragments.AccountFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.CreationTripFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.MapFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.ProfileFragment;
-import fr.univtln.cniobechoudayer.pimpmytrip.fragments.ReferenceTripsFragment;
+import fr.univtln.cniobechoudayer.pimpmytrip.fragments.RefTripsFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.fragments.TripsFragment;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.opengl.OpenGLActivity;
@@ -142,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 displayFragment(MapFragment.getInstance());
                 break;
             case R.id.tabRefTrips:
-                displayFragment(ReferenceTripsFragment.getInstance());
+                displayFragment(RefTripsFragment.getInstance());
                 break;
             case R.id.tabMyTrips:
                 displayFragment(TripsFragment.getInstance());
@@ -220,7 +219,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     private boolean checkIfUserIsManager() {
         if (mUserController.getmConnectedUser() != null) {
-            Log.d("getmConnectedUser", "isNotNull");
             if (mUserController.getmConnectedUser().isManager())
                 return true;
             else

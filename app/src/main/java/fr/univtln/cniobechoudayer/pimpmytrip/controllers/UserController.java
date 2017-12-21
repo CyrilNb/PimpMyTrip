@@ -28,7 +28,6 @@ import fr.univtln.cniobechoudayer.pimpmytrip.entities.User;
 
 public class UserController {
 
-    private static final String TAG = "UserController";
 
     /***********
      * MEMBERS *
@@ -114,28 +113,21 @@ public class UserController {
         return sInstance;
     }
 
-    public User getmConnectedUser() {
-        System.out.println("connected user: "+mConnectedUser);
-        return mConnectedUser;
-    }
-
-    public void setmConnectedUser(User mConnectedUser) {
-        this.mConnectedUser = mConnectedUser;
-    }
-
     /***************
      *   GETTERS   *
      *     AND     *
      *   SETTERS   *
      ***************/
 
+    public User getmConnectedUser() {
+        return mConnectedUser;
+    }
+
+
     public Map<String, User> getmMapUsers() {
         return mMapUsers;
     }
 
-    public void setmMapUsers(Map<String, User> mMapUsers) {
-        this.mMapUsers = mMapUsers;
-    }
 
     /***************
      *   METHODS   *
@@ -237,6 +229,21 @@ public class UserController {
         mDatabaseUsersConnectedReference.child("lastKnownLocation").setValue(position);
     }
 
+    /**
+     * Methods that returns if the user is a manager or not
+     *
+     * @return true if the user is a manager, otherwise false
+     */
+    public boolean isUserManager() {
+        if (this.mConnectedUser != null) {
+            if (this.mConnectedUser.isManager())
+                return true;
+            else
+                return false;
+        } else {
+            return false;
+        }
+    }
 
 
 }

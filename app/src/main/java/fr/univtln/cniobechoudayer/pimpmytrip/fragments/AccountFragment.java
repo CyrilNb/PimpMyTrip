@@ -34,6 +34,7 @@ import java.util.concurrent.Executor;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.authentication.LoginActivity;
 import fr.univtln.cniobechoudayer.pimpmytrip.authentication.SignUpActivity;
+import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 import fr.univtln.cniobechoudayer.pimpmytrip.utils.Utils;
 
 public class AccountFragment extends Fragment implements View.OnClickListener {
@@ -62,7 +63,6 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
     }
@@ -136,7 +136,6 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
         mBtnChangePassword.setOnClickListener(this);
         mBtnChangeEmail.setOnClickListener(this);
         mBtnSendResetEmail.setOnClickListener(this);
-
 
         mChangeEmail.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -238,6 +237,7 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
                                         Utils.displayErrorMessage(getContext(), getActivity(), mCoordinatorLayout, "Your profile is deleted :(");
+                                        UserController.getInstance().deleteUser();
                                         startActivity(new Intent(getActivity(), SignUpActivity.class));
                                         mProgressBar.setVisibility(View.GONE);
                                     } else {

@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerAdapterTrip;
-import fr.univtln.cniobechoudayer.pimpmytrip.adapters.RecyclerViewAdapterReferenceTrip;
 import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 import fr.univtln.cniobechoudayer.pimpmytrip.R;
 import fr.univtln.cniobechoudayer.pimpmytrip.callbacks.SimpleItemTouchHelperCallback;
