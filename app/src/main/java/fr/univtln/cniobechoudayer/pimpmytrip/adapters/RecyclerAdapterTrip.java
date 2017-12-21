@@ -142,14 +142,13 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
     }
 
     /**
-     * Method to display a the map fragment with selected trips displayed
+     * Method to display the map fragment with selected trips displayed
      */
     public void displaySelectedTripOnMap(final int position){
         try{
             mSwipedTrip = mListTrips.get(position);
-            ArrayList<Trip> listTripToBePassed = new ArrayList<>(); //Declare as ArrayList because of putParcelableArrayList() method
+            ArrayList<Trip> listTripToBePassed = new ArrayList<>(); //Declared as ArrayList because of putParcelableArrayList() method
             listTripToBePassed.add(mSwipedTrip);
-            System.out.println("swipedlist from recycler: "+listTripToBePassed.get(0).getName() );
             Bundle bundle = new Bundle();
             bundle.putParcelableArrayList("listSwipedTrips",listTripToBePassed);
             mMapFragment.setArguments(bundle);
@@ -165,7 +164,6 @@ public class RecyclerAdapterTrip extends RecyclerView.Adapter<RecyclerAdapterTri
      * Retrieving graphic elements from layout view
      */
     public class MyHolder extends RecyclerView.ViewHolder {
-
         TextView nameTrip, distanceTrip;
         ImageView imgView;
         public LinearLayout foreground, background;

@@ -24,15 +24,20 @@
         <service android:name=".services.RecordUserLocationService"></service>
 
         <activity
+            android:name=".activities.SplashActivity"
+            android:theme="@style/SplashTheme"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".activities.MainActivity"
             android:screenOrientation="portrait"
             android:hardwareAccelerated="true"/>
         <activity android:name=".opengl.OpenGLActivity">
-            <!--<intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
         </activity>
         <activity
             android:name=".authentication.AccountSettingsActivity"
@@ -44,11 +49,6 @@
         <activity
             android:name=".authentication.LoginActivity"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".authentication.ResetPasswordActivity"

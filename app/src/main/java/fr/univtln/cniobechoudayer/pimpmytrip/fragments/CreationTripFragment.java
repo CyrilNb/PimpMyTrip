@@ -599,14 +599,14 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         mTitleEditText = new EditText(getContext());
         mColorButton = new Button(getContext());
 
-        mTitleEditText.setHint("Choose a title");
+        mTitleEditText.setHint(getString(R.string.hintChooseTitleTrip));
         mTitleEditText.setSingleLine(false);
         mTitleEditText.setMaxLines(2);
         mTitleEditText.setHorizontalScrollBarEnabled(false);
         mTitleEditText.setHintTextColor(Color.WHITE);
         mTitleEditText.setTextColor(Color.WHITE);
 
-        mColorButton.setText("Choose a color");
+        mColorButton.setText(getString(R.string.hintChooseColorTrip));
         mColorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -618,7 +618,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         alertLayout.addView(mColorButton);
 
 
-        mBuilder.setTitle("Stop recording & save trip ?")
+        mBuilder.setTitle(getString(R.string.titleDialogSaveTrip))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         if (mListPositions != null && !isUserRecording) {
@@ -628,7 +628,6 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                             resetPath();
                         } else {
                             isUserSaving = true;
-                            Log.d("can't save cause", "listPos is null");
                         }
                         Toast.makeText(getContext(), "Your trip has been saved successfully !", Toast.LENGTH_LONG).show();
                         resetPath();
@@ -662,7 +661,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
         mChoicesTypeWaypoint = new Spinner(getContext());
 
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.spinnerChoicesMarker));
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.spinnerChoicesMarker));
         mChoicesTypeWaypoint.setAdapter(spinnerArrayAdapter);
 
         mTitleEditText = new EditText(getContext());
@@ -670,7 +669,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
         alertLayout.addView(mChoicesTypeWaypoint);
         alertLayout.addView(mTitleEditText);
 
-        mBuilder.setTitle("Save waypoint ?")
+        mBuilder.setTitle(getString(R.string.titleDialogWaypointTrip))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         BitmapDescriptor iconForMarker;
@@ -701,7 +700,6 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
                                 .title(waypoint.getLabel())
                                 .icon(iconForMarker));
 
-                        Log.d("mListWaypoints size", String.valueOf(mListWaypoints.size()));
                     }
 
                 })
@@ -809,7 +807,7 @@ public class CreationTripFragment extends Fragment implements View.OnClickListen
 
         alertLayout.addView(choiceTransportationMode);
 
-        mBuilder.setTitle("Choose your transporation mode")
+        mBuilder.setTitle(getString(R.string.titleDialogTransportationMode))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         mButtonRecordTrip.setImageResource(R.drawable.ic_stop_white_48dp);

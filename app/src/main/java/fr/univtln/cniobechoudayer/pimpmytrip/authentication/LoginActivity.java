@@ -3,12 +3,15 @@ package fr.univtln.cniobechoudayer.pimpmytrip.authentication;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -38,6 +41,8 @@ import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.util.Locale;
+
 /**
  * Login Activity to handle the process of logging in by users
  */
@@ -65,8 +70,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        setLanguage();
 
         /**
          * Retrieving graphic elements from view layout
@@ -164,7 +167,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         super.onResume();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
+        if (currentUser != null) {
             Intent startMainActivity = new Intent(this, MainActivity.class);
             //startActivity(startMainActivity);
         }
@@ -249,6 +252,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     /**
      * Get results from intent launched
+     *
      * @param requestCode
      * @param resultCode
      * @param data
@@ -279,26 +283,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
     }
 
-    /**
-     * Method to set up the language
-     */
-    private void setLanguage(){
-        Log.d("set", "language");
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        Log.d("language", prefs.getString(getString(R.string.preferenceLanguage), "en"));
-        /*    Locale myLocale = new Locale(prefs.getString(getString(R.string.preferenceLanguage), "en"));
-            Locale.setDefault(new Locale("en"));
-            android.content.res.Configuration config = new android.content.res.Configuration();
-            config.locale = myLocale;
-        Resources res = getResources();
-        DisplayMetrics dm = res.getDisplayMetrics();
-        Configuration conf = res.getConfiguration();
-        conf.locale = myLocale;
-        res.updateConfiguration(conf, dm);*/
-    }
 
     /**
      * Signing in with Google
+     *
      * @param acct
      */
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {

@@ -20,7 +20,6 @@ import android.os.Message;
 import android.os.Messenger;
 import android.support.annotation.ColorInt;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -83,8 +82,6 @@ import fr.univtln.cniobechoudayer.pimpmytrip.controllers.UserController;
 
 public class MapFragment extends Fragment implements View.OnClickListener, LocationListener {
 
-    public static final int LOCATION_UPDATE_MIN_DISTANCE = 3; //meters
-    public static final int LOCATION_UPDATE_MIN_TIME = 1000; //milliseconds
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
@@ -253,7 +250,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
             }
         });
 
-        mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        //mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         Utils.setActionBarTitle((AppCompatActivity) getActivity(), getString(R.string.titleMap));
 
         //Initializing map
@@ -265,9 +262,9 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
         Bundle extras = getArguments();
         if (extras != null) {
-            mListSwipedTrips = extras.getParcelableArrayList("mListSwipedTrips");
+            mListSwipedTrips = extras.getParcelableArrayList("listSwipedTrips");
             if (mListSwipedTrips != null) {
-
+                System.out.println("name from bundle: " + mListSwipedTrips.get(0).getName());
                 /**
                  * Loading the map asynchronously and display the trip swiped
                  */
@@ -279,8 +276,8 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                     }
                 });
 
-
             }
+
         } else {
             /**
              * Loading the map asynchronously and adding a OnMapReadyCallback for displaying locations
@@ -311,10 +308,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                     if (location != null) {
                         zoomInMap(new LatLng(location.getLatitude(), location.getLongitude()), 10);
                     }
-                    //getCurrentLocation();
-                    /*if (currentLocation != null) {
-                        zoomInMap(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), 10);
-                    }*/
 
                     mGoogleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
                         @Override
@@ -335,8 +328,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                             mListReferenceTrip.add(currentTrip);
                         }
                     }
-
-                    Log.d("mListReferenceTrip size:", String.valueOf(mListReferenceTrip.size()));
 
                     MapFragment myFragment = (MapFragment) getActivity().getSupportFragmentManager().findFragmentByTag("MapFragment");
                     if (myFragment != null && myFragment.isVisible()) {
@@ -392,10 +383,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
-                        Trip currentTrip = (Trip) tripSnapshot.getValue(Trip.class);
-                        Log.d("fDbRefTrips", "starting");
-                        Log.d("New reftrip retrieved", String.valueOf(currentTrip.getName()));
-                        Log.d("value reference trip ", String.valueOf(currentTrip.isReference()));
+                        Trip currentTrip = tripSnapshot.getValue(Trip.class);
                         if (currentTrip.isReference()) {
                             mListReferenceTrip.add(currentTrip);
                         }
@@ -430,13 +418,14 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                     System.out.println("new connected User added: " + dataSnapshot.getKey());
                     String idUser = dataSnapshot.getKey();
                     if (!idUser.equals(mUserController.getConnectedUserId())) {
-                    Position position = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
-                    //LatLng latLng = getLastPositionFromDB(dataSnapshot, idUser);
-                    LatLng latLng = new LatLng(position.getCoordX(), position.getCoordY());
-                    MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(idUser).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).visible(true);
-                    Marker marker = mGoogleMap.addMarker(markerOptions);
-                    //displayUserOnMap(latLng, idUser);
-                    mConnectedUsersMarkersHashMap.put(idUser, marker);
+                        Position position = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
+                        if(position !=null){
+                            LatLng latLng = new LatLng(position.getCoordX(), position.getCoordY());
+                            MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(idUser).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).visible(true);
+                            Marker marker = mGoogleMap.addMarker(markerOptions);
+                            //displayUserOnMap(latLng, idUser);
+                            mConnectedUsersMarkersHashMap.put(idUser, marker);
+                        }
                     }
                 }
 
@@ -447,7 +436,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                     if (!idUser.equals(mUserController.getConnectedUserId())) {
                         Position position = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
                         if (position != null) {
-                            //LatLng latLng = getLastPositionFromDB(dataSnapshot, idUser);
                             LatLng latLng = new LatLng(position.getCoordX(), position.getCoordY());
                             Marker marker = mConnectedUsersMarkersHashMap.get(idUser);
                             marker.setPosition(latLng);
@@ -458,10 +446,10 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
                     String idUser = dataSnapshot.getKey();
+                    //mConnectedUsersMarkersHashMap.get(idUser).remove();
                     if(mConnectedUsersMarkersHashMap.get(idUser) != null){
                         mConnectedUsersMarkersHashMap.get(idUser).remove();
                     }
-                    System.out.println(" connected User removed: " + idUser);
 
                 }
 
@@ -569,7 +557,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         alertLayout.addView(mChoicesTypeWaypoint);
         alertLayout.addView(mTitleEditText);
 
-        mBuilder.setTitle("Save waypoint ?")
+        mBuilder.setTitle(getString(R.string.titleDialogWaypointTrip))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         BitmapDescriptor iconForMarker;
@@ -654,7 +642,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         alertLayout.addView(mColorButton);
 
 
-        mBuilder.setTitle("Stop recording & save trip ?")
+        mBuilder.setTitle(getString(R.string.titleDialogSaveTrip))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         getActivity().stopService(mIntentRecordUserLocationService);
@@ -705,7 +693,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
         alertLayout.addView(choiceTransportationMode);
 
-        mBuilder.setTitle("Choose your transporation mode")
+        mBuilder.setTitle(getString(R.string.titleDialogTransportationMode))
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         mButtonRecordTrip.setImageResource(R.drawable.ic_stop_white_48dp);
@@ -877,29 +865,13 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
      *
      * @param tripToDisplay
      */
-    public void displaySwipedTrip(Trip tripToDisplay) {
-        List<Position> positionList = tripToDisplay.getListPositions();
-
-        if (positionList != null && !positionList.isEmpty()) {
-
-            PolylineOptions pathTrip = new PolylineOptions();
-
-            ListIterator<Position> iterator = positionList.listIterator();
-            while (iterator.hasNext()) {
-                Position pos = null;
-                pos = iterator.next();
-                pathTrip.add(new LatLng(pos.getCoordX(), pos.getCoordY()));
-            }
-
-            pathTrip.color(Color.parseColor(tripToDisplay.getColor()));
-            mGoogleMap.addPolyline(pathTrip);
-
-            double latitude = tripToDisplay.getListPositions().get(0).getCoordX();
-            double longitude = tripToDisplay.getListPositions().get(0).getCoordY();
-            zoomInMap(new LatLng(latitude, longitude), 7);
-        }
-
+    private void displaySwipedTrip(Trip tripToDisplay) {
+        this.displayTrip(tripToDisplay);
+        double latitude = tripToDisplay.getListPositions().get(0).getCoordX();
+        double longitude = tripToDisplay.getListPositions().get(0).getCoordY();
+        zoomInMap(new LatLng(latitude, longitude), 8);
     }
+
 
     /**
      * Method that displays the waypoints related to a specific displayed trip
@@ -1069,24 +1041,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     }
 
 
-    /**
-     * * Get the last position of the user retrieve from the database
-     *
-     * @param dataSnapshot data from the firebase db
-     * @param idUser       idUser related to the data changed
-     */
-    private LatLng getLastPositionFromDB(DataSnapshot dataSnapshot, String idUser) {
-        if (!idUser.equals(mUserController.getConnectedUserId())) {
-            Position position = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
-            if (position != null)
-                return new LatLng(position.getCoordX(), position.getCoordY());
-            else {
-                return new LatLng(0.0, 0.0);
-            }
-        } else {
-            return new LatLng(0.0, 0.0);
-        }
-    }
 }
 
 
