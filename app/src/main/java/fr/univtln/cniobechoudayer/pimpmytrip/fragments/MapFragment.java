@@ -373,11 +373,12 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Position newPosition = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
-                    Log.d("pos retrieved", newPosition.toString());
-                    if(isUserRecording){
-                        displayRecordingTrip(newPosition);
-                        Log.d("new pos","added to path");
+                    if (newPosition != null) {
+                        if (isUserRecording) {
+                            displayRecordingTrip(newPosition);
+                        }
                     }
+
 
                 }
 
@@ -428,28 +429,29 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     System.out.println("new connected User added: " + dataSnapshot.getKey());
                     String idUser = dataSnapshot.getKey();
-                    //if (!idUser.equals(mUserController.getConnectedUserId())) {
+                    if (!idUser.equals(mUserController.getConnectedUserId())) {
                     Position position = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
                     //LatLng latLng = getLastPositionFromDB(dataSnapshot, idUser);
                     LatLng latLng = new LatLng(position.getCoordX(), position.getCoordY());
-                    MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(idUser).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).visible(false);
+                    MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(idUser).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).visible(true);
                     Marker marker = mGoogleMap.addMarker(markerOptions);
-                    displayUserOnMap(latLng, idUser);
+                    //displayUserOnMap(latLng, idUser);
                     mConnectedUsersMarkersHashMap.put(idUser, marker);
-                    //}
+                    }
                 }
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                     System.out.println("onchild changed of user: " + dataSnapshot.getKey());
                     String idUser = dataSnapshot.getKey();
-                    //if (!idUser.equals(mUserController.getConnectedUserId())) {
-                    Position position = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
-                    if(position != null){
-                        //LatLng latLng = getLastPositionFromDB(dataSnapshot, idUser);
-                        LatLng latLng = new LatLng(position.getCoordX(), position.getCoordY());
-                        Marker marker = mConnectedUsersMarkersHashMap.get(idUser);
-                        marker.setPosition(latLng);
+                    if (!idUser.equals(mUserController.getConnectedUserId())) {
+                        Position position = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
+                        if (position != null) {
+                            //LatLng latLng = getLastPositionFromDB(dataSnapshot, idUser);
+                            LatLng latLng = new LatLng(position.getCoordX(), position.getCoordY());
+                            Marker marker = mConnectedUsersMarkersHashMap.get(idUser);
+                            marker.setPosition(latLng);
+                        }
                     }
                 }
 
@@ -483,12 +485,11 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     public void onStart() {
         super.onStart();
 
-        //TODO REFACTOR IN a classe mere fragment
         if (mListenerDbMyTrips != null)
             fDbMyTrips.addValueEventListener(mListenerDbMyTrips);
         if (mListenerDbTrips != null)
             fDbTrips.addValueEventListener(mListenerDbTrips);
-        if(mListenerConnectedUsers != null)
+        if (mListenerConnectedUsers != null)
             dDatabaseUsersConnectedReference.addValueEventListener(mListenerConnectedUsers);
 
     }
@@ -764,7 +765,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     }
 
 
-
     /**
      * Method that loads and display the current referenced trip
      */
@@ -786,18 +786,19 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
     /**
      * Method that display the current recorded trip in live
+     *
      * @param pos
      */
-    private void displayRecordingTrip(Position pos){
+    private void displayRecordingTrip(Position pos) {
         Toast.makeText(getContext(), "mListPositionsCurrentRecordedTrip" + mListPositionsCurrentRecordedTrip.size(), Toast.LENGTH_SHORT).show();
-        if(mCurrentDrawingPathOptions == null){
+        if (mCurrentDrawingPathOptions == null) {
             mCurrentDrawingPathOptions = new PolylineOptions();
             mCurrentDrawingPathOptions.color(getActivity().getResources().getColor(R.color.colorPrimaryDark));
         }
-        if(mListPositionsCurrentRecordedTrip.size() == 0){
+        if (mListPositionsCurrentRecordedTrip.size() == 0) {
             Toast.makeText(getContext(), "mCurrentDrawingPathOptions linked to map " + pos.toString(), Toast.LENGTH_SHORT).show();
             mCurrentPath = mGoogleMap.addPolyline(mCurrentDrawingPathOptions);
-        }else{
+        } else {
             mCurrentPath.remove();
         }
         mListPositionsCurrentRecordedTrip.add(pos);
@@ -946,7 +947,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     /**
      * Method that initializes location manager
      */
-
     private void initializeLocationManager() {
 
         if (locationManager == null) {
@@ -958,6 +958,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
     /**
      * Method to display user on map
+     *
      * @param location
      * @param idUser
      */
@@ -968,31 +969,35 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         Log.d("user found", userRetrieved.toString());
         mFactory = new IconGenerator(this.mContext);
         mFactory.setColor(getResources().getColor(R.color.colorPrimaryDark));
-            icon = Bitmap.createScaledBitmap(new CircleTransform().transform(userRetrieved.convertedPhoto()), 100, 100, false);
-            //icon = Bitmap.createScaledBitmap(new CircleTransform().transform(Utils.convertPicture(userRetrieved.getPhoto())), 200, 200, false);
+        icon = Bitmap.createScaledBitmap(new CircleTransform().transform(userRetrieved.convertedPhoto()), 100, 100, false);
+        //icon = Bitmap.createScaledBitmap(new CircleTransform().transform(Utils.convertPicture(userRetrieved.getPhoto())), 200, 200, false);
 
-            mGoogleMap.addMarker(
-                    new MarkerOptions()
-                            .position(location)
-                            .title(userRetrieved.getPseudo())//TODO get user
-                            .icon(BitmapDescriptorFactory.fromBitmap(icon)) //TODO get picture user
-            );
+        mGoogleMap.addMarker(
+                new MarkerOptions()
+                        .position(location)
+                        .title(userRetrieved.getPseudo())//TODO get user
+                        .icon(BitmapDescriptorFactory.fromBitmap(icon)) //TODO get picture user
+        );
     }
 
-    private User findUserInList(String userID){
+    private User findUserInList(String userID) {
         Iterator it = mUserController.getmMapUsers().entrySet().iterator();
         User user = new User();
         //Toast.makeText(getContext(), userID, Toast.LENGTH_SHORT).show();
         Toast.makeText(getContext(), String.valueOf(mUserController.getmMapUsers().size()), Toast.LENGTH_SHORT).show();
-        if(mUserController.getmMapUsers().size() > 0){
-            for(Map.Entry<String, User> userFound : mUserController.getmMapUsers().entrySet()) {
+        if (mUserController.getmMapUsers().size() > 0) {
+            for (Map.Entry<String, User> userFound : mUserController.getmMapUsers().entrySet()) {
                 String key = userFound.getKey();
-                user = userFound.getValue();
-                if(userID.equals(userFound.getKey()))
+                System.out.println("userID passed in args: " + userID);
+                System.out.println("findUserInList: " + key);
+                if (userID.equals(key)) {
+                    user = userFound.getValue();
+                    System.out.println("OK TEST");
                     Toast.makeText(getContext(), String.valueOf(user.getPseudo()), Toast.LENGTH_SHORT).show();
+                }
             }
-        }else{
-            user = new User("DEFAULT","default@gmail.com");
+        } else {
+            user = new User("DEFAULT", "default@gmail.com");
         }
 
         return user;
@@ -1018,79 +1023,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
     }
 
-    /**
-     * Get the lastknow location of the user
-     *
-     * @return
-     */
-    private void getCurrentLocation() {
-
-        /*mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        Criteria criteria = new Criteria();
-
-        // For showing a move to my location button
-        // Checking if user's location is accessible
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            //Requesting location permission
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-            return null;
-        }
-        return mLocationManager.getLastKnownLocation(mLocationManager.getBestProvider(criteria, false));*/
-
-        boolean isGPSEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        boolean isNetworkEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-        Location location = null;
-        if (!(isGPSEnabled || isNetworkEnabled))
-            Snackbar.make(mMapView, "error location provider", Snackbar.LENGTH_INDEFINITE).show();
-        else {
-            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                //TODO
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            if (isNetworkEnabled) {
-                mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                        LOCATION_UPDATE_MIN_TIME, LOCATION_UPDATE_MIN_DISTANCE, mLocationListener);
-                location = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            }
-
-            if (isGPSEnabled) {
-                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                        LOCATION_UPDATE_MIN_TIME, LOCATION_UPDATE_MIN_DISTANCE, mLocationListener);
-                location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            }
-        }
-        if (location != null) {
-            System.out.println(location);
-            drawMarker(location, "current position");
-        }
-    }
-
-    /**
-     * Draw a marker on the google map
-     *
-     * @param location location where to draw
-     */
-    private void drawMarker(Location location, String title) {
-        if (mGoogleMap != null) {
-            mGoogleMap.clear();
-            LatLng gps = new LatLng(location.getLatitude(), location.getLongitude());
-            mGoogleMap.addMarker(new MarkerOptions()
-                    .position(gps)
-                    .title(title));
-            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(gps, 12));
-        }
-
-    }
 
     /**
      * Method to ask user to give the app rights to access the location
