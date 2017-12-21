@@ -49,6 +49,7 @@
     <string name="forgot_password_msg">We just need your registered Email to sent you password reset instructions.</string>
     <string name="hint_confirmPassword">Confirm password</string>
     <string name="prompt_password">Current password</string>
+    <string name="google_api_error">Google sign in failed</string>
 
 
     <!-- DIALOGS -->

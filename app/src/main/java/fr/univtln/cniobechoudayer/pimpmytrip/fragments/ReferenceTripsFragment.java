@@ -9,7 +9,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -87,6 +86,7 @@ public class ReferenceTripsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mFragmentManager = getActivity().getSupportFragmentManager();
         setHasOptionsMenu(true);
+
     }
 
 
@@ -106,9 +106,9 @@ public class ReferenceTripsFragment extends Fragment {
         touchHelper.attachToRecyclerView(mRecyclerView);*/
 
         mListenerDbReferenceTrips = new ValueEventListener() {
+
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
                 mModelList.clear();
                 for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
                     for (DataSnapshot snapshot : tripSnapshot.getChildren()) {
@@ -132,21 +132,9 @@ public class ReferenceTripsFragment extends Fragment {
         mAdapter.SetOnItemClickListener(new RecyclerViewAdapterReferenceTrip.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position, Trip model) {
-
-                //handle item click events here
-                Toast.makeText(getActivity(), "Hey " + model.getName(), Toast.LENGTH_SHORT).show();
-
             }
         });
 
-        mAdapter.SetOnHeaderClickListener(new RecyclerViewAdapterReferenceTrip.OnHeaderClickListener() {
-            @Override
-            public void onHeaderClick(View view, String headerTitle) {
-                //handle item click events here
-                Toast.makeText(getActivity(), "REFERENCES TRIPS", Toast.LENGTH_SHORT).show();
-
-            }
-        });
 
         /**
          * Setting up fragment title
@@ -169,7 +157,6 @@ public class ReferenceTripsFragment extends Fragment {
 
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(getActivity().SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-        //changing edittext color
         EditText searchEdit = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
         searchEdit.setTextColor(Color.WHITE);
         searchEdit.setHintTextColor(Color.WHITE);

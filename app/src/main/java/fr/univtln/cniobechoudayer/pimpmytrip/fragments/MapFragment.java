@@ -204,11 +204,9 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
             @Override
             public void handleMessage(Message msg) {
                 Bundle reply = msg.getData();
-                Log.d("mListPositions service", String.valueOf(reply.get("listPositionsTrip")));
                 if (reply.get("listPositionsTrip") != null) {
                     //mListPositions.add((Position) reply.getParcelable("current_position"));
                     mListPositions = reply.getParcelableArrayList("listPositionsTrip");
-                    Log.d("listPos recorded size", String.valueOf(mListPositions.size()));
                     if (isUserSaving) {
                         Toast.makeText(getContext(), "Your trip has been saved successfully ! " + mListPositions.size() + " positions !", Toast.LENGTH_LONG).show();
                         fTripController.insertTrip(false, mListPositions, mListWaypoints, mCurrentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
@@ -216,7 +214,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                     }
                 } else {
                     mListPositions = new ArrayList<>();
-                    Log.d("mListPositions", "null");
                 }
             }
         };
@@ -326,8 +323,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
-                        Trip currentTrip = (Trip) tripSnapshot.getValue(Trip.class);
-                        Log.d("New trip retrieved", String.valueOf(currentTrip.getName()));
+                        Trip currentTrip = tripSnapshot.getValue(Trip.class);
                         if (currentTrip.isReference()) {
                             mListReferenceTrip.add(currentTrip);
                         }
@@ -354,7 +350,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                         Trip currentTrip = tripSnapshot.getValue(Trip.class);
                         mListMyTrips.add(currentTrip);
                     }
-                    Log.d("mListMyTrips", "updated");
                     loadMyTrips();
                 }
 
@@ -423,7 +418,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                     String idUser = dataSnapshot.getKey();
                     if (!idUser.equals(mUserController.getConnectedUserId())) {
                         Position position = dataSnapshot.child("lastKnownLocation").getValue(Position.class);
-                        if(position !=null){
+                        if (position != null) {
                             LatLng latLng = new LatLng(position.getCoordX(), position.getCoordY());
                             MarkerOptions markerOptions = new MarkerOptions().position(latLng).title(idUser).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).visible(true);
                             Marker marker = mGoogleMap.addMarker(markerOptions);
@@ -451,7 +446,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
                     String idUser = dataSnapshot.getKey();
                     //mConnectedUsersMarkersHashMap.get(idUser).remove();
-                    if(mConnectedUsersMarkersHashMap.get(idUser) != null){
+                    if (mConnectedUsersMarkersHashMap.get(idUser) != null) {
                         mConnectedUsersMarkersHashMap.get(idUser).remove();
                     }
 
@@ -592,7 +587,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                                 .title(waypoint.getLabel())
                                 .icon(iconForMarker));
 
-                        Log.d("mListWaypoints size", String.valueOf(mListWaypoints.size()));
+
                     }
 
                 })
@@ -653,10 +648,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
                         mButtonRecordTrip.setImageResource(R.drawable.ic_play_arrow_white_48dp);
                         isUserRecording = false;
                         if (mListPositions != null) {
-                            Log.d("add trip ?", "reached");
                             isUserSaving = true;
-                        } else {
-                            Log.d("can't save cause", "listPos is null");
                         }
                         fTripController.insertTrip(false, mListPositionsCurrentRecordedTrip, mListWaypoints, mCurrentChosenColor, mTitleEditText.getText().toString(), computeTotalTripDistance(mListPositions), mUserController.getConnectedUserId());
                         mListPositionsCurrentRecordedTrip.clear();
@@ -751,8 +743,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
             }
 
         }
-
-        Log.d("distance computed : ", String.valueOf(distance));
 
         return (int) distance;
 
@@ -935,7 +925,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
 
 
     /**
-     * Method to display user on map
+     * Method to display photo and pseudo of the user on map
      *
      * @param location
      * @param idUser
@@ -943,8 +933,6 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     private void displayUserOnMap(LatLng location, String idUser) {
         Bitmap icon = null;
         User userRetrieved = findUserInList(idUser);
-        //Toast.makeText(getContext(), userRetrieved.toString(), Toast.LENGTH_SHORT).show();
-        Log.d("user found", userRetrieved.toString());
         mFactory = new IconGenerator(this.mContext);
         mFactory.setColor(getResources().getColor(R.color.colorPrimaryDark));
         icon = Bitmap.createScaledBitmap(new CircleTransform().transform(userRetrieved.convertedPhoto()), 100, 100, false);
@@ -953,8 +941,8 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
         mGoogleMap.addMarker(
                 new MarkerOptions()
                         .position(location)
-                        .title(userRetrieved.getPseudo())//TODO get user
-                        .icon(BitmapDescriptorFactory.fromBitmap(icon)) //TODO get picture user
+                        .title(userRetrieved.getPseudo())
+                        .icon(BitmapDescriptorFactory.fromBitmap(icon))
         );
     }
 

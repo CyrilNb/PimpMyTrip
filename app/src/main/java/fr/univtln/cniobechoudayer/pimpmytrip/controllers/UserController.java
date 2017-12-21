@@ -61,10 +61,7 @@ public class UserController {
         if (fCurrentUser != null) {
             mCurrentUserId = fFirebaseAuth.getCurrentUser().getUid();
             mDbUser = mDatabase.child("users").child(mCurrentUserId);
-            Log.d("mDbUser", mDbUser.getKey());
             mDatabaseUsersConnectedReference = mDatabase.child("connectedUsers").child(mCurrentUserId);
-        }else{
-            Log.d("user connected", "null");
         }
 
         fListenerUsers = new ValueEventListener() {
@@ -73,7 +70,6 @@ public class UserController {
                 for(DataSnapshot userSnapshot : dataSnapshot.getChildren()){
                     User user = userSnapshot.getValue(User.class);
                     mMapUsers.put(userSnapshot.getKey(), user);
-                    Log.d("LISTENING","all users");
                 }
             }
 
@@ -90,7 +86,6 @@ public class UserController {
         fListenerUser = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                //TODO JOINTURE
                 mConnectedUser = dataSnapshot.getValue(User.class);
             }
 
@@ -100,7 +95,6 @@ public class UserController {
             }
         };
         if(mDbUser != null){
-            Log.d("mDbUser","not null");
             mDbUser.addValueEventListener(fListenerUser);
         }
         if(mDbAllUsers != null)
@@ -185,12 +179,10 @@ public class UserController {
      * @param photo new photo
      */
     public void updatePhotoUser(Bitmap photo) {
-        Log.d("updating photo user", "reached");
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         photo.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-        Log.d("encoded photo", encoded);
         mDatabase.child("users").child(mCurrentUserId).child("photo").setValue(encoded);
     }
 

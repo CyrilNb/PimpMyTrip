@@ -1,6 +1,5 @@
 package fr.univtln.cniobechoudayer.pimpmytrip.controllers;
 
-import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -19,8 +18,6 @@ import fr.univtln.cniobechoudayer.pimpmytrip.entities.Trip;
 
 public class StatisticsController {
 
-    private static FirebaseAuth sFirebaseAuth;
-    private static DatabaseReference sDatabase;
     private static StatisticsController sInstance;
     private static ValueEventListener sListenerDbStats;
     private static Statistics sUserStats;
@@ -30,11 +27,6 @@ public class StatisticsController {
 
     public StatisticsController() {
 
-        /**
-         * Getting useful singletons
-         */
-        sFirebaseAuth = FirebaseAuth.getInstance();
-        sDatabase = FirebaseDatabase.getInstance().getReference("PimpMyTripDatabase");
 
         /**
          * Setting up sDatabase listeners
@@ -42,10 +34,8 @@ public class StatisticsController {
         sListenerDbStats = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                    sUserStats = dataSnapshot.getValue(Statistics.class);
-                    if(sUserStats != null){
-                        Log.d("sUserStats", "retrieved : " + sUserStats.toString());
-                    }
+                sUserStats = dataSnapshot.getValue(Statistics.class);
+
             }
 
             @Override
@@ -58,10 +48,11 @@ public class StatisticsController {
 
     /**
      * Singleton pattern
+     *
      * @return
      */
-    public static StatisticsController getInstance(){
-        if(sInstance == null){
+    public static StatisticsController getInstance() {
+        if (sInstance == null) {
             sInstance = new StatisticsController();
         }
         return sInstance;
@@ -69,21 +60,21 @@ public class StatisticsController {
 
     /**
      * Method that update statistics of user when creating a new trip
+     *
      * @param savedTrip
      * @param isUserWalking
      */
-    public static void updateStats(Trip savedTrip, boolean isUserWalking){
+    public static void updateStats(Trip savedTrip, boolean isUserWalking) {
 
-        if(sUserStats != null){
-            Log.d("sUserStats", "exists");
+        if (sUserStats != null) {
             sUserStats.setNbMyTripsTravelled(sUserStats.getNbMyTripsTravelled() + 1);
             sUserStats.setNbTripsCreated(sUserStats.getNbTripsCreated() + 1);
 
-            if(isUserWalking){
+            if (isUserWalking) {
                 sUserStats.setNbTripsSUVCreated(sUserStats.getNbTripsSUVCreated() + 1);
                 sUserStats.setTotalTimeDrove(sUserStats.getTotalTimeDrove() + 1);
                 sUserStats.setTotalDistanceBySUV(sUserStats.getTotalDistanceBySUV() + savedTrip.getDistance());
-            }else{
+            } else {
                 sUserStats.setNbTripsWalkingCreated(sUserStats.getNbTripsWalkingCreated() + 1);
                 sUserStats.setTotalTimeWalked(sUserStats.getTotalTimeWalked() + savedTrip.getDistance());
                 sUserStats.setTotalDistanceByWalk(sUserStats.getTotalDistanceByWalk() + savedTrip.getDistance());
@@ -93,8 +84,7 @@ public class StatisticsController {
             sUserStats.setTotalTimeTravelled(sUserStats.getTotalTimeTravelled() + savedTrip.getDistance());
 
             sDbUserStats.setValue(sUserStats);
-        }else{
-            Log.d("sUserStats", "null");
+        } else {
             sDbStats.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(new Statistics());
         }
 
@@ -102,9 +92,10 @@ public class StatisticsController {
 
     /**
      * Getter for user stats
+     *
      * @return
      */
-    public Statistics getUserStats(){
+    public Statistics getUserStats() {
         return sUserStats;
     }
 

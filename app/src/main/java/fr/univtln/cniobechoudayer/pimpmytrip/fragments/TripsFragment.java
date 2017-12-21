@@ -55,6 +55,7 @@ public class TripsFragment extends Fragment {
 
     /**
      * Get singleton instance
+     *
      * @return
      */
     public static TripsFragment getInstance() {
@@ -76,7 +77,7 @@ public class TripsFragment extends Fragment {
         mTripsList = new ArrayList<>();
         View rootView = inflater.inflate(R.layout.fragment_trips, container, false);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerViewTrips);
-        mAdapterTrip = new RecyclerAdapterTrip(mTripsList,getActivity(), mFragmentManager);
+        mAdapterTrip = new RecyclerAdapterTrip(mTripsList, getActivity(), mFragmentManager);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());

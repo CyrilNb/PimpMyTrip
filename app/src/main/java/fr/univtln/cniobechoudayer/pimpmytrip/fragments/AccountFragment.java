@@ -298,14 +298,14 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         String langFormatted;
-                        switch(choiceLanguage.getSelectedItem().toString()){
+                        switch (choiceLanguage.getSelectedItem().toString()) {
                             case "French":
                                 langFormatted = "fr";
                                 break;
                             case "English":
                                 langFormatted = "en";
                                 break;
-                            default :
+                            default:
                                 langFormatted = "en";
                         }
                         Locale myLocale = new Locale(langFormatted);
@@ -315,7 +315,7 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
                         getContext().getResources().updateConfiguration(config, getContext().getResources().getDisplayMetrics());
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
                         SharedPreferences.Editor editor = prefs.edit();
-                        editor.putString("language", langFormatted);
+                        editor.putString("l", langFormatted);
                         editor.commit();
                         /**
                          * Restarting the app
@@ -337,7 +337,7 @@ public class AccountFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        switch(v.getId()){
+        switch (v.getId()) {
             case R.id.change_password_button:
                 mOldEmail.setVisibility(View.GONE);
                 mNewEmail.setVisibility(View.GONE);

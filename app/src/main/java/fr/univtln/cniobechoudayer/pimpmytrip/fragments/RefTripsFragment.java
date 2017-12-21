@@ -95,19 +95,16 @@ public class RefTripsFragment extends Fragment {
                 //This method is called once with the initial value and again whenever data at this location is updated
                 for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
                     Trip currentTrip = tripSnapshot.getValue(Trip.class);
-                    Log.d("listreftrips", String.valueOf(currentTrip.getName()));
                     if (currentTrip.isReference()) {
                         mRefTripsList.add(currentTrip);
                     }
                 }
-                Log.d("listreftrips", String.valueOf(mRefTripsList.size()));
                 mRecyclerAdapterRefTrip.notifyDataSetChanged();
 
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                //Failed to read value
                 Log.d(TAG, "Failed to read value of a trip in RefTripsFargment", databaseError.toException());
             }
         });
