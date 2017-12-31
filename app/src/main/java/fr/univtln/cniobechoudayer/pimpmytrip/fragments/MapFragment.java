@@ -784,7 +784,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     /**
      * Method that display the passed trip in google maps
      *
-     * @param tripToDisplay
+     * @param tripToDisplay trip to display
      */
     private void displayTrip(Trip tripToDisplay) {
         List<Position> positionList = tripToDisplay.getListPositions();
@@ -846,7 +846,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     /**
      * Method that display the passed trip in google maps
      *
-     * @param tripToDisplay
+     * @param tripToDisplay swiped trip to display
      */
     private void displaySwipedTrip(Trip tripToDisplay) {
         this.displayTrip(tripToDisplay);
@@ -859,7 +859,7 @@ public class MapFragment extends Fragment implements View.OnClickListener, Locat
     /**
      * Method that displays the waypoints related to a specific displayed trip
      *
-     * @param tripToLoadWaypoints
+     * @param tripToLoadWaypoints trip to loadwaypoints
      */
     private void displayWaypoints(Trip tripToLoadWaypoints) {
         if (tripToLoadWaypoints.getListWaypoints() != null) {
