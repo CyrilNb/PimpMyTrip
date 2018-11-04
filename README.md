@@ -20,6 +20,10 @@ Warning: as this project is currently under development, you might check the mos
 
 ![45347984_195590228022065_367330183251755008_n](https://user-images.githubusercontent.com/15064826/47965079-8b0abc00-e042-11e8-95ea-eb4307f336dd.jpg)
 
+# APK
+You can download the APK [here](../develop/app-debug.apk) to try it out by yourself!
+
+
 # Report
 If you are interested, for further details you can find your university report [here](https://github.com/CyrilNb/Lootr/files/2545864/PimpMyTrip.presentation.pdf)
 
