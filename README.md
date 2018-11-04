@@ -1,7 +1,6 @@
 # PimpMyTrip
 
-PimpMyTrip is a native Android application for travelers, walkers and nature lover. It's an offroad assistant to plan and manage your trips with realtime location update.
-
+[University Project] PimpMyTrip is a native Android application for travelers, walkers and nature lover. It's an offroad assistant to plan and manage your trips with realtime location update.
 
 # Stack
 
